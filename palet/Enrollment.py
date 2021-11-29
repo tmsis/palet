@@ -1,5 +1,13 @@
+from pyspark.sql import SparkSession
+
+
 class Enrollment():
 
+  #-----------------------------------------------------------------------
+  # Initialize the Enrollment API
+  #-----------------------------------------------------------------------
+  def __init__(self):
+    print('Initializing Enrollment API')
 
   # ---------------------------------------------------------------------------------
   #
@@ -11,6 +19,29 @@ class Enrollment():
     print('mc_plans')
  
 
+
+  def countOf(cols: str):
+    spark = SparkSession.getActiveSession()
+    r = f"""
+          select
+          t.SUBMTG_STATE_CD
+          ,count(distinct t.msis_ident_num) as m
+        from
+          taf.taf_mon_bsf as t
+        inner join
+          taf.tmp_max_da_run_id r
+            on r.DA_RUN_ID = t.da_run_id
+            and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
+        where
+          t.da_run_id = '1875'
+        group by
+          t.SUBMTG_STATE_CD
+        order by
+          t.SUBMTG_STATE_CD
+    """
+    
+    
+    
   # ---------------------------------------------------------------------------------
   #
   #
