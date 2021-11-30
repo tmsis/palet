@@ -1,7 +1,12 @@
 from pyspark.sql import SparkSession
 
 
+
 class Enrollment():
+
+  by = {}
+  by_group = []
+  filter = {}
 
   #-----------------------------------------------------------------------
   # Initialize the Enrollment API
@@ -19,29 +24,53 @@ class Enrollment():
     print('mc_plans')
  
 
+  def byEthnicity(self):
+    # print('by ethnicity...')
+    self.by_group.append('ethnicity')
+    return self
 
-  def countOf(cols: str):
+  def byState(self):
+    # print('by state...')
+    self.by_group.append('state')
+    return self
+
+  def fetch(self):
     spark = SparkSession.getActiveSession()
-    r = f"""
-          select
-          t.SUBMTG_STATE_CD
-          ,count(distinct t.msis_ident_num) as m
-        from
-          taf.taf_mon_bsf as t
-        inner join
-          taf.tmp_max_da_run_id r
-            on r.DA_RUN_ID = t.da_run_id
-            and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
-        where
-          t.da_run_id = '1875'
-        group by
-          t.SUBMTG_STATE_CD
-        order by
-          t.SUBMTG_STATE_CD
-    """
-    
-    
-    
+    # r = f"""
+    #       select
+    #       t.SUBMTG_STATE_CD
+    #       ,count(distinct t.msis_ident_num) as m
+    #     from
+    #       taf.taf_mon_bsf as t
+    #     inner join
+    #       taf.tmp_max_da_run_id r
+    #         on r.DA_RUN_ID = t.da_run_id
+    #         and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
+    #     where
+    #       t.da_run_id = '1875' #Need to get latest run id
+    #     group by
+    #       {','.join(self.by_group)}
+    #     order by
+    #       {','.join(self.by_group)}
+    # """
+    sql = f"""
+            select
+                t.SUBMTG_STATE_CD
+                , count(distinct t.msis_ident_num) as num_enrolls
+            from
+                taf.taf_mon_bsf as t
+            inner join
+                taf.tmp_max_da_run_id r
+                on r.DA_RUN_ID = t.da_run_id
+                and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
+            where
+                t.da_run_id = '1875' --Need to figure out how to get latest runId
+            group by
+                {','.join(self.by_group)}
+            order by
+                {','.join(self.by_group)}
+        """
+    return sql
   # ---------------------------------------------------------------------------------
   #
   #
@@ -56,9 +85,9 @@ class Enrollment():
     'Social Security Verification Indicator': 'ssn_vrfctn_ind',
     'Medicare Beneficiary ID': 'mdcr_bene_id',
     'Beneficiary Health Insurance Claim Number': 'mdcr_hicn_num',
-    : 'reg_flag',
+    'TODO: Add attribute': 'reg_flag',
     'Encrypted TMSIS Case Number': 'msis_case_num',
-    : 'sngl_enrlmt_flag',
+    'TODO: Add attribute': 'sngl_enrlmt_flag',
 
 
     medicaid_enrollment_intervals : 
