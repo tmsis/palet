@@ -1120,3 +1120,4 @@
 .venv/Scripts/python.exe
 .venv/Scripts/pythonw.exe
 palet/__pycache__/Trend.cpython-39.pyc
+.vscode/settings.json

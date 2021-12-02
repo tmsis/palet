@@ -1,4 +1,19 @@
+from pyspark.sql import SparkSession
+
+
+
 class Enrollment():
+
+  by = {}
+  by_group = []
+  filter = {}
+
+  #-----------------------------------------------------------------------
+  # Initialize the Enrollment API
+  #-----------------------------------------------------------------------
+  def __init__(self):
+    print('Initializing Enrollment API')
+
   # ---------------------------------------------------------------------------------
   #
   #
@@ -24,6 +39,57 @@ class Enrollment():
   # -------------------------------------------------------------------------------------
   def chip_enrollment_intervals():
     print("Start date: " + self.start + " End date: " + self.end)
+  def mc_plans():
+    print('mc_plans')
+ 
+
+  def byEthnicity(self):
+    # print('by ethnicity...')
+    self.by_group.append('ethnicity')
+    return self
+
+  def byState(self):
+    # print('by state...')
+    self.by_group.append('state')
+    return self
+
+  def fetch(self):
+    spark = SparkSession.getActiveSession()
+    # r = f"""
+    #       select
+    #       t.SUBMTG_STATE_CD
+    #       ,count(distinct t.msis_ident_num) as m
+    #     from
+    #       taf.taf_mon_bsf as t
+    #     inner join
+    #       taf.tmp_max_da_run_id r
+    #         on r.DA_RUN_ID = t.da_run_id
+    #         and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
+    #     where
+    #       t.da_run_id = '1875' #Need to get latest run id
+    #     group by
+    #       {','.join(self.by_group)}
+    #     order by
+    #       {','.join(self.by_group)}
+    # """
+    sql = f"""
+            select
+                t.SUBMTG_STATE_CD
+                , count(distinct t.msis_ident_num) as num_enrolls
+            from
+                taf.taf_mon_bsf as t
+            inner join
+                taf.tmp_max_da_run_id r
+                on r.DA_RUN_ID = t.da_run_id
+                and r.SUBMTG_STATE_CD = t.SUBMTG_STATE_CD
+            where
+                t.da_run_id = '1875' --Need to figure out how to get latest runId
+            group by
+                {','.join(self.by_group)}
+            order by
+                {','.join(self.by_group)}
+        """
+    return sql
   # ---------------------------------------------------------------------------------
   #
   #
