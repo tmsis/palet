@@ -5,6 +5,7 @@ class Enrollment():
   by_group = []
   filter = {}
   where = []
+  mon_group = []
 
   #-----------------------------------------------------------------------
   # Initialize the Enrollment API
@@ -18,16 +19,16 @@ class Enrollment():
   #
   #
   # ---------------------------------------------------------------------------------
-  def __init__(self, start, end):
-    self.start = start
-    self.end = end
+  # def __init__(self, start, end):
+  #   self.start = start
+  #   self.end = end
   # ---------------------------------------------------------------------------------
   #
   #
   #
   #
   # ---------------------------------------------------------------------------------
-  def medicaid_enrollment_intervals():
+  def medicaid_enrollment_intervals(self):
     print("Start date: " + self.start + " End date: " + self.end)
   # ---------------------------------------------------------------------------------
   #
@@ -35,7 +36,7 @@ class Enrollment():
   #
   #
   # -------------------------------------------------------------------------------------
-  def chip_enrollment_intervals():
+  def chip_enrollment_intervals(self):
     print("Start date: " + self.start + " End date: " + self.end)
   def mc_plans():
     print('mc_plans')
@@ -44,23 +45,31 @@ class Enrollment():
   # TODO: Figure out the best way to accept dates in this API
   def byFileDate(self, fileDate=None):
     if fileDate != None:
-      self.filter.update({"BSF_FIL_DT": fileDate})
+      self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
       self.by_group.append("BSF_FIL_DT")
+      self.mon_group.append('mon.BSF_FIL_DT')
     return self
 
   # add any byEthnicity values
   def byEthnicity(self, ethnicity=None):
     if ethnicity != None:
-      self.filter.update({"race_ethncty_exp_flag": ethnicity})
+      self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
       self.by_group.append("race_ethncty_exp_flag")
+      self.mon_group.append("mon.race_ethncty_exp_flag")
     return self
 
   # add any byState values
   def byState(self, state_fips=None):
     if state_fips != None:
-      self.filter.update({"SUBMTG_STATE_CD": state_fips})
+      self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
       self.by_group.append("SUBMTG_STATE_CD")
+      self.mon_group.append('mon.SUBMTG_STATE_CD')
     return self
+
+  def getValueFromFilter(self, column: str):
+    value = self.filter.get(column)
+    return column + "= " + value
+
 
   def checkForMultiVarFilter(self, values: str):
     return values.split(" ")
@@ -86,34 +95,37 @@ class Enrollment():
     #spark = SparkSession.getActiveSession()
 
     sql = f"""select
-          {', '.join(self.by_group)}
+          {', '.join(self.mon_group)}
         , count(*) as m
         from
           taf.taf_mon_bsf as mon
         inner join
           (
-            select distinct
-              {', '.join(self.by_group)}
-              , max(DA_RUN_ID) as DA_RUN_ID
+            select 
+              distinct 
+                SUBMTG_STATE_CD
+               ,BSF_FIL_DT
+               ,max(DA_RUN_ID) as DA_RUN_ID
             from 
               taf.tmp_max_da_run_id
             where
               --BSF_FIL_DT >= 201601 and BSF_FIL_DT <= 201812
-              { self.defineWhereClause() }
+              { self.getValueFromFilter('SUBMTG_STATE_CD')}
             group by 
-              {', '.join(self.by_group)}
+              SUBMTG_STATE_CD
+              ,BSF_FIL_DT
             order by 
-              {', '.join(self.by_group)}
+              SUBMTG_STATE_CD
           ) as rid 
               on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
               and mon.BSF_FIL_DT = rid.BSF_FIL_DT
               and mon.DA_RUN_ID = rid.DA_RUN_ID
         group by
-            {', '.join(self.by_group)}
+            {', '.join(self.mon_group)}
         order by
-            {', '.join(self.by_group)}
+            {', '.join(self.mon_group)}
     """
-   
+    print(sql)
     return sql
 
   attributes = {
@@ -255,3 +267,11 @@ class Enrollment():
     # 'state': 'submtg_state_cd',
     'run_id' : 'tmsis_run_id'
   } 
+
+
+
+
+
+E = Enrollment()
+E.byState('37').byEthnicity('09')
+E.fetch() 
