@@ -41,14 +41,11 @@ class Enrollment():
   def mc_plans():
     print('mc_plans')
   
-  # add any fileDates here
-  # TODO: Figure out the best way to accept dates in this API
-  def byFileDate(self, fileDate=None):
-    if fileDate != None:
-      self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
-      self.by_group.append("BSF_FIL_DT")
-      self.mon_group.append('mon.BSF_FIL_DT')
-    return self
+  def byAgeRange(self, age_range=None):
+    if age_range != None:
+      self.filter.update({"age_num": age_range})
+      self.by_group.append("age_num")
+      self.mon_group.append('mon.age_num')
 
   # add any byEthnicity values
   def byEthnicity(self, ethnicity=None):
@@ -58,6 +55,21 @@ class Enrollment():
       self.mon_group.append("mon.race_ethncty_exp_flag")
     return self
 
+  # add any fileDates here
+  # TODO: Figure out the best way to accept dates in this API
+  def byFileDate(self, fileDate=None):
+    if fileDate != None:
+      self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
+      self.by_group.append("BSF_FIL_DT")
+      self.mon_group.append('mon.BSF_FIL_DT')
+    return self
+
+  def byGender(self, gender=None):
+    if gender != None:
+      self.filter.update({"gndr_cd": "'" + gender + "'"})
+      self.by_group.append("gndr_cd")
+      self.mon_group.append('mon.gndr_cd')
+
   # add any byState values
   def byState(self, state_fips=None):
     if state_fips != None:
@@ -65,12 +77,6 @@ class Enrollment():
       self.by_group.append("SUBMTG_STATE_CD")
       self.mon_group.append('mon.SUBMTG_STATE_CD')
     return self
-
-  def byAgeRange(self, age_range=None):
-    if age_range != None:
-      self.filter.update({"age_num": age_range})
-      self.by_group.append("age_num")
-      self.mon_group.append('mon.age_num')
 
   ## Helper functions ########
   ############################
@@ -284,7 +290,8 @@ class Enrollment():
 
 
 
-
+## testing here
 E = Enrollment()
-E.byState('37').byEthnicity('09').byAgeRange("9-13")
+E.byState('37').byEthnicity('01').byAgeRange("18-21")
+E.byGender("F")
 E.fetch() 
