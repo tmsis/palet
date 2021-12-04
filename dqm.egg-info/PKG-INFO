@@ -1,0 +1,15 @@
+Metadata-Version: 1.2
+Name: palet
+Version: 1.0.1
+Summary: A package to calculate data quality measures on T-MSIS data using Databricks
+Home-page: https://git-codecommit.us-east-2.amazonaws.com/v1/repos/DQ-Measures
+Author: Jesse Beaumont
+Author-email: jesse.beaumont@cms.hhs.gov
+License: UNKNOWN
+Project-URL: Documentation, https://tmsis2.atlassian.net/wiki/spaces/PAL/pages/2928345193/PALET+-+General+Wiki+Work+in+Progress
+Project-URL: Tracker, https://tmsis2.atlassian.net/jira/software/projects/PAL/boards/154/backlog
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.8.6 :: Only
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
