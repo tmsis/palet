@@ -12869,3 +12869,16 @@ palet.egg-info/SOURCES.txt
 palet.egg-info/top_level.txt
 dist/palet-1.0.1-py3-none-any.whl
 palet/__pycache__/Article.cpython-39.pyc
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/dependency_links.txt
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/entry_points.txt
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/installed-files.txt
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/not-zip-safe
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/PKG-INFO
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/requires.txt
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/SOURCES.txt
+.venv/Lib/site-packages/databricks_cli-0.16.2-py3.9.egg-info/top_level.txt
+.venv/Lib/site-packages/toml-0.10.2.dist-info/REQUESTED
+.venv/Scripts/databricks-script.py
+.venv/Scripts/dbfs-script.py
+.venv/Scripts/python_d.exe
+.venv/Scripts/pythonw_d.exe
