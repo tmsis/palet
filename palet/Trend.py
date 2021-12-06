@@ -13,7 +13,6 @@ class Trend:
     # --------------------------------------------------------------------
 
     def __init__(self):
-
         print('Initializing Trend API')
 
 

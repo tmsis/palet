@@ -52,4 +52,3 @@ print(Readmit().fetch())
 print(Readmit().byState().fetch())
 print(Readmit().byState().byEthnicity().fetch())
 print(Readmit().byEthnicity().byState().fetch())
-
