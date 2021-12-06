@@ -1,4 +1,5 @@
-import Article
+from Article import Article
+
 
 class Enrollment(Article):
 
@@ -7,7 +8,7 @@ class Enrollment(Article):
     #-----------------------------------------------------------------------
     def __init__(self): 
         print('Initializing Enrollment API')
-        super().__init__(self)
+        super().__init__()
         
 
     # ---------------------------------------------------------------------------------
@@ -186,9 +187,8 @@ class Enrollment(Article):
 # E.byGender('F')
 # E.fetch()
 
-# e = Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F')
-
-# df = e.fetch()
+Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').getSQL()
+# e.sql()
 
 
 # readmit = Readmit(e)
