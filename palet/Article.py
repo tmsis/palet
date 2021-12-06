@@ -1,4 +1,4 @@
-class Article():
+class Article:
 
   def __init__(self):
     self.by = {}
@@ -9,5 +9,5 @@ class Article():
     self.sql = ''
 
 
-  def sql(self):
-    print(self.sql)
+  def getSQL(self):
+    return self.sql
