@@ -9,17 +9,7 @@ class Enrollment(Article):
     def __init__(self): 
         print('Initializing Enrollment API')
         super().__init__()
-        
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # def __init__(self, start, end):
-    #   self.start = start
-    #   self.end = end
 
     # ---------------------------------------------------------------------------------
     #
@@ -30,6 +20,7 @@ class Enrollment(Article):
     def medicaid_enrollment_intervals(self):
         print("Start date: " + self.start + " End date: " + self.end)
 
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -39,6 +30,7 @@ class Enrollment(Article):
     def chip_enrollment_intervals(self):
         print("Start date: " + self.start + " End date: " + self.end)
 
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -47,71 +39,6 @@ class Enrollment(Article):
     # ---------------------------------------------------------------------------------
     def mc_plans():
         print('mc_plans')
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byAgeRange(self, age_range=None):
-        if age_range != None:
-            self.filter.update({"age_num": age_range})
-            self.by_group.append("age_num")
-            self.mon_group.append('mon.age_num')
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any byEthnicity values
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byEthnicity(self, ethnicity=None):
-        if ethnicity != None:
-            self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
-            self.by_group.append("race_ethncty_exp_flag")
-            self.mon_group.append("mon.race_ethncty_exp_flag")
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any fileDates here
-    # TODO: Figure out the best way to accept dates in this API
-    #
-    # ---------------------------------------------------------------------------------
-    def byFileDate(self, fileDate=None):
-        if fileDate != None:
-            self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
-            self.by_group.append("BSF_FIL_DT")
-            self.mon_group.append('mon.BSF_FIL_DT')
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byGender(self, gender=None):
-        if gender != None:
-            self.filter.update({"gndr_cd": "'" + gender + "'"})
-            self.by_group.append("gndr_cd")
-            self.mon_group.append('mon.gndr_cd')
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any byState values
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
-        if state_fips != None:
-            self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
-            self.by_group.append("SUBMTG_STATE_CD")
-            self.mon_group.append('mon.SUBMTG_STATE_CD')
-        return self
 
 
     # ---------------------------------------------------------------------------------
@@ -170,6 +97,7 @@ class Enrollment(Article):
     # ---------------------------------------------------------------------------------
     def fetch(self):
         from pyspark.sql import SparkSession
+
         spark = SparkSession.getActiveSession()
 
         return spark.sql(self.sql())
@@ -187,7 +115,9 @@ class Enrollment(Article):
 # E.byGender('F')
 # E.fetch()
 
-Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').getSQL()
+e_sql = Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').sql()
+
+print(e_sql)
 # e.sql()
 
 
