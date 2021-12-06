@@ -15,7 +15,7 @@ class Article:
   #
   # ---------------------------------------------------------------------------------
   def getValueFromFilter(self, column: str):
-      value = self.filter.get(column)
+      value = self.filter.get(column) ## TODO: what do we do here for required columns
       return column + " = " + value
 
 

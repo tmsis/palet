@@ -115,14 +115,13 @@ class Enrollment(Article):
 # E.byGender('F')
 # E.fetch()
 
-e_sql = Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').sql()
+# e_sql = Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').sql()
+# print(e_sql)
 
-print(e_sql)
+
+
+
 # e.sql()
-
-
 # readmit = Readmit(e)
-
-
 # readmit = Readmit().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F')
 

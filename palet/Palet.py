@@ -22,3 +22,11 @@ class Palet():
         @staticmethod
         def show(sql) :
             print(Palet.utils.compress(sql.replace('\n', '')))
+
+
+
+
+        @staticmethod
+        def createDateRange(year: str) :
+            range = year + "01-" + year + "12" 
+            return range
