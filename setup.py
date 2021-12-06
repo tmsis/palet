@@ -5,7 +5,7 @@ with open("CMS_README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="palet",
-    version="1.0.21",
+    version="1.0.1",
     author="Jesse Beaumont",
     author_email="jesse.beaumont@cms.hhs.gov",
     description="A package to calculate data quality measures on T-MSIS data using Databricks",
@@ -18,7 +18,7 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(),
     package_data={
-        "palet": ["cfg/*.pkl", "batch/*.pkl", "testing/*.pkl"],
+        "palet": ["cfg/*.pkl"],
     },
     project_urls={
         'Documentation': 'https://tmsis2.atlassian.net/wiki/spaces/PAL/pages/2928345193/PALET+-+General+Wiki+Work+in+Progress',
