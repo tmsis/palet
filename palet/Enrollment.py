@@ -1,5 +1,4 @@
-from Article import Article
-from Trend import Trend
+from palet.Article import Article
 
 class Enrollment(Article):
 
