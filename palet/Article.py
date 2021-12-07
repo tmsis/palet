@@ -7,6 +7,53 @@ class Article:
     self.where = []
     self.mon_group = []
 
+  # ---------------------------------------------------------------------------------
+  #
+  #
+  #
+  #
+  # ---------------------------------------------------------------------------------
+  def getByGroupWithAlias(self):
+
+    new_line_comma = '\n\t\t\t   ,'
+
+    if (len(self.mon_group)) > 0:
+      return f"{new_line_comma.join(self.mon_group)},"
+    else:
+      return ''
+
+
+  # ---------------------------------------------------------------------------------
+  #
+  #
+  #
+  #
+  # ---------------------------------------------------------------------------------
+  def createView_rid_x_month_x_state(self):
+    from pyspark.sql import SparkSession
+
+    # create or replace temporary view rid_x_month_x_state as
+    z = f"""
+        select distinct
+            SUBMTG_STATE_CD
+            ,BSF_FIL_DT
+            ,max(DA_RUN_ID) as DA_RUN_ID
+        from
+            taf.tmp_max_da_run_id
+        where
+            BSF_FIL_DT >= 201801 and 
+            BSF_FIL_DT <= 201812
+        group by
+            SUBMTG_STATE_CD
+            ,BSF_FIL_DT
+        order by
+            SUBMTG_STATE_CD
+            ,BSF_FIL_DT"""
+
+    # spark = SparkSession.getActiveSession()
+    # spark.sql(self.sql())
+    return z
+
 
   # ---------------------------------------------------------------------------------
   #
@@ -28,29 +75,33 @@ class Article:
   def defineWhereClause(self):
       clause = ""
       where = []
-      for key in self.filter:
 
-          # get the value(s) in case there are multiple
-          values = self.filter[key]
+      if len(self.filter) > 0:
+        for key in self.filter:
 
-          if str(values).find(" ") > -1: #Check for multiple values here, space separator is default
-              splitVals = self.checkForMultiVarFilter(values)
-              for value in splitVals:
-                  clause = ("mon." + key, value)
-                  where.append(' = '.join(clause))
+            # get the value(s) in case there are multiple
+            values = self.filter[key]
 
-          elif str(values).find("-") > -1: #Check for multiples with - separator
-              splitVals = self.checkForMultiVarFilter(values, "-")
-              range_stmt = "mon." + key + " between " + splitVals[0] + " and " + splitVals[1]
+            if str(values).find(" ") > -1: #Check for multiple values here, space separator is default
+                splitVals = self.checkForMultiVarFilter(values)
+                for value in splitVals:
+                    clause = ("mon." + key, value)
+                    where.append(' = '.join(clause))
 
-              where.append(range_stmt)
+            elif str(values).find("-") > -1: #Check for multiples with - separator
+                splitVals = self.checkForMultiVarFilter(values, "-")
+                range_stmt = "mon." + key + " between " + splitVals[0] + " and " + splitVals[1]
 
-          else: #else parse the single value
-              clause = ("mon." + key, self.filter[key])
-              where.append(' = '.join(clause))
+                where.append(range_stmt)
 
-      return " AND ".join(where)
+            else: #else parse the single value
+                clause = ("mon." + key, self.filter[key])
+                where.append(' = '.join(clause))
 
+        return f"where {' and '.join(where)}"
+
+      else:
+        return ''
 
   # ---------------------------------------------------------------------------------
   #
@@ -121,8 +172,25 @@ class Article:
   #
   # ---------------------------------------------------------------------------------
   def byState(self, state_fips=None):
+
+      self.by_group.append("SUBMTG_STATE_CD")
+      self.mon_group.append('mon.SUBMTG_STATE_CD')
+
       if state_fips != None:
           self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
-          self.by_group.append("SUBMTG_STATE_CD")
-          self.mon_group.append('mon.SUBMTG_STATE_CD')
+
       return self
+
+  # ---------------------------------------------------------------------------------
+  #
+  #
+  #
+  #
+  # ---------------------------------------------------------------------------------
+  def fetch(self):
+
+    from pyspark.sql import SparkSession
+
+    spark = SparkSession.getActiveSession()
+
+    return spark.sql(self.sql())
