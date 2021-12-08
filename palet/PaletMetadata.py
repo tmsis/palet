@@ -1,9 +1,14 @@
 
 class PaletMetadata:
 
+    class Trend:
+        properties = {
+            'age': mean
+        }
+
     class Enrollment():
 
-            attributes = {
+            properties = {
 
                 'mediciadId': 'msis_ident_num',
                 'ssn': 'ssn_num',

@@ -12868,4 +12868,6 @@ palet.egg-info/PKG-INFO
 palet.egg-info/SOURCES.txt
 palet.egg-info/top_level.txt
 dist/palet-1.0.1-py3-none-any.whl
-palet/__pycache__/*
+build/**
+palet/__pycache__/**
+README copy.md
