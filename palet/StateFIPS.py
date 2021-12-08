@@ -1,9 +1,8 @@
 
-import Article
 from typing import Any
 
 
-class State(Article) :
+class State() :
 
     # this is an overrideable function in Python that will loop through attributes
     # and allow you to create custom logic
