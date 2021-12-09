@@ -70,7 +70,3 @@ class StateHelper() :
         'VI': '78'
         }
 
-    @staticmethod
-    def displayValues(self): 
-        for state in __dict__[self.properties]:
-            print(state)
