@@ -2,7 +2,7 @@
 from typing import Any
 
 
-class State() :
+class StateHelper() :
 
     # this is an overrideable function in Python that will loop through attributes
     # and allow you to create custom logic
@@ -69,3 +69,8 @@ class State() :
         'PR': '72',
         'VI': '78'
         }
+
+    @staticmethod
+    def displayValues(self): 
+        for state in __dict__[self.properties]:
+            print(state)

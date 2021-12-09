@@ -24,12 +24,7 @@ class Article:
             return ''
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
+    ## Create a temporary table here to optimize our querying of the objects and data
     def createView_rid_x_month_x_state(self):
         from pyspark.sql import SparkSession
 
@@ -185,6 +180,21 @@ class Article:
             self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
 
         return self
+
+    ## This function is just returning the straight data from the table
+    ## TODO: If they are looking for analytics calculations we need more details
+    def byIncomeBracket(self, bracket=None):
+        self.by_group.append("INCM_CD")
+        #self.mon_group.append('mon.INCM_CD')
+
+        if bracket != None:
+            self.filter.update({"INCM_CD": "'" + bracket + "'"})
+        else:
+            self.filter.update({"INCM_CD": "null"})
+
+        return self
+
+
 
     # ---------------------------------------------------------------------------------
     #
