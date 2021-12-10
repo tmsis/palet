@@ -15,7 +15,7 @@ class Article:
     #   getByGroupWithAlias: This function allows our byGroup to be aliased properly 
     #       for the dynamic sql generation
     # ---------------------------------------------------------------------------------
-    def getByGroupWithAlias(self):
+    def _getByGroupWithAlias(self):
         
         new_line_comma = '\n\t\t\t   ,'
         
@@ -26,7 +26,7 @@ class Article:
 
 
     ## Create a temporary table here to optimize our querying of the objects and data
-    def createView_rid_x_month_x_state(self):
+    def _createView_rid_x_month_x_state(self):
         from pyspark.sql import SparkSession
 
         # create or replace temporary view rid_x_month_x_state as 
@@ -70,7 +70,7 @@ class Article:
     #
     #
     # ---------------------------------------------------------------------------------
-    def defineWhereClause(self):
+    def _defineWhereClause(self):
         clause = ""
         where = []
 
@@ -81,16 +81,16 @@ class Article:
                 values = self.filter[key]
 
                 if str(values).find(" ") > -1: #Check for multiple values here, space separator is default
-                    splitRange = self.checkForMultiVarFilter(values)
+                    splitRange = self._checkForMultiVarFilter(values)
                     for value in splitRange:
                         clause = ("mon." + key, value)
                         where.append(' ((= '.join(clause))
 
                 elif str(values).find(",") > -1: #Check for multiples with , separator
-                    splitVals = self.checkForMultiVarFilter(values, ",")
+                    splitVals = self._checkForMultiVarFilter(values, ",")
                     for values in splitVals:
                         if str(values).find("-") > -1: #check for age ranges here with the - separator
-                            splitRange = self.checkForMultiVarFilter(values, "-")
+                            splitRange = self._checkForMultiVarFilter(values, "-")
                             range_stmt = "mon." + key + " between " + splitRange[0] + " and " + splitRange[1]
                         elif str(values).find("+") > -1: ## check for greater than; i.e. x+ equals >= x
                             range_stmt = "mon." + key + " >= " + values.strip("+") ## take the x+ and strip out the +
@@ -111,7 +111,7 @@ class Article:
     #
     #
     # ---------------------------------------------------------------------------------
-    def checkForMultiVarFilter(self, values: str, separator=" "):
+    def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
 
@@ -127,7 +127,16 @@ class Article:
         if age_range != None:
             self.filter.update({"age_num": age_range})
             
-        return self
+        return self       
+
+    ## TODO: Do we want to have this function ONLY for multiple values or do we want to combine this functionality into a range?
+    def byAges(self, ages=None):
+        self.by_group.append("age_num")
+        self.mon_group.append('mon.age_num')
+        if ages != None:
+            self.filter.update({"age_num": ages})
+            
+        return self                        
 
     # ---------------------------------------------------------------------------------
     #
