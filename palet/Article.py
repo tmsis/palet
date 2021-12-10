@@ -1,3 +1,4 @@
+
 class Article:
 
     ## Initialize the common variables here.
@@ -24,16 +25,12 @@ class Article:
             return ''
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
+    ## Create a temporary table here to optimize our querying of the objects and data
     def createView_rid_x_month_x_state(self):
         from pyspark.sql import SparkSession
 
-        # create or replace temporary view rid_x_month_x_state as
+        # create or replace temporary view rid_x_month_x_state as 
+        ## TODO: remove the hard coded file data below (2018)
         z = f"""
             select distinct
                 SUBMTG_STATE_CD
@@ -84,16 +81,20 @@ class Article:
                 values = self.filter[key]
 
                 if str(values).find(" ") > -1: #Check for multiple values here, space separator is default
-                    splitVals = self.checkForMultiVarFilter(values)
-                    for value in splitVals:
+                    splitRange = self.checkForMultiVarFilter(values)
+                    for value in splitRange:
                         clause = ("mon." + key, value)
-                        where.append(' = '.join(clause))
+                        where.append(' ((= '.join(clause))
 
-                elif str(values).find("-") > -1: #Check for multiples with - separator
-                    splitVals = self.checkForMultiVarFilter(values, "-")
-                    range_stmt = "mon." + key + " between " + splitVals[0] + " and " + splitVals[1]
-
-                    where.append(range_stmt)
+                elif str(values).find(",") > -1: #Check for multiples with , separator
+                    splitVals = self.checkForMultiVarFilter(values, ",")
+                    for values in splitVals:
+                        if str(values).find("-") > -1: #check for age ranges here with the - separator
+                            splitRange = self.checkForMultiVarFilter(values, "-")
+                            range_stmt = "mon." + key + " between " + splitRange[0] + " and " + splitRange[1]
+                        elif str(values).find("+") > -1: ## check for greater than; i.e. x+ equals >= x
+                            range_stmt = "mon." + key + " >= " + values.strip("+") ## take the x+ and strip out the +
+                        where.append(range_stmt)
 
                 else: #else parse the single value
                     clause = ("mon." + key, self.filter[key])
@@ -185,6 +186,21 @@ class Article:
             self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
 
         return self
+
+    ## This function is just returning the straight data from the table
+    ## TODO: If they are looking for analytics calculations we need more details
+    def byIncomeBracket(self, bracket=None):
+        self.by_group.append("INCM_CD")
+        #self.mon_group.append('mon.INCM_CD')
+
+        if bracket != None:
+            self.filter.update({"INCM_CD": "'" + bracket + "'"})
+        else:
+            self.filter.update({"INCM_CD": "null"})
+
+        return self
+
+
 
     # ---------------------------------------------------------------------------------
     #

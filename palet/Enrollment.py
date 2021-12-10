@@ -47,12 +47,7 @@ class Enrollment(Article):
         print('mc_plans')
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
+    ## define the sql function here that has a class specific sql statement. i.e. Enrollment sql query being built
     def sql(self):
         
         rms = self.createView_rid_x_month_x_state()
