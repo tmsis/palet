@@ -1,112 +1,30 @@
-from palet.Article import Article
-
-class Enrollment(Article):
-
-    #-----------------------------------------------------------------------
-    # Initialize the Enrollment API
-    #-----------------------------------------------------------------------
-    def __init__(self, article:Article =None):
-        # print('Initializing Enrollment API')
-        super().__init__()
-
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
-            self.mon_group = article.mon_group
+from typing import Any
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def medicaid_enrollment_intervals(self):
-        print("Start date: " + self.start + " End date: " + self.end)
+class AgeGroupHelper() :
+
+    # this is an overrideable function in Python that will loop through attributes
+    # and allow you to create custom logic
+    # in this case __getatrr__ is only called when an attribute you try to call on the object doesn't exist
+    # you then can provide logic to do anything; in this case we look up the passed state/name 
+    # TODO: Currently this class must have an instance. A couple of ways we might do it:
+    #           * Add it in the library initialization so they have access to a State object like State = State()
+    #           * Is there a way we can do something in the super class or a loadtime?
+    def __getattr__(self, name: str) -> Any:
+            return str(self.properties[name])
+
+    properties = {
+        "Child": "0-18",
+        "YoungAdult": "19-44",
+        "Adult": "45-64",
+        "Senior": "65-84",
+        "Elderly": "84-120"
+
+    }
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def chip_enrollment_intervals(self):
-        print("Start date: " + self.start + " End date: " + self.end)
 
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def mc_plans():
-        print('mc_plans')
-
-
-    ## define the sql function here that has a class specific sql statement. i.e. Enrollment sql query being built
-    def sql(self):
-        
-        rms = self.createView_rid_x_month_x_state()
-
-        new_line_comma = '\n\t\t,'
-
-        z = f"""
-            select
-                {self.getByGroupWithAlias()}
-                2018 as YEAR
-                , count(*) as m
-
-            from
-                taf.taf_mon_bsf as mon
-
-            inner join
-                ({rms}) as rid    
-                    on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD    
-                    and mon.BSF_FIL_DT = rid.BSF_FIL_DT
-                    and mon.DA_RUN_ID = rid.DA_RUN_ID
-
-            {self.defineWhereClause()}
-                
-            group by
-                {self.getByGroupWithAlias()}
-                YEAR
-            order by
-                {self.getByGroupWithAlias()}
-                YEAR
-        """
-
-        return z
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-
-
-# print(Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').sql())
-
-
-# print(Enrollment().sql())
-# print(Enrollment().byState().sql())
-# print(Enrollment().byState('37').sql())
-# print(Enrollment().byState('37').byAgeRange('18-21').sql())
-
-# print('-----------------------------------------------------------------------')
-# trend = Trend().byState('37').byAgeRange('18-21')
-# print(trend.sql())
-# print('-----------------------------------------------------------------------')
-# enroll = Enrollment(trend)
-# print(enroll.sql())
-# print('-----------------------------------------------------------------------')
-
-
-    
 # CC0 1.0 Universal
 
 # Statement of Purpose

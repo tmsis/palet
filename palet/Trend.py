@@ -1,5 +1,6 @@
 from palet.Article import Article
 from datetime import date
+
 class Trend(Article):
 
     ## ----------------------------------------------
@@ -21,7 +22,7 @@ class Trend(Article):
     ## getMonthOverMonth function for trends of measures
     ## --------------------------------------------------
     def getMonthOverMonth(self, year=str(date.today().year)):
-        from Palet import Palet
+        from palet.Palet import Palet
         
         self.filter.update({"BSF_FIL_DT":  Palet.Utils.createDateRange(str(year)) })
         self.by_group.append("BSF_FIL_DT")
@@ -71,6 +72,8 @@ class Trend(Article):
             """
 
         return z
+
+# t = Trend()
 
 # print(Trend().sql())
 # print(Trend().byState('37').sql())
