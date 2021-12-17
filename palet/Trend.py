@@ -73,13 +73,6 @@ class Trend(Article):
 
         return z
 
-# t = Trend()
-
-# print(Trend().sql())
-# print(Trend().byState('37').sql())
-# print(Trend().byState('37').byAgeRange('18-21').sql())
-
-
     
 # CC0 1.0 Universal
 

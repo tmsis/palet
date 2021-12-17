@@ -50,13 +50,13 @@ class Enrollment(Article):
     ## define the sql function here that has a class specific sql statement. i.e. Enrollment sql query being built
     def sql(self):
         
-        rms = self.createView_rid_x_month_x_state()
+        rms = self._createView_rid_x_month_x_state()
 
         new_line_comma = '\n\t\t,'
 
         z = f"""
             select
-                {self.getByGroupWithAlias()}
+                {self._getByGroupWithAlias()}
                 2018 as YEAR
                 , count(*) as m
 
@@ -69,42 +69,17 @@ class Enrollment(Article):
                     and mon.BSF_FIL_DT = rid.BSF_FIL_DT
                     and mon.DA_RUN_ID = rid.DA_RUN_ID
 
-            {self.defineWhereClause()}
+            {self._defineWhereClause()}
                 
             group by
-                {self.getByGroupWithAlias()}
+                {self._getByGroupWithAlias()}
                 YEAR
             order by
-                {self.getByGroupWithAlias()}
+                {self._getByGroupWithAlias()}
                 YEAR
         """
 
         return z
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-
-
-# print(Enrollment().byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F').sql())
-
-
-# print(Enrollment().sql())
-# print(Enrollment().byState().sql())
-# print(Enrollment().byState('37').sql())
-# print(Enrollment().byState('37').byAgeRange('18-21').sql())
-
-# print('-----------------------------------------------------------------------')
-# trend = Trend().byState('37').byAgeRange('18-21')
-# print(trend.sql())
-# print('-----------------------------------------------------------------------')
-# enroll = Enrollment(trend)
-# print(enroll.sql())
-# print('-----------------------------------------------------------------------')
-
 
     
 # CC0 1.0 Universal

@@ -5,7 +5,7 @@
 from numpy import float64, int64
 
 
-class DQM_Metadata:
+class Metadata:
 
     # -------------------------------------------------------------------------------------------------
     #   Eligibility Tables

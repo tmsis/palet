@@ -1,7 +1,10 @@
+
 from typing import Any
 
+class State() :
 
-class AgeGroupHelper() :
+    stabbrev = ""
+    state = ""
 
     # this is an overrideable function in Python that will loop through attributes
     # and allow you to create custom logic
@@ -11,18 +14,29 @@ class AgeGroupHelper() :
     #           * Add it in the library initialization so they have access to a State object like State = State()
     #           * Is there a way we can do something in the super class or a loadtime?
     def __getattr__(self, name: str) -> Any:
-            return str(self.properties[name])
+            return str(self.__getFIPSCode(self, name))
 
-    properties = {
-        "Child": "0-18",
-        "YoungAdult": "19-44",
-        "Adult": "45-64",
-        "Senior": "65-84",
-        "Elderly": "84-120"
+    # TODO: Move this shared function to the super Metadata class and inherit
+    def __load_metadata_file(self, palet, fn):
+            import pandas as pd
+            import os
+            pdf = None
 
-    }
+            this_dir, this_filename = os.path.split(__file__)
+            pkl = os.path.join(this_dir + '/cfg/', fn + '.pkl')
 
+            # print('Reading file ' + fn)
+            pdf = pd.read_pickle(pkl)
 
+            return pdf
+
+    def __init__(self, stabbrev) -> None:
+        self.stabbrev = stabbrev
+        self.st_fips = self.__load_metadata_file(self, 'st_fips')
+        self.state = str(self.st_fips[self.st_fips['STABBREV'] == self.stabbrev].squeeze('rows').get('FIPS'))
+
+    def getInstanceProperties(self) :
+        print(self.__dict__)
 
 
 # CC0 1.0 Universal
@@ -141,3 +155,4 @@ class AgeGroupHelper() :
 
 # For more information, please see
 # <http://creativecommons.org/publicdomain/zero/1.0/>
+
