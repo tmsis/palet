@@ -105,40 +105,40 @@ class Article:
         else:
             return ''
 
-  # ---------------------------------------------------------------------------------
-  #
-  #
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def checkForMultiVarFilter(self, values: str, separator=" "):
-      return values.split(separator)
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def checkForMultiVarFilter(self, values: str, separator=" "):
+        return values.split(separator)
 
 
-  # ---------------------------------------------------------------------------------
-  #
-  #
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def byAgeRange(self, age_range=None):
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byAgeRange(self, age_range=None):
 
-      self.by_group.append("age_num")
-      self.mon_group.append('mon.age_num')
+        self.by_group.append("age_num")
+        self.mon_group.append('mon.age_num')
 
-      if age_range != None:
-          self.filter.update({"age_num": age_range})
+        if age_range != None:
+            self.filter.update({"age_num": age_range})
 
-      return self
-      
+        return self
+        
 
-  # ---------------------------------------------------------------------------------
-  #
-  # add any byEthnicity values
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def byEthnicity(self, ethnicity=None):
+    # ---------------------------------------------------------------------------------
+    #
+    # add any byEthnicity values
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byEthnicity(self, ethnicity=None):
 
       self.by_group.append("race_ethncty_exp_flag")
       self.mon_group.append("mon.race_ethncty_exp_flag")
@@ -148,13 +148,13 @@ class Article:
 
       return self
 
-  # ---------------------------------------------------------------------------------
-  #
-  # add any fileDates here
-  # TODO: Figure out the best way to accept dates in this API
-  #
-  # ---------------------------------------------------------------------------------
-  def byFileDate(self, fileDate=None):
+    # ---------------------------------------------------------------------------------
+    #
+    # add any fileDates here
+    # TODO: Figure out the best way to accept dates in this API
+    #
+    # ---------------------------------------------------------------------------------
+    def byFileDate(self, fileDate=None):
 
       self.by_group.append("BSF_FIL_DT")
       self.mon_group.append('mon.BSF_FIL_DT')
@@ -165,13 +165,13 @@ class Article:
       return self
 
 
-  # ---------------------------------------------------------------------------------
-  #
-  #
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def byGender(self, gender=None):
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byGender(self, gender=None):
 
       self.by_group.append("gndr_cd")
       self.mon_group.append('mon.gndr_cd')
@@ -182,13 +182,13 @@ class Article:
       return self
 
 
-  # ---------------------------------------------------------------------------------
-  #
-  # add any byState values
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def byState(self, state_fips=None):
+    # ---------------------------------------------------------------------------------
+    #
+    # add any byState values
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byState(self, state_fips=None):
 
       self.by_group.append("SUBMTG_STATE_CD")
       self.mon_group.append('mon.SUBMTG_STATE_CD')
@@ -198,31 +198,13 @@ class Article:
 
       return self
 
-  # ---------------------------------------------------------------------------------
-  #
-  #
-  #
-  #
-  # ---------------------------------------------------------------------------------
-  def fetch(self):
-
-    from pyspark.sql import SparkSession
-
-    spark = SparkSession.getActiveSession()
-
-    return spark.sql(self.sql())
-
-            return f"where {' and '.join(where)}"
-
-        else:
-            return ''
-
     # ---------------------------------------------------------------------------------
     #
     #
     #
     #
     # ---------------------------------------------------------------------------------
+
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
