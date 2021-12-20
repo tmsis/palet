@@ -10,10 +10,10 @@ from palet.Enrollment import Enrollment
 from palet.Palet import Palet
 
 State = State('NY')
-State.getInstanceProperties()
+State.propertiesOf()
 AgeGroup = AgeGroup()
 t = Trend().getMonthOverMonth()
-e = Enrollment(t).byAgeRange('0-18,65+').byState(State.state).byIncomeBracket()
+e = Enrollment(t).byAgeRange('0-18,65+').byState(State.state_fips).byIncomeBracket()
 print(e.sql())
 
 Palet.Utils.propertiesOf(e)

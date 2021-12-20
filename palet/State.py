@@ -1,9 +1,11 @@
 
 from typing import Any
 
+from palet.Palet import Palet
+
 class State() :
 
-    stabbrev = ""
+    _stabbrev = ""
     state = ""
 
     # this is an overrideable function in Python that will loop through attributes
@@ -31,12 +33,17 @@ class State() :
             return pdf
 
     def __init__(self, stabbrev) -> None:
-        self.stabbrev = stabbrev
-        self.st_fips = self.__load_metadata_file(self, 'st_fips')
-        self.state = str(self.st_fips[self.st_fips['STABBREV'] == self.stabbrev].squeeze('rows').get('FIPS'))
+        self._stabbrev = stabbrev
+        self.fips_tbl = self.__load_metadata_file(self, 'st_fips')
+        self.state_fips = str(self.fips_tbl[self.fips_tbl['STABBREV'] == self._stabbrev].squeeze('rows').get('FIPS'))
 
-    def getInstanceProperties(self) :
-        print(self.__dict__)
+
+    ## Use this static call on an instance of one of your objects such as Enrollment or Trend
+    ## Pass the instance into this function and you'll get back all the instance variables you
+    ## have set on it. Useful for seeing what you have on configured on your object
+
+    def propertiesOf(self): 
+        return Palet.Utils.propertiesOf(self)
 
 
 # CC0 1.0 Universal
