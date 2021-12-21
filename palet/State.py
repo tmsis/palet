@@ -1,4 +1,4 @@
-
+## TODO: Clean up docstring based on formatting similar to Article class
 from typing import Any
 
 from palet.Palet import Palet
@@ -6,6 +6,7 @@ from palet.Palet import Palet
 class State() :
 
     _stabbrev = ""
+    _zipstate_lookup = ""
     state = ""
 
     # this is an overrideable function in Python that will loop through attributes
@@ -15,34 +16,54 @@ class State() :
     # TODO: Currently this class must have an instance. A couple of ways we might do it:
     #           * Add it in the library initialization so they have access to a State object like State = State()
     #           * Is there a way we can do something in the super class or a loadtime?
-    def __getattr__(self, name: str) -> Any:
-            return str(self.__getFIPSCode(self, name))
+    # def __getattr__(self, name: str) -> Any:
+    #         return str(self.__getFIPSCode(self, name))
 
     # TODO: Move this shared function to the super Metadata class and inherit
-    def __load_metadata_file(self, palet, fn):
-            import pandas as pd
-            import os
-            pdf = None
+    def __load_metadata_file(self, palet, fn):     
+        import pandas as pd
+        import os
+        pdf = None
 
-            this_dir, this_filename = os.path.split(__file__)
-            pkl = os.path.join(this_dir + '/cfg/', fn + '.pkl')
+        this_dir, this_filename = os.path.split(__file__)
+        pkl = os.path.join(this_dir + '/cfg/', fn + '.pkl')
 
-            # print('Reading file ' + fn)
-            pdf = pd.read_pickle(pkl)
+        # print('Reading file ' + fn)
+        pdf = pd.read_pickle(pkl)
 
-            return pdf
-
+        return pdf
+        
+        
     def __init__(self, stabbrev) -> None:
+        """Create an instance of this class by giving it a 2 letter state abbreviation.
+
+        Args:
+            :param stabbrev: Call the class with the constructor using a two letter state abbreviation. 
+            :type stabbrev: str
+            :Example: State = State('NC')
+             
+            :return: State instance which will now has FIPS codes and lookups via zipcode, county, etc.
+            :rtype: Instance of State class
+        """        
         self._stabbrev = stabbrev
         self.fips_tbl = self.__load_metadata_file(self, 'st_fips')
         self.state_fips = str(self.fips_tbl[self.fips_tbl['STABBREV'] == self._stabbrev].squeeze('rows').get('FIPS'))
+        
+        self._countystate_lookup = self.__load_metadata_file(self, 'countystate_lookup')
+        self.county = str(self._countystate_lookup[self._countystate_lookup['StateFIPS'] == self._stabbrev].squeeze('rows').get('StateFIPS'))
 
+        self._zipstate_lookup = self.__load_metadata_file(self, 'zipstate_lookup')
 
     ## Use this static call on an instance of one of your objects such as Enrollment or Trend
     ## Pass the instance into this function and you'll get back all the instance variables you
     ## have set on it. Useful for seeing what you have on configured on your object
 
     def propertiesOf(self): 
+        """Displays the proeprties of the current instance
+
+        Returns:
+            str: Returns all the properties of the current instance.
+        """                 
         return Palet.Utils.propertiesOf(self)
 
 

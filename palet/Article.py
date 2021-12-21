@@ -1,6 +1,8 @@
 
 class Article:
 
+    ## TODO: Continue to clean up docstring using syntax formatting
+    
     ## Initialize the common variables here.
     ## All SQL objects should inherit from this class
     ## ----------------------------------------------
@@ -59,7 +61,7 @@ class Article:
     #
     #
     # ---------------------------------------------------------------------------------
-    def getValueFromFilter(self, column: str):
+    def _getValueFromFilter(self, column: str):
         value = self.filter.get(column) ## TODO: what do we do here for required columns
         return column + " = " + value
 
@@ -111,9 +113,8 @@ class Article:
     #
     #
     # ---------------------------------------------------------------------------------
-    def checkForMultiVarFilter(self, values: str, separator=" "):
+    def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
-
 
     # ---------------------------------------------------------------------------------
     #
@@ -122,7 +123,15 @@ class Article:
     #
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
+        """Filter your query by Age Range. Most top level objects inherit this function such as Enrollment, Trend, etc.
+             If your object is already set by a by group this will add it as the next by group.
 
+        Args:
+            :age_range: (str, optional): Filter a single age, range such as 18-21, or an inclusive number such as 65+. Defaults to None.
+
+        Returns:
+            :Article Object: returns the updated object
+        """        
         self.by_group.append("age_num")
         self.mon_group.append('mon.age_num')
 
@@ -139,108 +148,18 @@ class Article:
     #
     # ---------------------------------------------------------------------------------
     def byEthnicity(self, ethnicity=None):
+        """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
 
-      self.by_group.append("race_ethncty_exp_flag")
-      self.mon_group.append("mon.race_ethncty_exp_flag")
+        Args:
+            :ethnicity: (str, optional): Filter a single ethnicity. Defaults to None.
 
-      if ethnicity != None:
-          self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
-
-      return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any fileDates here
-    # TODO: Figure out the best way to accept dates in this API
-    #
-    # ---------------------------------------------------------------------------------
-    def byFileDate(self, fileDate=None):
-
-      self.by_group.append("BSF_FIL_DT")
-      self.mon_group.append('mon.BSF_FIL_DT')
-
-      if fileDate != None:
-          self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
-
-      return self
-
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byGender(self, gender=None):
-
-      self.by_group.append("gndr_cd")
-      self.mon_group.append('mon.gndr_cd')
-    
-      if gender != None:
-          self.filter.update({"gndr_cd": "'" + gender + "'"})
-
-      return self
-
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any byState values
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
-
-      self.by_group.append("SUBMTG_STATE_CD")
-      self.mon_group.append('mon.SUBMTG_STATE_CD')
-
-      if state_fips != None:
-          self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
-
-      return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-
-    def _checkForMultiVarFilter(self, values: str, separator=" "):
-        return values.split(separator)
-
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byAgeRange(self, age_range=None):
-        self.by_group.append("age_num")
-        self.mon_group.append('mon.age_num')
-        if age_range != None:
-            self.filter.update({"age_num": age_range})
-            
-        return self       
-
-    ## TODO: Do we want to have this function ONLY for multiple values or do we want to combine this functionality into a range?
-    def byAges(self, ages=None):
-        self.by_group.append("age_num")
-        self.mon_group.append('mon.age_num')
-        if ages != None:
-            self.filter.update({"age_num": ages})
-            
-        return self                        
-
-    # ---------------------------------------------------------------------------------
-    #
-    # add any byEthnicity values
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byEthnicity(self, ethnicity=None):
+        Returns:
+            :Article Object: returns the updated object
+        """    
         self.by_group.append("race_ethncty_exp_flag")
         self.mon_group.append("mon.race_ethncty_exp_flag")
+
         if ethnicity != None:
             self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
 
@@ -253,35 +172,55 @@ class Article:
     #
     # ---------------------------------------------------------------------------------
     def byFileDate(self, fileDate=None):
+        """Filter your query by File Date. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            :fileDate: (str, optional): Filter by a file date. Defaults to None.
+
+        Returns:
+            :Article Object: returns the updated object
+        """
         self.by_group.append("BSF_FIL_DT")
         self.mon_group.append('mon.BSF_FIL_DT')
+
         if fileDate != None:
             self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
-            
+
         return self
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
+
     # ---------------------------------------------------------------------------------
     def byGender(self, gender=None):
+        """Filter your query by Gender. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            :gender: (str, optional): Filter by gender. Defaults to None.
+
+        Returns:
+            :Article Object: returns the updated object
+        """
         self.by_group.append("gndr_cd")
-        self.mon_group.append('mon.gndr_cd')    
+        self.mon_group.append('mon.gndr_cd')
+
         if gender != None:
             self.filter.update({"gndr_cd": "'" + gender + "'"})
-            
+
         return self
 
-    # ---------------------------------------------------------------------------------
-    #
-    # add any byState values
-    #
-    #
+
     # ---------------------------------------------------------------------------------
     def byState(self, state_fips=None):
+        """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
 
+        Args:
+            :state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+
+        Returns:
+            :class:`Article` returns the updated object
+        """
         self.by_group.append("SUBMTG_STATE_CD")
         self.mon_group.append('mon.SUBMTG_STATE_CD')
 
@@ -293,6 +232,23 @@ class Article:
     ## This function is just returning the straight data from the table
     ## TODO: If they are looking for analytics calculations we need more details
     def byIncomeBracket(self, bracket=None):
+        """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args
+        ----
+            :bracket:`str, (optional)`: Filter by income. Defaults to None.
+
+        Returns
+        -------
+            :class:`Article` returns the updated object
+
+        Examples
+        --------
+        >>> Enrollment.byIncomeBracket('10000-25000')
+        or
+        >>> Trend.byIncomeBracket('50000-100000')
+        """        
         self.by_group.append("INCM_CD")
         #self.mon_group.append('mon.INCM_CD')
 
@@ -304,14 +260,13 @@ class Article:
         return self
 
 
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
     # ---------------------------------------------------------------------------------
     def fetch(self):
+        """Call this function when you are ready for results
+
+        Returns:
+            :class:`Dataframe`: Executes your query and returns a spark dataframe object.
+        """        
         from pyspark.sql import SparkSession
         spark = SparkSession.getActiveSession()
         return spark.sql(self.sql())
