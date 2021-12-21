@@ -13,14 +13,13 @@ class AgeGroup() :
     def __getattr__(self, name: str) -> Any:
             return str(self.properties[name])
 
-    ## TODO: We will refactor this much like State. It's on the list
+    ## TODO: We will refactor this much like State. It's on the list. Do we create a metadata file for this as well?
     properties = {
         "Child": "0-18",
         "YoungAdult": "19-44",
         "Adult": "45-64",
         "Senior": "65-84",
         "Elderly": "84-120"
-
     }
 
 
