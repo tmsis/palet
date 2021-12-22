@@ -1,46 +1,76 @@
+## TODO: Clean up docstring based on formatting similar to Article class
 from typing import Any
 
+from palet.Palet import Palet
 
-class Palet():
+class State() :
 
- class Utils():
+    _stabbrev = ""
+    _zipstate_lookup = ""
+    state = ""
 
-        # ---------------------------------------------------------------------------------
-        #
-        #
-        #
-        #
-        # ---------------------------------------------------------------------------------
-        @staticmethod
-        def compress(string):
-            return ' '.join(string.split())
+    # this is an overrideable function in Python that will loop through attributes
+    # and allow you to create custom logic
+    # in this case __getatrr__ is only called when an attribute you try to call on the object doesn't exist
+    # you then can provide logic to do anything; in this case we look up the passed state/name 
+    # TODO: Currently this class must have an instance. A couple of ways we might do it:
+    #           * Add it in the library initialization so they have access to a State object like State = State()
+    #           * Is there a way we can do something in the super class or a loadtime?
+    # def __getattr__(self, name: str) -> Any:
+    #         return str(self.__getFIPSCode(self, name))
 
+    # TODO: Move this shared function to the super Metadata class and inherit
+    def __load_metadata_file(self, palet, fn):     
+        import pandas as pd
+        import os
+        pdf = None
 
-        # ---------------------------------------------------------------------------------
-        #
-        #
-        #
-        #
-        # ---------------------------------------------------------------------------------
-        @staticmethod
-        def show(sql) :
-            print(Palet.utils.compress(sql.replace('\n', '')))
+        this_dir, this_filename = os.path.split(__file__)
+        pkl = os.path.join(this_dir + '/cfg/', fn + '.pkl')
 
+        # print('Reading file ' + fn)
+        pdf = pd.read_pickle(pkl)
 
+        return pdf
+        
+        
+    def __init__(self, stabbrev) -> None:
+        """Create an instance of this class by giving it a 2 letter state abbreviation.
 
+        Args:
+        -----
+            stabbrev: `str: required` Call the class with the constructor using a two letter state abbreviation. 
 
-        @staticmethod
-        def createDateRange(year: str) :
-            range = year + "01-" + year + "12" 
-            return range
+        Return:
+        ------
+            Instance of :class:`State` which will now contain FIPS codes and lookups via zipcode, county, etc.
+  
+        Examples:
+        --------
+        >>> State = State('NC')
 
+        """        
+        self._stabbrev = stabbrev
+        self.fips_tbl = self.__load_metadata_file(self, 'st_fips')
+        self.state_fips = str(self.fips_tbl[self.fips_tbl['STABBREV'] == self._stabbrev].squeeze('rows').get('FIPS'))
+        
+        self._countystate_lookup = self.__load_metadata_file(self, 'countystate_lookup')
+        self.county = str(self._countystate_lookup[self._countystate_lookup['StateFIPS'] == self._stabbrev].squeeze('rows').get('StateFIPS'))
 
-        ## Use this static call on an instance of one of your objects such as Enrollment or Trend
-        ## Pass the instance into this function and you'll get back all the instance variables you
-        ## have set on it. Useful for seeing what you have on configured on your object
-        @staticmethod
-        def propertiesOf(Obj: Any): 
-            return print(Obj.__dict__)
+        self._zipstate_lookup = self.__load_metadata_file(self, 'zipstate_lookup')
+
+    ## Use this static call on an instance of one of your objects such as Enrollment or Trend
+    ## Pass the instance into this function and you'll get back all the instance variables you
+    ## have set on it. Useful for seeing what you have on configured on your object
+
+    def propertiesOf(self): 
+        """Displays the proeprties of the current instance
+
+        Returns:
+        --------
+            :str: Returns all the properties of the current instance.
+        """                 
+        return Palet.Utils.propertiesOf(self)
 
 
 # CC0 1.0 Universal
@@ -159,3 +189,4 @@ class Palet():
 
 # For more information, please see
 # <http://creativecommons.org/publicdomain/zero/1.0/>
+

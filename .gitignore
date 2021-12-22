@@ -7,3 +7,8 @@ palet/__pycache__/**
 README copy.md
 palet.code-workspace
 **/*.pyc
+misc/DDL/**
+misc/**
+palet/__pycache__/Palet.cpython-39.pyc
+palet/__pycache__/Article.cpython-39.pyc
+.gitignore
