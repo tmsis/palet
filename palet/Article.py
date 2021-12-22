@@ -29,7 +29,6 @@ class Article:
 
     ## Create a temporary table here to optimize our querying of the objects and data
     def _createView_rid_x_month_x_state(self):
-        from pyspark.sql import SparkSession
 
         # create or replace temporary view rid_x_month_x_state as 
         ## TODO: remove the hard coded file data below (2018)
@@ -49,9 +48,6 @@ class Article:
             order by
                 SUBMTG_STATE_CD
                 ,BSF_FIL_DT"""
-
-        # spark = SparkSession.getActiveSession()
-        # spark.sql(self.sql())
         return z
 
 
@@ -116,21 +112,17 @@ class Article:
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
+  
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
         """Filter your query by Age Range. Most top level objects inherit this function such as Enrollment, Trend, etc.
              If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            :age_range: (str, optional): Filter a single age, range such as 18-21, or an inclusive number such as 65+. Defaults to None.
+            age_range: `str, optional`: Filter a single age, range such as 18-21, or an inclusive number such as 65+. Defaults to None.
 
         Returns:
-            :Article Object: returns the updated object
+            :class:`Article` returns the updated object
         """        
         self.by_group.append("age_num")
         self.mon_group.append('mon.age_num')
@@ -152,10 +144,10 @@ class Article:
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            :ethnicity: (str, optional): Filter a single ethnicity. Defaults to None.
+            ethnicity: `str, optional`: Filter a single ethnicity. Defaults to None.
 
         Returns:
-            :Article Object: returns the updated object
+            :class:`Article`: returns the updated object
         """    
         self.by_group.append("race_ethncty_exp_flag")
         self.mon_group.append("mon.race_ethncty_exp_flag")
@@ -176,10 +168,10 @@ class Article:
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            :fileDate: (str, optional): Filter by a file date. Defaults to None.
+            fileDate: `str, optional`: Filter by a file date. Defaults to None.
 
         Returns:
-            :Article Object: returns the updated object
+            :class:`Article` returns the updated object
         """
         self.by_group.append("BSF_FIL_DT")
         self.mon_group.append('mon.BSF_FIL_DT')
@@ -196,7 +188,7 @@ class Article:
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            :gender: (str, optional): Filter by gender. Defaults to None.
+            gender: `str, optional`: Filter by gender. Defaults to None.
 
         Returns:
             :Article Object: returns the updated object
@@ -216,7 +208,7 @@ class Article:
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            :state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
 
         Returns:
             :class:`Article` returns the updated object
@@ -237,7 +229,7 @@ class Article:
 
         Args
         ----
-            :bracket:`str, (optional)`: Filter by income. Defaults to None.
+            bracket:`str, (optional)`: Filter by income. Defaults to None.
 
         Returns
         -------

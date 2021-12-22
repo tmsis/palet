@@ -38,12 +38,17 @@ class State() :
         """Create an instance of this class by giving it a 2 letter state abbreviation.
 
         Args:
-            :param stabbrev: Call the class with the constructor using a two letter state abbreviation. 
-            :type stabbrev: str
-            :Example: State = State('NC')
-             
-            :return: State instance which will now has FIPS codes and lookups via zipcode, county, etc.
-            :rtype: Instance of State class
+        -----
+            stabbrev: `str: required` Call the class with the constructor using a two letter state abbreviation. 
+
+        Return:
+        ------
+            Instance of :class:`State` which will now contain FIPS codes and lookups via zipcode, county, etc.
+  
+        Examples:
+        --------
+        >>> State = State('NC')
+
         """        
         self._stabbrev = stabbrev
         self.fips_tbl = self.__load_metadata_file(self, 'st_fips')
@@ -62,7 +67,8 @@ class State() :
         """Displays the proeprties of the current instance
 
         Returns:
-            str: Returns all the properties of the current instance.
+        --------
+            :str: Returns all the properties of the current instance.
         """                 
         return Palet.Utils.propertiesOf(self)
 
