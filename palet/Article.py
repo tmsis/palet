@@ -1,4 +1,9 @@
 
+from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.pandas._typing import PandasDataFrame
+from pyspark.sql import SparkSession
+
+
 class Article:
 
     ## TODO: Continue to clean up docstring using syntax formatting
@@ -12,6 +17,7 @@ class Article:
         self.filter = {}
         self.where = []
         self.mon_group = []
+        self._pctChangeCalc = 0
 
     # ---------------------------------------------------------------------------------
     #   getByGroupWithAlias: This function allows our byGroup to be aliased properly 
@@ -49,6 +55,21 @@ class Article:
                 SUBMTG_STATE_CD
                 ,BSF_FIL_DT"""
         return z
+
+
+    # ---------------------------------------------------------------------------------
+    # Do last minute add-ons here
+    # ---------------------------------------------------------------------------------
+    def _addSecondaryCalcs(self, df: DataFrame, spark: SparkSession) :
+        if self._pctChangeCalc == 1 : 
+            pdf: PandasDataFrame = df.toPandas()
+            pdf.pct_change()
+            df = spark.createDataFrame(pdf)
+            return df
+        else:
+            return self
+
+
 
 
     # ---------------------------------------------------------------------------------
@@ -260,8 +281,11 @@ class Article:
             :class:`Dataframe`: Executes your query and returns a spark dataframe object.
         """        
         from pyspark.sql import SparkSession
-        spark = SparkSession.getActiveSession()
-        return spark.sql(self.sql())
+        ss = SparkSession.getActiveSession()
+        sparkDF = ss.sql(self.sql())
+        ## perform last minute add-ons here
+        df = self._addSecondaryCalcs(sparkDF, ss)
+        return df
 
 
 # CC0 1.0 Universal

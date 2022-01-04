@@ -15,6 +15,7 @@ AgeGroup = AgeGroup()
 t = Trend().getMonthOverMonth()
 e = Enrollment(t).byAgeRange('0-18,65+').byState(State.state_fips).byIncomeBracket()
 print(e.sql())
+e.fetch()
 
 Palet.Utils.propertiesOf(e)
 
