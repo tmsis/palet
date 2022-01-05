@@ -6,11 +6,10 @@ from pyspark.sql import SparkSession
 
 class Article:
 
-    ## TODO: Continue to clean up docstring using syntax formatting
-    
-    ## Initialize the common variables here.
-    ## All SQL objects should inherit from this class
-    ## ----------------------------------------------
+    # TODO: Continue to clean up docstring using syntax formatting
+    # Initialize the common variables here.
+    # All SQL objects should inherit from this class
+    # ----------------------------------------------
     def __init__(self):
         self.by = {}
         self.by_group = []
@@ -20,25 +19,24 @@ class Article:
         self._pctChangeCalc = 0
 
     # ---------------------------------------------------------------------------------
-    #   getByGroupWithAlias: This function allows our byGroup to be aliased properly 
-    #       for the dynamic sql generation
+    #   getByGroupWithAlias: This function allows our byGroup to be aliased
+    #       properly for the dynamic sql generation
     # ---------------------------------------------------------------------------------
     def _getByGroupWithAlias(self):
-        
+
         new_line_comma = '\n\t\t\t   ,'
-        
         if (len(self.mon_group)) > 0:
             return f"{new_line_comma.join(self.mon_group)},"
         else:
             return ''
 
-
-    ## Create a temporary table here to optimize our querying of the objects and data
+    # Create a temporary table here to optimize our querying of the
+    # objects and data
     def _createView_rid_x_month_x_state(self):
 
-        # create or replace temporary view rid_x_month_x_state as 
-        ## TODO: remove the hard coded file data below (2018)
-        z = f"""
+        # create or replace temporary view rid_x_month_x_state as
+        # TODO: remove the hard coded file data below (2018)
+        z = """
             select distinct
                 SUBMTG_STATE_CD
                 ,BSF_FIL_DT
@@ -46,7 +44,7 @@ class Article:
             from
                 taf.tmp_max_da_run_id
             where
-                BSF_FIL_DT >= 201801 and 
+                BSF_FIL_DT >= 201801 and
                 BSF_FIL_DT <= 201812
             group by
                 SUBMTG_STATE_CD
@@ -56,21 +54,17 @@ class Article:
                 ,BSF_FIL_DT"""
         return z
 
-
     # ---------------------------------------------------------------------------------
     # Do last minute add-ons here
     # ---------------------------------------------------------------------------------
-    def _addSecondaryCalcs(self, df: DataFrame, spark: SparkSession) :
-        if self._pctChangeCalc == 1 : 
+    def _addSecondaryCalcs(self, df: DataFrame, spark: SparkSession):
+        if self._pctChangeCalc == 1:
             pdf: PandasDataFrame = df.toPandas()
             pdf.pct_change()
             df = spark.createDataFrame(pdf)
             return df
         else:
             return self
-
-
-
 
     # ---------------------------------------------------------------------------------
     #
@@ -79,9 +73,8 @@ class Article:
     #
     # ---------------------------------------------------------------------------------
     def _getValueFromFilter(self, column: str):
-        value = self.filter.get(column) ## TODO: what do we do here for required columns
+        value = self.filter.get(column)  # TODO: required columns handling?
         return column + " = " + value
-
 
     # ---------------------------------------------------------------------------------
     #
@@ -99,23 +92,28 @@ class Article:
                 # get the value(s) in case there are multiple
                 values = self.filter[key]
 
-                if str(values).find(" ") > -1: #Check for multiple values here, space separator is default
+                # Check for multiple values here, space separator is default
+                if str(values).find(" ") > -1:
                     splitRange = self._checkForMultiVarFilter(values)
                     for value in splitRange:
                         clause = ("mon." + key, value)
                         where.append(' ((= '.join(clause))
 
-                elif str(values).find(",") > -1: #Check for multiples with , separator
+                # Check for multiples with , separator
+                elif str(values).find(",") > -1:
                     splitVals = self._checkForMultiVarFilter(values, ",")
                     for values in splitVals:
-                        if str(values).find("-") > -1: #check for age ranges here with the - separator
+                        # check for age ranges here with the - separator
+                        if str(values).find("-") > -1:
                             splitRange = self._checkForMultiVarFilter(values, "-")
                             range_stmt = "mon." + key + " between " + splitRange[0] + " and " + splitRange[1]
-                        elif str(values).find("+") > -1: ## check for greater than; i.e. x+ equals >= x
-                            range_stmt = "mon." + key + " >= " + values.strip("+") ## take the x+ and strip out the +
+                        # check for greater than; i.e. x+ equals >= x
+                        elif str(values).find("+") > -1:
+                            range_stmt = "mon." + key + " >= " + values.strip("+")
+                        # take the x+ and strip out the +
                         where.append(range_stmt)
 
-                else: #else parse the single value
+                else:  # else parse the single value
                     clause = ("mon." + key, self.filter[key])
                     where.append(' = '.join(clause))
 
@@ -133,26 +131,27 @@ class Article:
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
-  
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
-        """Filter your query by Age Range. Most top level objects inherit this function such as Enrollment, Trend, etc.
-             If your object is already set by a by group this will add it as the next by group.
+        """Filter your query by Age Range. Most top level objects inherit this
+            function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the
+            next by group.
 
         Args:
-            age_range: `str, optional`: Filter a single age, range such as 18-21, or an inclusive number such as 65+. Defaults to None.
+            age_range: `str, optional`: Filter a single age, range such as
+            18-21, or an inclusive number such as 65+. Defaults to None.
 
         Returns:
             :class:`Article` returns the updated object
-        """        
+        """
         self.by_group.append("age_num")
         self.mon_group.append('mon.age_num')
 
-        if age_range != None:
+        if age_range is not None:
             self.filter.update({"age_num": age_range})
 
         return self
-        
 
     # ---------------------------------------------------------------------------------
     #
@@ -169,11 +168,11 @@ class Article:
 
         Returns:
             :class:`Article`: returns the updated object
-        """    
+        """
         self.by_group.append("race_ethncty_exp_flag")
         self.mon_group.append("mon.race_ethncty_exp_flag")
 
-        if ethnicity != None:
+        if ethnicity is not None:
             self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
 
         return self
@@ -197,11 +196,10 @@ class Article:
         self.by_group.append("BSF_FIL_DT")
         self.mon_group.append('mon.BSF_FIL_DT')
 
-        if fileDate != None:
+        if fileDate is not None:
             self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
 
         return self
-
 
     # ---------------------------------------------------------------------------------
     def byGender(self, gender=None):
@@ -217,11 +215,10 @@ class Article:
         self.by_group.append("gndr_cd")
         self.mon_group.append('mon.gndr_cd')
 
-        if gender != None:
+        if gender is not None:
             self.filter.update({"gndr_cd": "'" + gender + "'"})
 
         return self
-
 
     # ---------------------------------------------------------------------------------
     def byState(self, state_fips=None):
@@ -237,13 +234,13 @@ class Article:
         self.by_group.append("SUBMTG_STATE_CD")
         self.mon_group.append('mon.SUBMTG_STATE_CD')
 
-        if state_fips != None:
+        if state_fips is not None:
             self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
 
         return self
 
-    ## This function is just returning the straight data from the table
-    ## TODO: If they are looking for analytics calculations we need more details
+    # This function is just returning the straight data from the table
+    # TODO: If they are looking for analytics calculations we need more details
     def byIncomeBracket(self, bracket=None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
@@ -261,17 +258,14 @@ class Article:
         >>> Enrollment.byIncomeBracket('10000-25000')
         or
         >>> Trend.byIncomeBracket('50000-100000')
-        """        
+        """
         self.by_group.append("INCM_CD")
-        #self.mon_group.append('mon.INCM_CD')
-
-        if bracket != None:
+        if bracket is not None:
             self.filter.update({"INCM_CD": "'" + bracket + "'"})
         else:
             self.filter.update({"INCM_CD": "null"})
 
         return self
-
 
     # ---------------------------------------------------------------------------------
     def fetch(self):
@@ -279,11 +273,11 @@ class Article:
 
         Returns:
             :class:`Dataframe`: Executes your query and returns a spark dataframe object.
-        """        
+        """
         from pyspark.sql import SparkSession
         ss = SparkSession.getActiveSession()
         sparkDF = ss.sql(self.sql())
-        ## perform last minute add-ons here
+        # perform last minute add-ons here
         df = self._addSecondaryCalcs(sparkDF, ss)
         return df
 
