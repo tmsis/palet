@@ -48,14 +48,13 @@ class Readmit:
 
         return sql
 
+
 print(Readmit().fetch())
 print(Readmit().byState().fetch())
 print(Readmit().byState().byEthnicity().fetch())
 print(Readmit().byEthnicity().byState().fetch())
 
 
-
-    
 # CC0 1.0 Universal
 
 # Statement of Purpose
