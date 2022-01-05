@@ -1,3 +1,5 @@
+from pyspark.sql import SparkSession
+
 
 class Introspection:
 
@@ -38,6 +40,7 @@ class Introspection:
         return Introspection.intersection(self.variables, resultCols)
 
     def connect(self):
+        spark = SparkSession.getActiveSession()
 
         # Member Cols
         myResultSet = spark.sql(
@@ -68,8 +71,6 @@ class Introspection:
         self.memberColsSkewed = ', '.join(self.memberColsSkewed)
         self.memberColsSkewedWithAlias = ', '.join(self.memberColsSkewedWithAlias)
 
-
-    
 # CC0 1.0 Universal
 
 # Statement of Purpose
