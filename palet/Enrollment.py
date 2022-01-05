@@ -1,11 +1,12 @@
 from palet.Article import Article
 
+
 class Enrollment(Article):
 
-    #-----------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     # Initialize the Enrollment API
-    #-----------------------------------------------------------------------
-    def __init__(self, article:Article =None):
+    # -----------------------------------------------------------------------
+    def __init__(self, article: Article = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
@@ -16,7 +17,6 @@ class Enrollment(Article):
             self.where = article.where
             self.mon_group = article.mon_group
 
-
     # ---------------------------------------------------------------------------------
     #
     #
@@ -25,7 +25,6 @@ class Enrollment(Article):
     # ---------------------------------------------------------------------------------
     def medicaid_enrollment_intervals(self):
         print("Start date: " + self.start + " End date: " + self.end)
-
 
     # ---------------------------------------------------------------------------------
     #
@@ -36,7 +35,6 @@ class Enrollment(Article):
     def chip_enrollment_intervals(self):
         print("Start date: " + self.start + " End date: " + self.end)
 
-
     # ---------------------------------------------------------------------------------
     #
     #
@@ -46,13 +44,12 @@ class Enrollment(Article):
     def mc_plans():
         print('mc_plans')
 
-
-    ## define the sql function here that has a class specific sql statement. i.e. Enrollment sql query being built
+    # define the sql function here that has a class specific sql statement. i.e. Enrollment sql query being built
     def sql(self):
-        
+
         rms = self._createView_rid_x_month_x_state()
 
-        new_line_comma = '\n\t\t,'
+        # new_line_comma = '\n\t\t,'
 
         z = f"""
             select
@@ -64,13 +61,13 @@ class Enrollment(Article):
                 taf.taf_mon_bsf as mon
 
             inner join
-                ({rms}) as rid    
-                    on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD    
+                ({rms}) as rid
+                    on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
                     and mon.BSF_FIL_DT = rid.BSF_FIL_DT
                     and mon.DA_RUN_ID = rid.DA_RUN_ID
 
             {self._defineWhereClause()}
-                
+
             group by
                 {self._getByGroupWithAlias()}
                 YEAR
@@ -81,7 +78,7 @@ class Enrollment(Article):
 
         return z
 
-    
+
 # CC0 1.0 Universal
 
 # Statement of Purpose

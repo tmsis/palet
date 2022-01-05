@@ -3,7 +3,7 @@ from typing import Any
 
 class Palet():
 
- class Utils():
+    class Utils():
 
         # ---------------------------------------------------------------------------------
         #
@@ -15,7 +15,6 @@ class Palet():
         def compress(string):
             return ' '.join(string.split())
 
-
         # ---------------------------------------------------------------------------------
         #
         #
@@ -23,23 +22,19 @@ class Palet():
         #
         # ---------------------------------------------------------------------------------
         @staticmethod
-        def show(sql) :
+        def show(sql):
             print(Palet.utils.compress(sql.replace('\n', '')))
 
-
-
-
         @staticmethod
-        def createDateRange(year: str) :
-            range = year + "01-" + year + "12" 
+        def createDateRange(year: str):
+            range = year + "01-" + year + "12"
             return range
 
-
-        ## Use this static call on an instance of one of your objects such as Enrollment or Trend
-        ## Pass the instance into this function and you'll get back all the instance variables you
-        ## have set on it. Useful for seeing what you have on configured on your object
+        # Use this static call on an instance of one of your objects such as Enrollment or Trend
+        # Pass the instance into this function and you'll get back all the instance variables you
+        # have set on it. Useful for seeing what you have on configured on your object
         @staticmethod
-        def propertiesOf(Obj: Any): 
+        def propertiesOf(Obj: Any):
             return print(Obj.__dict__)
 
 
