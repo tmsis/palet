@@ -12,3 +12,4 @@ misc/**
 palet/__pycache__/Palet.cpython-39.pyc
 palet/__pycache__/Article.cpython-39.pyc
 .gitignore
+junk/test.py
