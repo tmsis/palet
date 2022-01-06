@@ -7,7 +7,7 @@ class Enrollment(Article):
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
     def __init__(self, article: Article = None):
-        # print('Initializing Enrollment API')
+        print('Initializing Enrollment API')
         super().__init__()
 
         if (article is not None):
