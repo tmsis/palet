@@ -1,6 +1,5 @@
 
 from pyspark.sql.dataframe import DataFrame
-from pyspark.sql.pandas._typing import PandasDataFrame
 from pyspark.sql import SparkSession
 
 
@@ -59,10 +58,10 @@ class Article:
     # ---------------------------------------------------------------------------------
     def _addSecondaryCalcs(self, df: DataFrame, spark: SparkSession):
         if self._pctChangeCalc == 1:
-            pdf: PandasDataFrame = df.toPandas()
+            pdf = df.toPandas()
             pdf.pct_change()
-            df = spark.createDataFrame(pdf)
-            return df
+            # df = spark.createDataFrame(pdf)
+            return pdf
         else:
             return self
 
@@ -278,8 +277,8 @@ class Article:
         ss = SparkSession.getActiveSession()
         sparkDF = ss.sql(self.sql())
         # perform last minute add-ons here
-        df = self._addSecondaryCalcs(sparkDF, ss)
-        return df
+        pdf = self._addSecondaryCalcs(sparkDF, ss)
+        return pdf
 
 
 # CC0 1.0 Universal
