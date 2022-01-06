@@ -1,7 +1,122 @@
+from datetime import datetime
+import logging
+
 from typing import Any
 
 
 class Palet():
+
+    PERFORMANCE = 15
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def __init__(self, report_month: str, run_id: str = None):
+        from datetime import datetime
+        self.now = datetime.now()
+        self.initialize_logger(self.now)
+
+        self.version = '1.0.1'
+
+        self.report_month = report_month
+
+        # static metadata dataframes
+        self.apdxc = self.load_metadata_file('apdxc')
+        self.countystate_lookup = self.load_metadata_file('countystate_lookup')
+        self.fmg = self.load_metadata_file('fmg')
+        self.missVar = self.load_metadata_file('missVar')
+        self.prgncy = self.load_metadata_file('prgncy')
+        self.prgncy['Code'] = self.prgncy['Code'].str.strip()
+        self.prgncy['Code'] = self.prgncy['Code'].str.upper()
+        self.prgncy['Type'] = self.prgncy['Type'].str.strip()
+        self.prgncy['Type'] = self.prgncy['Type'].str.upper()
+        self.prvtxnmy = self.load_metadata_file('prvtxnmy')
+        self.sauths = self.load_metadata_file('sauths')
+        self.schip = self.load_metadata_file('schip')
+        self.splans = self.load_metadata_file('splans')
+        self.st_fips = self.load_metadata_file('st_fips')
+        self.st_name = self.load_metadata_file('st_name')
+        self.st_usps = self.load_metadata_file('st_usps')
+        self.st2_name = self.load_metadata_file('st2_name')
+        self.stabr = self.load_metadata_file('stabr')
+        self.stc_cd = self.load_metadata_file('stc_cd')
+        self.stc_cd['z_tos'] = self.stc_cd['TypeOfService'].map('{:03d}'.format)
+
+        # self.logger = None
+        self.logfile = None
+
+        self.sql = {}
+
+        self.actual_time = self.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
+
+    # --------------------------------------------------------------------
+    #
+    #
+    #
+    # --------------------------------------------------------------------
+    def initialize_logger(self, now: datetime):
+
+        file_date = now.strftime('%Y-%m-%d-%H-%M-%S')
+
+        logging.addLevelName(Palet.PERFORMANCE, 'PERFORMANCE')
+
+        def performance(self, message, *args, **kws):
+            self.log(Palet.PERFORMANCE, message, *args, **kws)
+
+        logging.Logger.performance = performance
+
+        p_dir = '/tmp/'
+        p_filename = 'custom_log_' + file_date + '.log'
+        p_logfile = p_dir + p_filename
+
+        self.logger = logging.getLogger('palet_log')
+        self.logger.setLevel(logging.INFO)
+
+        fh = logging.FileHandler(p_logfile, mode='a')
+        ch = logging.StreamHandler()
+        # ch.setLevel(logging.INFO)
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        if (self.logger.hasHandlers()):
+            self.logger.handlers.clear()
+
+        self.logger.addHandler(fh)
+        self.logger.addHandler(ch)
+
+        self.logfile = p_logfile
+        self.logfilename = p_filename
+
+        self.logger.debug('DQ Measures log file: ' + p_logfile)
+
+    # --------------------------------------------------------------------
+    #
+    #   Load in Pickle metadata files sourced from Excel
+    #
+    # --------------------------------------------------------------------
+    def load_metadata_file(self, fn):
+        import pandas as pd
+        import os
+        pdf = None
+
+        this_dir, this_filename = os.path.split(__file__)
+        pkl = os.path.join(this_dir + '/cfg/', fn + '.pkl')
+
+        pdf = pd.read_pickle(pkl)
+
+        return pdf
+
+    # --------------------------------------------------------------------
+    #
+    #
+    # --------------------------------------------------------------------
+    def show(self, v):
+        print(self.sql[v])
 
     class Utils():
 

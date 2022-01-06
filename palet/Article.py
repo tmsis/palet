@@ -1,6 +1,9 @@
+from datetime import datetime
+import logging
 
-from pyspark.sql.dataframe import DataFrame
 from pyspark.sql import SparkSession
+
+from palet.Palet import Palet
 
 
 class Article:
@@ -14,8 +17,13 @@ class Article:
         self.by_group = []
         self.filter = {}
         self.where = []
+
         self.mon_group = []
-        self._pctChangeCalc = 0
+
+        # self._pctChangeCalc = 0
+
+        self.postprocess = []
+        self.palet = Palet('201801')
 
     # ---------------------------------------------------------------------------------
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
@@ -56,14 +64,15 @@ class Article:
     # ---------------------------------------------------------------------------------
     # Do last minute add-ons here
     # ---------------------------------------------------------------------------------
-    def _addSecondaryCalcs(self, df: DataFrame, spark: SparkSession):
-        if self._pctChangeCalc == 1:
-            pdf = df.toPandas()
-            pdf.pct_change()
-            # df = spark.createDataFrame(pdf)
-            return pdf
-        else:
-            return self
+    # def _postprocess(self, df: DataFrame, spark: SparkSession):
+    #     # import pandas as pd
+    #     if self._pctChangeCalc == 1:
+    #         pdf = df.toPandas()
+    #         pdf.pct_change()
+    #         df = spark.createDataFrame(pdf)
+    #         return pdf
+    #     else:
+    #         return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -230,6 +239,9 @@ class Article:
         Returns:
             :class:`Article` returns the updated object
         """
+
+        self.palet.logger.info('Group by - state')
+
         self.by_group.append("SUBMTG_STATE_CD")
         self.mon_group.append('mon.SUBMTG_STATE_CD')
 
@@ -258,6 +270,9 @@ class Article:
         or
         >>> Trend.byIncomeBracket('50000-100000')
         """
+
+        self.palet.logger.info('Group by - income bracket')
+
         self.by_group.append("INCM_CD")
         if bracket is not None:
             self.filter.update({"INCM_CD": "'" + bracket + "'"})
@@ -273,12 +288,17 @@ class Article:
         Returns:
             :class:`Dataframe`: Executes your query and returns a spark dataframe object.
         """
-        from pyspark.sql import SparkSession
-        ss = SparkSession.getActiveSession()
-        sparkDF = ss.sql(self.sql())
+        session = SparkSession.getActiveSession()
+        # self.palet.logger.info('Fetching data - \n' + self.sql())
+
+        sparkDF = session.sql(self.sql())
+        df = sparkDF.toPandas()
+
         # perform last minute add-ons here
-        pdf = self._addSecondaryCalcs(sparkDF, ss)
-        return pdf
+        for pp in self.postprocess:
+            df = pp(df)
+
+        return df
 
 
 # CC0 1.0 Universal
