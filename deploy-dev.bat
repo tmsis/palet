@@ -20,3 +20,4 @@
 databricks --profile dev fs cp .\palet\Palet.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
 databricks --profile dev fs cp .\palet\Article.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
 databricks --profile dev fs cp .\palet\Enrollment.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
+databricks --profile dev fs cp .\palet\Trend.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite

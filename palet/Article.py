@@ -20,8 +20,6 @@ class Article:
 
         self.mon_group = []
 
-        # self._pctChangeCalc = 0
-
         self.postprocess = []
         self.palet = Palet('201801')
 

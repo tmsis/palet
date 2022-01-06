@@ -7,30 +7,46 @@ class Trend(Article):
     # ----------------------------------------------
     # Initialization of Trend class
     # ----------------------------------------------
-    def __init__(self, article: Article = None):
+    def __init__(self):
         # print('Initializing Trend API')
         super().__init__()
 
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
-            self.mon_group = article.mon_group
+        self._pctChangePeriod = 1
 
     # --------------------------------------------------
     # getMonthOverMonth function for trends of measures
     # --------------------------------------------------
-    def getMonthOverMonth(self, year=str(date.today().year)):
-        from palet.Palet import Palet
+    def byMonth(self, year=None, interval='monthly'):
+        # from palet.Palet import Palet
+        period = -1
 
-        self.filter.update({"BSF_FIL_DT":  Palet.Utils.createDateRange(str(year))})
-        self.by_group.append("BSF_FIL_DT")
-        self.mon_group.append('mon.BSF_FIL_DT')
+        if year is None:
+            year = str(date.today().year)
+
+        if interval == 'monthly':
+            period = -1
+        elif interval == 'quarterly' or interval == '4':
+            period = -4
+        elif interval == 'yearly' or interval == '12':
+            period = -12
+
+        self._pctChangePeriod = period
+
+        # self.filter.update({"BSF_FIL_DT":  Palet.Utils.createDateRange(str(year))})
+        # self.by_group.append("BSF_FIL_DT")
+        # self.mon_group.append('mon.BSF_FIL_DT')
+
         return self
 
     def mean(col: str):
         print('Calculating Average ' + col)
+
+    def _percentChange(self, df, interval):
+        print('_percentChange')
+
+        df['enrollment change'] = df['enrollment'].pct_change(interval)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #
@@ -68,7 +84,7 @@ class Trend(Article):
                     {self.getByGroupWithAlias()}
                     mon.BSF_FIL_DT
             """
-
+        self.postprocess.append(self._percentChange)
         return z
 
 

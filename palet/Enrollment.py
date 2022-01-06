@@ -46,19 +46,6 @@ class Enrollment(Article):
     #
     #
     # ---------------------------------------------------------------------------------
-    def _percentChange(self, df):
-        print('_percentChange')
-
-        df['enrollment change'] = df['enrollment'].pct_change()
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     def _decorate(self, df):
         print('_decorate')
 
@@ -107,7 +94,6 @@ class Enrollment(Article):
                 YEAR
         """
 
-        self.postprocess.append(self._percentChange)
         self.postprocess.append(self._decorate)
 
         return z
