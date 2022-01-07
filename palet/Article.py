@@ -1,3 +1,4 @@
+import pandas as pd
 from datetime import datetime
 import logging
 
@@ -21,6 +22,7 @@ class Article:
 
         self.postprocess = []
         self.palet = Palet('201801')
+        self._pctChangePeriod = -1
         # This variable exists to save the sql statement from the sub-classes
         self._sql = None
 
@@ -137,6 +139,24 @@ class Article:
     # ---------------------------------------------------------------------------------
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
+
+    def _percentChange(self, df, interval):
+        print('_percentChange')
+
+        df['enrollment change'] = df['enrollment'].pct_change(interval)
+
+        return df
+
+    def _decorate(self, df):
+        print('_decorate')
+
+        df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
+        df = pd.merge(df, self.palet.st_name,
+                      how='inner',
+                      left_on=['USPS'],
+                      right_on=['USPS'])
+
+        return df
 
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
@@ -281,6 +301,48 @@ class Article:
             self.filter.update({"INCM_CD": "null"})
 
         return self
+
+    def sql(self):
+
+        rms = self._createView_rid_x_month_x_state()
+
+        # new_line_comma = '\n\t\t\t   ,'
+
+        # Do we need to defaul to byState regardless? Is everything State reliant?
+        # If we don't have submtg_state_cd any call fails so we're forcing it in
+        # If the user decides to use it as their own byGroup we need to make sure
+        # not to add it twice
+        if 'SUBMTG_STATE_CD' not in self.by_group:
+            self = self.byState()
+
+        z = f"""
+                select
+                    {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+                    , count(*) as m
+
+                from
+                    taf.taf_mon_bsf as mon
+
+                inner join
+                    ({rms}) as rid
+                        on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
+                        and mon.BSF_FIL_DT = rid.BSF_FIL_DT
+                        and mon.DA_RUN_ID = rid.DA_RUN_ID
+
+                {self._defineWhereClause()}
+
+                group by
+                   {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+                order by
+                    {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+            """
+        self.postprocess.append(self._percentChange)
+        self.postprocess.append(self._decorate)
+        self._sql = z
+        return z
 
     # ---------------------------------------------------------------------------------
     def fetch(self):

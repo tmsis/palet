@@ -2,9 +2,6 @@
 # use it as you will.
 # TODO: Refactor to have automated testing for breakage
 
-
-from palet.AgeGroup import AgeGroup
-from palet.State import State
 from palet.Trend import Trend
 from palet.Enrollment import Enrollment
 from palet.Palet import Palet

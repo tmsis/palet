@@ -17,8 +17,7 @@ class Trend(Article):
             self.filter = article.filter
             self.where = article.where
             self.mon_group = article.mon_group
-
-        self._pctChangePeriod = 1
+            self._pctChangePeriod = -1
 
     # --------------------------------------------------
     # getMonthOverMonth function for trends of measures
@@ -48,60 +47,12 @@ class Trend(Article):
     def mean(col: str):
         print('Calculating Average ' + col)
 
-    def _percentChange(self, df, interval):
-        print('_percentChange')
-
-        df['enrollment change'] = df['enrollment'].pct_change(interval)
-
-        return df
-
     # ---------------------------------------------------------------------------------
     #
     #
-    #
-    #
+    # TODO: do we need to move the sql() function into Article?
+    # Is the logic the same for all? Having a issue with post processing
     # ---------------------------------------------------------------------------------
-    def sql(self):
-
-        rms = self._createView_rid_x_month_x_state()
-
-        # new_line_comma = '\n\t\t\t   ,'
-        
-        # Do we need to defaul to byState regardless? Is everything State reliant?
-        # If we don't have submtg_state_cd any call fails so we're forcing it in
-        # If the user decides to use it as their own byGroup we need to make sure
-        # not to add it twice
-        if 'SUBMTG_STATE_CD' not in self.by_group:
-            self = self.byState()
-
-        z = f"""
-                select
-                    {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-                    , count(*) as m
-
-                from
-                    taf.taf_mon_bsf as mon
-
-                inner join
-                    ({rms}) as rid
-                        on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
-                        and mon.BSF_FIL_DT = rid.BSF_FIL_DT
-                        and mon.DA_RUN_ID = rid.DA_RUN_ID
-
-                {self.defineWhereClause()}
-
-                group by
-                   {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-                order by
-                    {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-            """
-        self.postprocess.append(self._percentChange)
-        self._sql = z
-        return z
-
 
 # CC0 1.0 Universal
 
