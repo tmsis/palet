@@ -292,7 +292,7 @@ class Article:
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
-        sparkDF = session.sql(self.sql())
+        sparkDF = session.sql(self._sql)
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here
