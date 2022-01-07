@@ -2,7 +2,6 @@ from datetime import datetime
 import logging
 
 from pyspark.sql import SparkSession
-
 from palet.Palet import Palet
 
 
@@ -22,6 +21,8 @@ class Article:
 
         self.postprocess = []
         self.palet = Palet('201801')
+        # This variable exists to save the sql statement from the sub-classes
+        self._sql = None
 
     # ---------------------------------------------------------------------------------
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
@@ -264,9 +265,11 @@ class Article:
 
         Examples
         --------
-        >>> Enrollment.byIncomeBracket('10000-25000')
+        >>> Enrollment.byIncomeBracket('01')
         or
-        >>> Trend.byIncomeBracket('50000-100000')
+        >>> Trend.byIncomeBracket('01-03')
+        or
+        >>> Trend.byIncomeBracket('02,03,05')
         """
 
         self.palet.logger.info('Group by - income bracket')
@@ -289,7 +292,7 @@ class Article:
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
-        sparkDF = session.sql(self.sql())
+        sparkDF = session.sql(self._sql())
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here

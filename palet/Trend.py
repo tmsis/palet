@@ -7,9 +7,16 @@ class Trend(Article):
     # ----------------------------------------------
     # Initialization of Trend class
     # ----------------------------------------------
-    def __init__(self):
-        # print('Initializing Trend API')
+    def __init__(self, article: Article = None):
+        # print('Initializing Enrollment API')
         super().__init__()
+
+        if (article is not None):
+            self.by = article.by
+            self.by_group = article.by_group
+            self.filter = article.filter
+            self.where = article.where
+            self.mon_group = article.mon_group
 
         self._pctChangePeriod = 1
 
@@ -56,9 +63,16 @@ class Trend(Article):
     # ---------------------------------------------------------------------------------
     def sql(self):
 
-        rms = self.createView_rid_x_month_x_state()
+        rms = self._createView_rid_x_month_x_state()
 
         # new_line_comma = '\n\t\t\t   ,'
+        
+        # Do we need to defaul to byState regardless? Is everything State reliant?
+        # If we don't have submtg_state_cd any call fails so we're forcing it in
+        # If the user decides to use it as their own byGroup we need to make sure
+        # not to add it twice
+        if 'SUBMTG_STATE_CD' not in self.by_group:
+            self = self.byState()
 
         z = f"""
                 select
@@ -85,6 +99,7 @@ class Trend(Article):
                     mon.BSF_FIL_DT
             """
         self.postprocess.append(self._percentChange)
+        self._sql = z
         return z
 
 
