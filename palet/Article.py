@@ -140,10 +140,11 @@ class Article:
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
-    def _percentChange(self, df, interval):
+    def _percentChange(self, df):
         print('_percentChange')
 
-        df['enrollment change'] = df['enrollment'].pct_change(interval)
+        # this appears to have to be a key variable based on user input. We need to look at it more
+        df['enrollment change'] = df['enrollment'].pct_change(self._pctChangePeriod)
 
         return df
 
