@@ -1,8 +1,8 @@
+import pandas as pd
 from datetime import datetime
 import logging
 
 from pyspark.sql import SparkSession
-
 from palet.Palet import Palet
 
 
@@ -20,10 +20,11 @@ class Article:
 
         self.mon_group = []
 
-        # self._pctChangeCalc = 0
-
         self.postprocess = []
         self.palet = Palet('201801')
+        self._pctChangePeriod = -1
+        # This variable exists to save the sql statement from the sub-classes
+        self._sql = None
 
     # ---------------------------------------------------------------------------------
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
@@ -138,6 +139,25 @@ class Article:
     # ---------------------------------------------------------------------------------
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
+
+    def _percentChange(self, df):
+        print('_percentChange')
+
+        # this appears to have to be a key variable based on user input. We need to look at it more
+        df['enrollment change'] = df['enrollment'].pct_change(self._pctChangePeriod)
+
+        return df
+
+    def _decorate(self, df):
+        print('_decorate')
+
+        df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
+        df = pd.merge(df, self.palet.st_name,
+                      how='inner',
+                      left_on=['USPS'],
+                      right_on=['USPS'])
+
+        return df
 
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
@@ -266,9 +286,11 @@ class Article:
 
         Examples
         --------
-        >>> Enrollment.byIncomeBracket('10000-25000')
+        >>> Enrollment.byIncomeBracket('01')
         or
-        >>> Trend.byIncomeBracket('50000-100000')
+        >>> Trend.byIncomeBracket('01-03')
+        or
+        >>> Trend.byIncomeBracket('02,03,05')
         """
 
         self.palet.logger.info('Group by - income bracket')
@@ -281,6 +303,48 @@ class Article:
 
         return self
 
+    def sql(self):
+
+        rms = self._createView_rid_x_month_x_state()
+
+        # new_line_comma = '\n\t\t\t   ,'
+
+        # Do we need to defaul to byState regardless? Is everything State reliant?
+        # If we don't have submtg_state_cd any call fails so we're forcing it in
+        # If the user decides to use it as their own byGroup we need to make sure
+        # not to add it twice
+        if 'SUBMTG_STATE_CD' not in self.by_group:
+            self = self.byState()
+
+        z = f"""
+                select
+                    {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+                    , count(*) as m
+
+                from
+                    taf.taf_mon_bsf as mon
+
+                inner join
+                    ({rms}) as rid
+                        on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
+                        and mon.BSF_FIL_DT = rid.BSF_FIL_DT
+                        and mon.DA_RUN_ID = rid.DA_RUN_ID
+
+                {self._defineWhereClause()}
+
+                group by
+                   {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+                order by
+                    {self._getByGroupWithAlias()}
+                    mon.BSF_FIL_DT
+            """
+        self.postprocess.append(self._percentChange)
+        self.postprocess.append(self._decorate)
+        self._sql = z
+        return z
+
     # ---------------------------------------------------------------------------------
     def fetch(self):
         """Call this function when you are ready for results
@@ -291,7 +355,7 @@ class Article:
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
-        sparkDF = session.sql(self.sql())
+        sparkDF = session.sql(self._sql)
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here

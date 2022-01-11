@@ -8,9 +8,16 @@ class Enrollment(Article):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self):
-
+    def __init__(self, article: Article = None):
+        # print('Initializing Enrollment API')
         super().__init__()
+
+        if (article is not None):
+            self.by = article.by
+            self.by_group = article.by_group
+            self.filter = article.filter
+            self.where = article.where
+            self.mon_group = article.mon_group
         self.palet.logger.info('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -42,76 +49,11 @@ class Enrollment(Article):
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _percentChange(self, df):
-        print('_percentChange')
-
-        df['enrollment change'] = df['enrollment'].pct_change()
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _decorate(self, df):
-        print('_decorate')
-
-        df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-        df = pd.merge(df, self.palet.st_name,
-                      how='inner',
-                      left_on=['USPS'],
-                      right_on=['USPS'])
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    #
     #  define the sql function here that has a class specific sql statement.
     #  i.e. Enrollment sql query being built
     #
     #
     # ---------------------------------------------------------------------------------
-    def sql(self):
-
-        rms = self._createView_rid_x_month_x_state()
-
-        # new_line_comma = '\n\t\t,'
-        #     inner join
-        # ({rms}) as rid
-        #     on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
-        #     and mon.BSF_FIL_DT = rid.BSF_FIL_DT
-        #     and mon.DA_RUN_ID = rid.DA_RUN_ID
-
-        z = f"""
-            select
-                {self._getByGroupWithAlias()}
-                2018 as YEAR
-                , count(*) as enrollment
-
-            from
-                taf.taf_mon_bsf as mon
-
-            {self._defineWhereClause()}
-
-            group by
-                {self._getByGroupWithAlias()}
-                YEAR
-            order by
-                {self._getByGroupWithAlias()}
-                YEAR
-        """
-
-        self.postprocess.append(self._percentChange)
-        self.postprocess.append(self._decorate)
-
-        return z
-
 
 # CC0 1.0 Universal
 
