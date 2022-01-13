@@ -11,7 +11,7 @@ State = State('NC')
 t = Trend().byMonth()
 # e = Enrollment(t).byAgeRange('0-18,65+').byState(State.state_fips).byIncomeBracket('01')
 # e = Enrollment(t).byIncomeBracket('01').byState(State.state_fips)
-e = Enrollment(t).byMonth()
+e = Enrollment(t).byMonth().byState(State.state_fips)
 print(e.sql())
 e.fetch()
 

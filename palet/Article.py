@@ -98,6 +98,8 @@ class Article:
             return ''
 
     # call this if they want monthly counts
+    # TODO: I'm not sure the conditional is needed here
+    # At first I thought it was needed in the GroupBy but calculated columns don't need a groupBy
     def _enroll_by_state_logic(self, logicType="count"):
         self._monthly_cnt_stmt = ""
         new_line_comma = ',\n\t\t\t\t\t'
@@ -380,11 +382,9 @@ class Article:
                 {rms}
                 group by
                    {self._getByGroupWithAlias()}
-                   {pref}
                     ann.DE_FIL_DT
                 order by
                     {self._getByGroupWithAlias()}
-                    {pref}
                     ann.DE_FIL_DT
             """
         self.postprocess.append(self._percentChange)
