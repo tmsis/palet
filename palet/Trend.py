@@ -16,7 +16,6 @@ class Trend(Article):
             self.by_group = article.by_group
             self.filter = article.filter
             self.where = article.where
-            self.mon_group = article.mon_group
             self._pctChangePeriod = -1
 
     # --------------------------------------------------
@@ -38,9 +37,9 @@ class Trend(Article):
 
         self._pctChangePeriod = period
 
-        # self.filter.update({"BSF_FIL_DT":  Palet.Utils.createDateRange(str(year))})
-        # self.by_group.append("BSF_FIL_DT")
-        # self.mon_group.append('mon.BSF_FIL_DT')
+        # self.filter.update({"DE_FIL_DT":  Palet.Utils.createDateRange(str(year))})
+        # self.by_group.append("DE_FIL_DT")
+        # self.ann_group.append('ann.DE_FIL_DT')
 
         return self
 

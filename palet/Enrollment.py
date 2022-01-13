@@ -17,7 +17,7 @@ class Enrollment(Article):
             self.by_group = article.by_group
             self.filter = article.filter
             self.where = article.where
-            self.mon_group = article.mon_group
+            self.month_group = article.month_group
         self.palet.logger.info('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -54,6 +54,16 @@ class Enrollment(Article):
     #
     #
     # ---------------------------------------------------------------------------------
+
+    # TODO: put in month logic
+    # TODO: add sphinx documentation for this function
+    def byMonth(self, month=None):
+        for str_month in self._str_month_:
+            self.month_group.append("chip_enrlmt_days_" + str_month)
+            self.month_group.append("mdcd_enrlmt_days_" + str_month)
+        return self
+        # if month is not None:
+        #    self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
 
 # CC0 1.0 Universal
 

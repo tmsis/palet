@@ -9,7 +9,7 @@ from palet.Palet import Palet
 class Article:
 
     # TODO: Continue to clean up docstring using syntax formatting
-    # Initialize the common variables here.
+    # Initialize the comann variables here.
     # All SQL objects should inherit from this class
     # ----------------------------------------------
     def __init__(self):
@@ -18,62 +18,63 @@ class Article:
         self.filter = {}
         self.where = []
 
-        self.mon_group = []
+        self.month_group = []
+        self._str_month_ = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
         self.postprocess = []
+
+        # TODO: remove this logic when ready
         self.palet = Palet('201801')
         self._pctChangePeriod = -1
-        # This variable exists to save the sql statement from the sub-classes
-        self._sql = None
+        self._monthly_cnt_stmt = None
+        # This variable exists to save the sql statement from the sub-classbyes
+        # self._sql = None
 
     # ---------------------------------------------------------------------------------
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
     #       properly for the dynamic sql generation
     # ---------------------------------------------------------------------------------
     def _getByGroupWithAlias(self):
-
+        z = ""
         new_line_comma = '\n\t\t\t   ,'
-        if (len(self.mon_group)) > 0:
-            return f"{new_line_comma.join(self.mon_group)},"
+        if (len(self.by_group)) > 0:
+            for column in self.by_group:
+                z += "ann." + column + new_line_comma
+            return f"{z}"
         else:
             return ''
 
+    # call this if they want monthly counts
+    def _enroll_by_state_logic(self, logicType="count"):
+        self._monthly_cnt_stmt = ""
+        new_line_comma = ',\n\t\t\t\t\t'
+        if logicType == "count": 
+            for monthFld in self.month_group:
+                self._monthly_cnt_stmt += "count(" + "ann." + monthFld + ")" + new_line_comma
+            return self._monthly_cnt_stmt
+        elif logicType == "prefix":
+            for monthFld in self.month_group:
+                self._monthly_cnt_stmt += "ann." + monthFld + new_line_comma
+            return self._monthly_cnt_stmt
+
     # Create a temporary table here to optimize our querying of the
     # objects and data
-    def _createView_rid_x_month_x_state(self):
+    def _createView_rid_x_annth_x_state(self):
 
-        # create or replace temporary view rid_x_month_x_state as
+        # create or replace temporary view rid_x_annth_x_state as
         # TODO: remove the hard coded file data below (2018)
         z = """
-            select distinct
-                SUBMTG_STATE_CD
-                ,BSF_FIL_DT
-                ,max(DA_RUN_ID) as DA_RUN_ID
+            (select
+            max(da_run_id) as max_da_run_id
             from
-                taf.tmp_max_da_run_id
+            taf.taf_ann_de_base
             where
-                BSF_FIL_DT >= 201801 and
-                BSF_FIL_DT <= 201812
-            group by
-                SUBMTG_STATE_CD
-                ,BSF_FIL_DT
-            order by
-                SUBMTG_STATE_CD
-                ,BSF_FIL_DT"""
+            DE_FIL_DT = 2018
+            AND (
+            mdcd_enrlmt_days_yr > 1
+            OR chip_enrlmt_days_yr > 1
+            ))"""
         return z
-
-    # ---------------------------------------------------------------------------------
-    # Do last minute add-ons here
-    # ---------------------------------------------------------------------------------
-    # def _postprocess(self, df: DataFrame, spark: SparkSession):
-    #     # import pandas as pd
-    #     if self._pctChangeCalc == 1:
-    #         pdf = df.toPandas()
-    #         pdf.pct_change()
-    #         df = spark.createDataFrame(pdf)
-    #         return pdf
-    #     else:
-    #         return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -88,7 +89,7 @@ class Article:
     # ---------------------------------------------------------------------------------
     #
     # slice and dice here to create the proper sytax for a where clause
-    #
+    #f
     #
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
@@ -105,7 +106,7 @@ class Article:
                 if str(values).find(" ") > -1:
                     splitRange = self._checkForMultiVarFilter(values)
                     for value in splitRange:
-                        clause = ("mon." + key, value)
+                        clause = ("ann." + key, value)
                         where.append(' ((= '.join(clause))
 
                 # Check for multiples with , separator
@@ -115,21 +116,21 @@ class Article:
                         # check for age ranges here with the - separator
                         if str(values).find("-") > -1:
                             splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "mon." + key + " between " + splitRange[0] + " and " + splitRange[1]
+                            range_stmt = "ann." + key + " between " + splitRange[0] + " and " + splitRange[1]
                         # check for greater than; i.e. x+ equals >= x
                         elif str(values).find("+") > -1:
-                            range_stmt = "mon." + key + " >= " + values.strip("+")
+                            range_stmt = "ann." + key + " >= " + values.strip("+")
                         # take the x+ and strip out the +
                         where.append(range_stmt)
 
                 else:  # else parse the single value
-                    clause = ("mon." + key, self.filter[key])
+                    clause = ("ann." + key, self.filter[key])
                     where.append(' = '.join(clause))
 
             return f"where {' and '.join(where)}"
 
         else:
-            return ''
+            return "where 1=1"
 
     # ---------------------------------------------------------------------------------
     #
@@ -174,7 +175,6 @@ class Article:
             :class:`Article` returns the updated object
         """
         self.by_group.append("age_num")
-        self.mon_group.append('mon.age_num')
 
         if age_range is not None:
             self.filter.update({"age_num": age_range})
@@ -198,8 +198,7 @@ class Article:
             :class:`Article`: returns the updated object
         """
         self.by_group.append("race_ethncty_exp_flag")
-        self.mon_group.append("mon.race_ethncty_exp_flag")
-
+        
         if ethnicity is not None:
             self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
 
@@ -221,11 +220,10 @@ class Article:
         Returns:
             :class:`Article` returns the updated object
         """
-        self.by_group.append("BSF_FIL_DT")
-        self.mon_group.append('mon.BSF_FIL_DT')
-
+        self.by_group.append("DE_FIL_DT")
+        
         if fileDate is not None:
-            self.filter.update({"BSF_FIL_DT": "'" + fileDate + "'"})
+            self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
 
         return self
 
@@ -241,8 +239,7 @@ class Article:
             :Article Object: returns the updated object
         """
         self.by_group.append("gndr_cd")
-        self.mon_group.append('mon.gndr_cd')
-
+        
         if gender is not None:
             self.filter.update({"gndr_cd": "'" + gender + "'"})
 
@@ -263,8 +260,7 @@ class Article:
         self.palet.logger.info('Group by - state')
 
         self.by_group.append("SUBMTG_STATE_CD")
-        self.mon_group.append('mon.SUBMTG_STATE_CD')
-
+        
         if state_fips is not None:
             self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
 
@@ -305,7 +301,9 @@ class Article:
 
     def sql(self):
 
-        rms = self._createView_rid_x_month_x_state()
+        rms = self._createView_rid_x_annth_x_state()
+        ebs = self._enroll_by_state_logic()
+        pref = self._enroll_by_state_logic("prefix")
 
         # new_line_comma = '\n\t\t\t   ,'
 
@@ -319,30 +317,26 @@ class Article:
         z = f"""
                 select
                     {self._getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-                    , count(*) as m
-
+                    ann.DE_FIL_DT,
+                    {ebs}
+                    count(*) as num_enrolled
                 from
-                    taf.taf_mon_bsf as mon
-
-                inner join
-                    ({rms}) as rid
-                        on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
-                        and mon.BSF_FIL_DT = rid.BSF_FIL_DT
-                        and mon.DA_RUN_ID = rid.DA_RUN_ID
-
+                    taf.taf_ann_de_base as ann
                 {self._defineWhereClause()}
-
+                AND ann.da_run_id in
+                {rms}
                 group by
                    {self._getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
+                   {pref}
+                    ann.DE_FIL_DT
                 order by
                     {self._getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
+                    {pref}
+                    ann.DE_FIL_DT
             """
         self.postprocess.append(self._percentChange)
         self.postprocess.append(self._decorate)
-        self._sql = z
+        # self._sql = z
         return z
 
     # ---------------------------------------------------------------------------------
@@ -355,7 +349,7 @@ class Article:
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
-        sparkDF = session.sql(self._sql)
+        sparkDF = session.sql(self.sql())
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here
@@ -375,12 +369,12 @@ class Article:
 # authorship and/or a database (each, a "Work").
 
 # Certain owners wish to permanently relinquish those rights to a Work for the
-# purpose of contributing to a commons of creative, cultural and scientific
-# works ("Commons") that the public can reliably and without fear of later
+# purpose of contributing to a comanns of creative, cultural and scientific
+# works ("Comanns") that the public can reliably and without fear of later
 # claims of infringement build upon, modify, incorporate in other works, reuse
 # and redistribute as freely as possible in any form whatsoever and for any
 # purposes, including without limitation commercial purposes. These owners may
-# contribute to the Commons to promote the ideal of a free culture and the
+# contribute to the Comanns to promote the ideal of a free culture and the
 # further production of creative, cultural and scientific works, or to gain
 # reputation or greater distribution for their Work in part through the use and
 # efforts of others.
@@ -475,9 +469,9 @@ class Article:
 #   disclaims responsibility for obtaining any necessary consents, permissions
 #   or other rights required for any use of the Work.
 
-#   d. Affirmer understands and acknowledges that Creative Commons is not a
+#   d. Affirmer understands and acknowledges that Creative Comanns is not a
 #   party to this document and has no duty or obligation with respect to this
 #   CC0 or use of the Work.
 
 # For more information, please see
-# <http://creativecommons.org/publicdomain/zero/1.0/>
+# <http://creativecomanns.org/publicdomain/zero/1.0/>
