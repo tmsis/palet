@@ -55,7 +55,7 @@ class Enrollment(Article):
     #
     # ---------------------------------------------------------------------------------
 
-    # TODO: put in month logic
+    # TODO: how do we deal with this when a State is not filtered?
     # TODO: add sphinx documentation for this function
     def byMonth(self, month=None):
         for str_month in self._str_month_:

@@ -20,6 +20,59 @@ class Article:
 
         self.month_group = []
         self._str_month_ = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+        self._chip_enrlmt_by_month_ = {
+            '01': 'chip_enrlmt_days_01',
+            'jan': 'chip_enrlmt_days_01',
+            '02': 'chip_enrlmt_days_02',
+            'feb': 'chip_enrlmt_days_02',
+            '03': 'chip_enrlmt_days_03',
+            'mar': 'chip_enrlmt_days_03',
+            '04': 'chip_enrlmt_days_04',
+            'apr': 'chip_enrlmt_days_04',
+            '05': 'chip_enrlmt_days_05',
+            'may': 'chip_enrlmt_days_05',
+            '06': 'chip_enrlmt_days_06',
+            'jun': 'chip_enrlmt_days_06',
+            '06': 'chip_enrlmt_days_06',
+            'jul': 'chip_enrlmt_days_07',
+            '07': 'chip_enrlmt_days_07',
+            'aug': 'chip_enrlmt_days_08',
+            '08': 'chip_enrlmt_days_08',
+            'sep': 'chip_enrlmt_days_09',
+            '09': 'chip_enrlmt_days_09',
+            'oct': 'chip_enrlmt_days_10',
+            '10': 'chip_enrlmt_days_10',
+            'nov': 'chip_enrlmt_days_11',
+            '11': 'chip_enrlmt_days_11',
+            'dec': 'chip_enrlmt_days_12',
+            '12': 'chip_enrlmt_days_12'
+        }
+        self._mdcd_enrlmt_by_month_ = {
+            '01': 'mdcd_enrlmt_days_01',
+            'jan': 'mdcd_enrlmt_days_01',
+            '02': 'mdcd_enrlmt_days_02',
+            'feb': 'mdcd_enrlmt_days_02',
+            '03': 'mdcd_enrlmt_days_03',
+            'mar': 'mdcd_enrlmt_days_03',
+            '04': 'mdcd_enrlmt_days_04',
+            'apr': 'mdcd_enrlmt_days_04',
+            '05': 'mdcd_enrlmt_days_05',
+            'may': 'mdcd_enrlmt_days_05',
+            '06': 'mdcd_enrlmt_days_06',
+            'jun': 'mdcd_enrlmt_days_06',
+            '07': 'mdcd_enrlmt_days_07',
+            'jul': 'mdcd_enrlmt_days_07',
+            '08': 'mdcd_enrlmt_days_08',
+            'aug': 'mdcd_enrlmt_days_08',
+            '09': 'mdcd_enrlmt_days_09',
+            'sep': 'mdcd_enrlmt_days_09',
+            '10': 'mdcd_enrlmt_days_10',
+            'oct': 'mdcd_enrlmt_days_10',
+            '11': 'mdcd_enrlmt_days_11',
+            'nov': 'mdcd_enrlmt_days_11',
+            '12': 'mdcd_enrlmt_days_12',
+            'dec': 'mdcd_enrlmt_days_12'
+        }
 
         self.postprocess = []
 
@@ -48,9 +101,9 @@ class Article:
     def _enroll_by_state_logic(self, logicType="count"):
         self._monthly_cnt_stmt = ""
         new_line_comma = ',\n\t\t\t\t\t'
-        if logicType == "count": 
-            for monthFld in self.month_group:
-                self._monthly_cnt_stmt += "count(" + "ann." + monthFld + ")" + new_line_comma
+        if logicType == "count":
+            for monthFld in self._str_month_:
+                self._monthly_cnt_stmt += "sum(case when " + "ann." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or ann." + self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) as " + monthFld + "_enrlmt_cnt" + new_line_comma
             return self._monthly_cnt_stmt
         elif logicType == "prefix":
             for monthFld in self.month_group:
@@ -89,7 +142,7 @@ class Article:
     # ---------------------------------------------------------------------------------
     #
     # slice and dice here to create the proper sytax for a where clause
-    #f
+    #
     #
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
@@ -198,7 +251,7 @@ class Article:
             :class:`Article`: returns the updated object
         """
         self.by_group.append("race_ethncty_exp_flag")
-        
+
         if ethnicity is not None:
             self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
 
@@ -221,7 +274,7 @@ class Article:
             :class:`Article` returns the updated object
         """
         self.by_group.append("DE_FIL_DT")
-        
+
         if fileDate is not None:
             self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
 
@@ -239,7 +292,7 @@ class Article:
             :Article Object: returns the updated object
         """
         self.by_group.append("gndr_cd")
-        
+
         if gender is not None:
             self.filter.update({"gndr_cd": "'" + gender + "'"})
 
@@ -260,7 +313,7 @@ class Article:
         self.palet.logger.info('Group by - state')
 
         self.by_group.append("SUBMTG_STATE_CD")
-        
+
         if state_fips is not None:
             self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
 
