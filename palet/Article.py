@@ -99,13 +99,14 @@ class Article:
 
     # call this if they want monthly counts
     # TODO: I'm not sure the conditional is needed here
+    # TODO: Review the OVER() call for counts in here. We need a view.
     # At first I thought it was needed in the GroupBy but calculated columns don't need a groupBy
     def _enroll_by_state_logic(self, logicType="count"):
         self._monthly_cnt_stmt = ""
         new_line_comma = ',\n\t\t\t\t\t'
         if logicType == "count":
             for monthFld in self._str_month_:
-                self._monthly_cnt_stmt += "sum(case when " + "ann." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or ann." + self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) as " + monthFld + "_enrlmt_cnt" + new_line_comma
+                self._monthly_cnt_stmt += "sum(case when " + "ann." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or ann." + self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) OVER() as " + monthFld + "_enrlmt_cnt" + new_line_comma
             return self._monthly_cnt_stmt
         elif logicType == "prefix":
             for monthFld in self.month_group:
@@ -380,6 +381,14 @@ class Article:
                 {self._defineWhereClause()}
                 AND ann.da_run_id in
                 {rms}
+                AND
+                sum(
+                    case
+                    when ann.chip_enrlmt_days_yr > 0
+                    or ann.mdcd_enrlmt_days_yr > 0 then 1
+                    else 0
+                    end
+                ) as total_enrlmt_eoy
                 group by
                    {self._getByGroupWithAlias()}
                     ann.DE_FIL_DT

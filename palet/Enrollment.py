@@ -58,12 +58,14 @@ class Enrollment(Article):
     # TODO: how do we deal with this when a State is not filtered?
     # TODO: add sphinx documentation for this function
     def byMonth(self, month=None):
-        for str_month in self._str_month_:
-            self.month_group.append("chip_enrlmt_days_" + str_month)
-            self.month_group.append("mdcd_enrlmt_days_" + str_month)
+        if month is not None:
+            self.month_group.append("chip_enrlmnt_days" + self._chip_enrlmt_by_month_[month])
+            self.month_group.append("chip_enrlmnt_days" + self._mdcd_enrlmt_by_month_[month])
+        else:
+            for str_month in self._str_month_:
+                self.month_group.append("chip_enrlmt_days_" + str_month)
+                self.month_group.append("mdcd_enrlmt_days_" + str_month)
         return self
-        # if month is not None:
-        #    self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
 
 # CC0 1.0 Universal
 
