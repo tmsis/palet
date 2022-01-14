@@ -324,7 +324,6 @@ class Article:
         return self
 
     # This function is just returning the straight data from the table
-    # TODO: If they are looking for analytics calculations we need more details
     def byIncomeBracket(self, bracket=None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
