@@ -106,7 +106,8 @@ class Article:
         new_line_comma = ',\n\t\t\t\t\t'
         if logicType == "count":
             for monthFld in self._str_month_:
-                self._monthly_cnt_stmt += "sum(case when " + "ann." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or ann." + self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) OVER() as " + monthFld + "_enrlmt_cnt" + new_line_comma
+                self._monthly_cnt_stmt += "sum(case when " + "ann." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or ann." + \
+                    self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) OVER() as " + monthFld + "_enrlmt_cnt" + new_line_comma
             return self._monthly_cnt_stmt
         elif logicType == "prefix":
             for monthFld in self.month_group:
