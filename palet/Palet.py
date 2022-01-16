@@ -14,14 +14,16 @@ class Palet():
     #
     #
     # ---------------------------------------------------------------------------------
-    def __init__(self, report_month: str, run_id: str = None):
+    def __init__(self, report_month: str, start_month: str, end_month: str, run_id: str = None):
         from datetime import datetime
         self.now = datetime.now()
         self.initialize_logger(self.now)
 
         self.version = '1.0.1'
 
-        self.report_month = report_month
+        self.report_month = datetime.strptime(report_month, '%Y%m')
+        self.start_month = datetime.strptime(start_month, '%Y%m')
+        self.end_month = datetime.strptime(end_month, '%Y%m')
 
         # static metadata dataframes
         self.apdxc = self.load_metadata_file('apdxc')

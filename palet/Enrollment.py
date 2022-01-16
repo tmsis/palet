@@ -8,10 +8,16 @@ class Enrollment(Article):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self):
-
+    def __init__(self, article: Article = None):
+        print('Initializing Enrollment API')
         super().__init__()
-        self.palet.logger.info('Initializing Enrollment API')
+
+        if (article is not None):
+            self.by = article.by
+            self.by_group = article.by_group
+            self.filter = article.filter
+            self.where = article.where
+            self.mon_group = article.mon_group
 
     # ---------------------------------------------------------------------------------
     #
@@ -92,7 +98,7 @@ class Enrollment(Article):
             select
                 {self._getByGroupWithAlias()}
                 2018 as YEAR
-                , count(*) as enrollment
+                , count(distinct msis_ident_num) as enrollment
 
             from
                 taf.taf_mon_bsf as mon
