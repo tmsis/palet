@@ -8,7 +8,7 @@ class Trend(Article):
     # Initialization of Trend class
     # ----------------------------------------------
     def __init__(self, article: Article = None):
-        # print('Initializing Trend API')
+        # print('Initializing Enrollment API')
         super().__init__()
 
         if (article is not None):
@@ -16,17 +16,31 @@ class Trend(Article):
             self.by_group = article.by_group
             self.filter = article.filter
             self.where = article.where
-            self.mon_group = article.mon_group
+            self._pctChangePeriod = -1
 
     # --------------------------------------------------
     # getMonthOverMonth function for trends of measures
     # --------------------------------------------------
-    def getMonthOverMonth(self, year=str(date.today().year)):
-        from palet.Palet import Palet
+    def byMonth(self, year=None, interval='monthly'):
+        # from palet.Palet import Palet
+        period = -1
 
-        self.filter.update({"BSF_FIL_DT":  Palet.Utils.createDateRange(str(year))})
-        self.by_group.append("BSF_FIL_DT")
-        self.mon_group.append('mon.BSF_FIL_DT')
+        if year is None:
+            year = str(date.today().year)
+
+        if interval == 'monthly':
+            period = -1
+        elif interval == 'quarterly' or interval == '4':
+            period = -4
+        elif interval == 'yearly' or interval == '12':
+            period = -12
+
+        self._pctChangePeriod = period
+
+        # self.filter.update({"DE_FIL_DT":  Palet.Utils.createDateRange(str(year))})
+        # self.by_group.append("DE_FIL_DT")
+        # self.ann_group.append('a.DE_FIL_DT')
+
         return self
 
     def mean(col: str):
@@ -35,42 +49,9 @@ class Trend(Article):
     # ---------------------------------------------------------------------------------
     #
     #
-    #
-    #
+    # TODO: do we need to move the sql() function into Article?
+    # Is the logic the same for all? Having a issue with post processing
     # ---------------------------------------------------------------------------------
-    def sql(self):
-
-        rms = self.createView_rid_x_month_x_state()
-
-        # new_line_comma = '\n\t\t\t   ,'
-
-        z = f"""
-                select
-                    {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-                    , count(*) as m
-
-                from
-                    taf.taf_mon_bsf as mon
-
-                inner join
-                    ({rms}) as rid
-                        on  mon.SUBMTG_STATE_CD = rid.SUBMTG_STATE_CD
-                        and mon.BSF_FIL_DT = rid.BSF_FIL_DT
-                        and mon.DA_RUN_ID = rid.DA_RUN_ID
-
-                {self.defineWhereClause()}
-
-                group by
-                   {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-                order by
-                    {self.getByGroupWithAlias()}
-                    mon.BSF_FIL_DT
-            """
-
-        return z
-
 
 # CC0 1.0 Universal
 
