@@ -201,7 +201,7 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: how do we deal with this when a State is not filtered?
+    # TODO: Fix this for PaletMetadata
     # TODO: add sphinx documentation for this function
     def byMonth(self, month=None):
         if month is not None:

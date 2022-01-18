@@ -1,6 +1,8 @@
 class PaletMetadata:
     class Enrollment:
 
+        fileDate = 'DE_FIL_DT'
+
         # ---------------------------------------------------------------------------------
         #
         #   Beneficiary Identity
@@ -79,7 +81,9 @@ class PaletMetadata:
             timestampUpdate = 'rec_updt_ts'
 
         class CHIP:
-            class month:
+            yearly = 'chip_enrlmt_days_yr'
+
+            class monthly:
                 Jan = 'chip_enrlmt_days_01',
                 Feb = 'chip_enrlmt_days_02',
                 Mar = 'chip_enrlmt_days_03',
@@ -94,7 +98,9 @@ class PaletMetadata:
                 Dec = 'chip_enrlmt_days_12'
 
         class Medicaid:
-            class month:
+            yearly = 'mdcd_enrlmt_days_yr'
+            
+            class monthly:
                 Jan = 'mdcd_enrlmt_days_01',
                 Feb = 'mdcd_enrlmt_days_02',
                 Mar = 'mdcd_enrlmt_days_03',
@@ -107,6 +113,7 @@ class PaletMetadata:
                 Oct = 'mdcd_enrlmt_days_10',
                 Nov = 'mdcd_enrlmt_days_11',
                 Dec = 'mdcd_enrlmt_days_12'
+
         # ---------------------------------------------------------------------------------
         #
         #   TODO:

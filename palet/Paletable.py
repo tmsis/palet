@@ -28,60 +28,6 @@ class Paletable:
 
         self.month_group = []
         self._str_month_ = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-        self._chip_enrlmt_by_month_ = {
-            '01': 'chip_enrlmt_days_01',
-            'jan': 'chip_enrlmt_days_01',
-            '02': 'chip_enrlmt_days_02',
-            'feb': 'chip_enrlmt_days_02',
-            '03': 'chip_enrlmt_days_03',
-            'mar': 'chip_enrlmt_days_03',
-            '04': 'chip_enrlmt_days_04',
-            'apr': 'chip_enrlmt_days_04',
-            '05': 'chip_enrlmt_days_05',
-            'may': 'chip_enrlmt_days_05',
-            '06': 'chip_enrlmt_days_06',
-            'jun': 'chip_enrlmt_days_06',
-            '06': 'chip_enrlmt_days_06',
-            'jul': 'chip_enrlmt_days_07',
-            '07': 'chip_enrlmt_days_07',
-            'aug': 'chip_enrlmt_days_08',
-            '08': 'chip_enrlmt_days_08',
-            'sep': 'chip_enrlmt_days_09',
-            '09': 'chip_enrlmt_days_09',
-            'oct': 'chip_enrlmt_days_10',
-            '10': 'chip_enrlmt_days_10',
-            'nov': 'chip_enrlmt_days_11',
-            '11': 'chip_enrlmt_days_11',
-            'dec': 'chip_enrlmt_days_12',
-            '12': 'chip_enrlmt_days_12'
-        }
-        self._mdcd_enrlmt_by_month_ = {
-            '01': 'mdcd_enrlmt_days_01',
-            'jan': 'mdcd_enrlmt_days_01',
-            '02': 'mdcd_enrlmt_days_02',
-            'feb': 'mdcd_enrlmt_days_02',
-            '03': 'mdcd_enrlmt_days_03',
-            'mar': 'mdcd_enrlmt_days_03',
-            '04': 'mdcd_enrlmt_days_04',
-            'apr': 'mdcd_enrlmt_days_04',
-            '05': 'mdcd_enrlmt_days_05',
-            'may': 'mdcd_enrlmt_days_05',
-            '06': 'mdcd_enrlmt_days_06',
-            'jun': 'mdcd_enrlmt_days_06',
-            '07': 'mdcd_enrlmt_days_07',
-            'jul': 'mdcd_enrlmt_days_07',
-            '08': 'mdcd_enrlmt_days_08',
-            'aug': 'mdcd_enrlmt_days_08',
-            '09': 'mdcd_enrlmt_days_09',
-            'sep': 'mdcd_enrlmt_days_09',
-            '10': 'mdcd_enrlmt_days_10',
-            'oct': 'mdcd_enrlmt_days_10',
-            '11': 'mdcd_enrlmt_days_11',
-            'nov': 'mdcd_enrlmt_days_11',
-            '12': 'mdcd_enrlmt_days_12',
-            'dec': 'mdcd_enrlmt_days_12'
-        }
-
         self.postprocess = []
 
         # TODO: remove this logic when ready
@@ -288,10 +234,10 @@ class Paletable:
         Returns:
             :class:`Article` returns the updated object
         """
-        self.by_group.append("age_num")
+        self.by_group.append(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
-            self.filter.update({"age_num": age_range})
+            self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
 
         return self
 
@@ -311,10 +257,10 @@ class Paletable:
         Returns:
             :class:`Article`: returns the updated object
         """
-        self.by_group.append("race_ethncty_exp_flag")
+        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
-            self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
 
         return self
 
@@ -334,10 +280,10 @@ class Paletable:
         Returns:
             :class:`Article` returns the updated object
         """
-        self.by_group.append("DE_FIL_DT")
+        self.by_group.append(PaletMetadata.Enrollment.fileDate)
 
         if fileDate is not None:
-            self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
+            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + fileDate + "'"})
 
         return self
 
@@ -362,7 +308,7 @@ class Paletable:
         self.by_group.append(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
-            self.filter.update({"gndr_cd": "'" + gender + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
 
         return self
 
@@ -420,11 +366,11 @@ class Paletable:
 
         self.palet.logger.info('Group by - income bracket')
 
-        self.by_group.append("INCM_CD")
+        self.by_group.append(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
-            self.filter.update({"INCM_CD": "'" + bracket + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
         else:
-            self.filter.update({"INCM_CD": "null"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: "null"})
 
         return self
 
@@ -437,7 +383,6 @@ class Paletable:
 
         rms = self._createView_rid_x_annth_x_state()
         ebs = self._enroll_by_state_logic()
-        pref = self._enroll_by_state_logic("prefix")
 
         # new_line_comma = '\n\t\t\t   ,'
 
