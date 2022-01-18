@@ -1,21 +1,21 @@
-from palet.Article import Article
+from palet.Paletable import Paletable
 from datetime import date
 
 
-class Trend(Article):
+class Trend(Paletable):
 
     # ----------------------------------------------
     # Initialization of Trend class
     # ----------------------------------------------
-    def __init__(self, article: Article = None):
+    def __init__(self, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
+        if (paletable is not None):
+            self.by = paletable.by
+            self.by_group = paletable.by_group
+            self.filter = paletable.filter
+            self.where = paletable.where
             self._pctChangePeriod = -1
 
     # --------------------------------------------------
@@ -49,7 +49,7 @@ class Trend(Article):
     # ---------------------------------------------------------------------------------
     #
     #
-    # TODO: do we need to move the sql() function into Article?
+    # TODO: do we need to move the sql() function into paletable?
     # Is the logic the same for all? Having a issue with post processing
     # ---------------------------------------------------------------------------------
 

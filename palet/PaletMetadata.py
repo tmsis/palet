@@ -78,6 +78,35 @@ class PaletMetadata:
             timestampAdd = 'rec_add_ts'
             timestampUpdate = 'rec_updt_ts'
 
+        class CHIP:
+            class month:
+                Jan = 'chip_enrlmt_days_01',
+                Feb = 'chip_enrlmt_days_02',
+                Mar = 'chip_enrlmt_days_03',
+                Apr = 'chip_enrlmt_days_04',
+                May = 'chip_enrlmt_days_05',
+                Jun = 'chip_enrlmt_days_06',
+                Jul = 'chip_enrlmt_days_07',
+                Aug = 'chip_enrlmt_days_08',
+                Sep = 'chip_enrlmt_days_09',
+                Oct = 'chip_enrlmt_days_10',
+                Nov = 'chip_enrlmt_days_11',
+                Dec = 'chip_enrlmt_days_12'
+
+        class Medicaid:
+            class month:
+                Jan = 'mdcd_enrlmt_days_01',
+                Feb = 'mdcd_enrlmt_days_02',
+                Mar = 'mdcd_enrlmt_days_03',
+                Apr = 'mdcd_enrlmt_days_04',
+                May = 'mdcd_enrlmt_days_05',
+                Jun = 'mdcd_enrlmt_days_06',
+                Jul = 'mdcd_enrlmt_days_07',
+                Aug = 'mdcd_enrlmt_days_08',
+                Sep = 'mdcd_enrlmt_days_09',
+                Oct = 'mdcd_enrlmt_days_10',
+                Nov = 'mdcd_enrlmt_days_11',
+                Dec = 'mdcd_enrlmt_days_12'
         # ---------------------------------------------------------------------------------
         #
         #   TODO:
@@ -146,4 +175,4 @@ class PaletMetadata:
         thirdPartyLiabilityInsurance = 'tpl_insrnc_cvrg_ind'
         thirdPartyLiabilityOther = 'tpl_othr_cvrg_ind'
         enrollmentIntervals = 'medicaid_enrollment_intervals'
-        chipEnrollmentIntervals = 'chip_enrollment_intervals'
+        CHIPIntervals = 'chip_enrollment_intervals'

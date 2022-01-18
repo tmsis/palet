@@ -1,23 +1,23 @@
 import pandas as pd
 from pyspark.sql import dataframe
-from palet.Article import Article
+from palet.Paletable import Paletable
 
 
-class Enrollment(Article):
+class Enrollment(Paletable):
 
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, article: Article = None):
+    def __init__(self, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
-            self.month_group = article.month_group
+        if (paletable is not None):
+            self.by = paletable.by
+            self.by_group = paletable.by_group
+            self.filter = paletable.filter
+            self.where = paletable.where
+            self.month_group = paletable.month_group
         self.palet.logger.info('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------

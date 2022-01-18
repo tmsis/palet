@@ -161,7 +161,6 @@ class Palet():
         @staticmethod
         def propertiesOf(Obj: Any):
             return print(Obj.__dict__)
-            
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
