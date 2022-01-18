@@ -4,7 +4,7 @@ import logging
 
 from pyspark.sql import SparkSession
 from palet.Palet import Palet
-
+from palet.PaletMetadata import PaletMetadata
 
 class Article:
 
@@ -358,7 +358,7 @@ class Article:
 
         self.palet.logger.info('Group by - gender')
 
-        self.by_group.append("gndr_cd")
+        self.by_group.append(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
             self.filter.update({"gndr_cd": "'" + gender + "'"})
