@@ -6,7 +6,8 @@ from pyspark.sql import SparkSession
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
-class Article:
+
+class Paletable:
 
     # TODO: Continue to clean up docstring using syntax formatting
     # Initialize the comann variables here.
@@ -506,7 +507,7 @@ class Article:
     #
     #
     # ---------------------------------------------------------------------------------
-    def log(self, viewname: str, sql='') :
+    def log(self, viewname: str, sql=''):
         self.palet.logger.info('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))
