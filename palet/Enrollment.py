@@ -175,7 +175,8 @@ class Enrollment(Paletable):
                 taf.taf_ann_de_base as a
             where
                 a.da_run_id in ( {self._getRunIds()} ) and
-                {self._getByTimeunitCull()}
+                {self._getByTimeunitCull()} AND
+                {self._defineWhereClause()}
             group by
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt
