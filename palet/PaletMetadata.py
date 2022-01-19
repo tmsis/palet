@@ -77,7 +77,7 @@ class PaletMetadata:
             race = 'race_ethncty_flag'
             raceExpanded = 'race_ethncty_exp_flag'
             hispanic = 'hspnc_ethncty_flag'
-            timestampAdd = 'rec_add_ts', 
+            timestampAdd = 'rec_add_ts',
             timestampUpdate = 'rec_updt_ts'
 
         class CHIP:
