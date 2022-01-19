@@ -1,6 +1,4 @@
 import pandas as pd
-from datetime import datetime
-import logging
 
 from pyspark.sql import SparkSession
 from palet.Palet import Palet
@@ -21,21 +19,13 @@ class Paletable:
     def __init__(self):
         self.runids = [789]
         self.timeunit = 'year'
-        self.by = {}
         self.by_group = []
         self.filter = {}
-        self.where = []
 
-        self.month_group = []
-        self._str_month_ = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-        self.postprocess = []
+        self.preprocesses = []
+        self.postprocesses = []
 
-        # TODO: remove this logic when ready
         self.palet = Palet('201801')
-        self._pctChangePeriod = -1
-        self._monthly_cnt_stmt = None
-        # This variable exists to save the sql statement from the sub-classbyes
-        # self._sql = None
 
     # ---------------------------------------------------------------------------------
     #
@@ -44,6 +34,24 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
         return ','.join(map(str, self.runids))
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addPreProcess(self, cb):
+        if cb not in self.preprocesses:
+            self.preprocesses.append(cb)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addPostProcess(self, cb):
+        if cb not in self.postprocesses:
+            self.postprocesses.append(cb)
 
     # ---------------------------------------------------------------------------------
     #
@@ -60,54 +68,6 @@ class Paletable:
             return f"{z}"
         else:
             return ''
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # call this if they want monthly counts
-    # TODO: I'm not sure the conditional is needed here
-    # TODO: Review the OVER() call for counts in here. We need a view.
-    # At first I thought it was needed in the GroupBy but calculated columns don't need a groupBy
-    def _enroll_by_state_logic(self, logicType="count"):
-        self._monthly_cnt_stmt = ""
-        new_line_comma = ',\n\t\t\t\t\t'
-        if logicType == "count":
-            for monthFld in self._str_month_:
-                self._monthly_cnt_stmt += "sum(case when " + "a." + self._chip_enrlmt_by_month_[monthFld] + " > 0 or a." + \
-                    self._mdcd_enrlmt_by_month_[monthFld] + " > 0 then 1 else 0 end) OVER() as " + monthFld + "_enrlmt_cnt" + new_line_comma
-            return self._monthly_cnt_stmt
-        elif logicType == "prefix":
-            for monthFld in self.month_group:
-                self._monthly_cnt_stmt += "a." + monthFld + new_line_comma
-            return self._monthly_cnt_stmt
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # Create a temporary table here to optimize our querying of the
-    # objects and data
-    def _createView_rid_x_annth_x_state(self):
-
-        # create or replace temporary view rid_x_annth_x_state as
-        # TODO: remove the hard coded file data below (2018)
-        z = """
-            (select
-            max(da_run_id) as max_da_run_id
-            from
-            taf.taf_ann_de_base
-            where
-            DE_FIL_DT = 2018
-            AND (
-            mdcd_enrlmt_days_yr > 1
-            OR chip_enrlmt_days_yr > 1
-            ))"""
-        return z
 
     # ---------------------------------------------------------------------------------
     #
@@ -183,7 +143,10 @@ class Paletable:
     def _percentChange(self, df):
         self.palet.logger.debug('Percent Change')
 
-        df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+        if (len(self.by_group)) > 0:
+            df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+        else:
+            df['isfirst'] = 0
 
         df['mdcd_pct'] = [
             round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1, 5)
@@ -266,29 +229,6 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    # add any fileDates here
-    # TODO: Figure out the best way to accept dates in this API
-    #
-    # ---------------------------------------------------------------------------------
-    def byFileDate(self, fileDate=None):
-        """Filter your query by File Date. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
-
-        Args:
-            fileDate: `str, optional`: Filter by a file date. Defaults to None.
-
-        Returns:
-            :class:`Article` returns the updated object
-        """
-        self.by_group.append(PaletMetadata.Enrollment.fileDate)
-
-        if fileDate is not None:
-            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + fileDate + "'"})
-
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
     #
     #
     # ---------------------------------------------------------------------------------
@@ -317,7 +257,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
+    def bySubmittingState(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -330,10 +270,10 @@ class Paletable:
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append("SUBMTG_STATE_CD")
+        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
 
         if state_fips is not None:
-            self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
 
@@ -380,49 +320,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-
-        rms = self._createView_rid_x_annth_x_state()
-        ebs = self._enroll_by_state_logic()
-
-        # new_line_comma = '\n\t\t\t   ,'
-
-        # Do we need to defaul to byState regardless? Is everything State reliant?
-        # If we don't have submtg_state_cd any call fails so we're forcing it in
-        # If the user decides to use it as their own byGroup we need to make sure
-        # not to add it twice
-        if 'SUBMTG_STATE_CD' not in self.by_group:
-            self = self.byState()
-
-        z = f"""
-                select
-                    {self._getByGroupWithAlias()}
-                    a.DE_FIL_DT,
-                    {ebs}
-                    count(*) as num_enrolled
-                from
-                    taf.taf_ann_de_base as ann
-                {self._defineWhereClause()}
-                AND a.da_run_id in
-                {rms}
-                AND
-                sum(
-                    case
-                    when a.chip_enrlmt_days_yr > 0
-                    or a.mdcd_enrlmt_days_yr > 0 then 1
-                    else 0
-                    end
-                ) as total_enrlmt_eoy
-                group by
-                   {self._getByGroupWithAlias()}
-                    a.DE_FIL_DT
-                order by
-                    {self._getByGroupWithAlias()}
-                    a.DE_FIL_DT
-            """
-        self.postprocess.append(self._percentChange)
-        self.postprocess.append(self._decorate)
-        # self._sql = z
-        return z
+        return self.sql
 
     # ---------------------------------------------------------------------------------
     #
@@ -442,7 +340,7 @@ class Paletable:
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here
-        for pp in self.postprocess:
+        for pp in self.postprocesses:
             df = pp(df)
 
         return df

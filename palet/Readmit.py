@@ -24,11 +24,6 @@ class Readmit:
 
     def __init__(self) -> None:
 
-        self.by = {
-            'ethnicity': self.byEthnicity,
-            'state': self.byState,
-        }
-
         self.analyses = {
         }
 
