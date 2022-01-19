@@ -1,24 +1,57 @@
 import pandas as pd
 from pyspark.sql import dataframe
-from palet.Article import Article
+from palet.Paletable import Paletable
 
 
-class Enrollment(Article):
+class Enrollment(Paletable):
 
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, article: Article = None):
+    def __init__(self, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
-            self.month_group = article.month_group
+        if (paletable is not None):
+            self.by_group = paletable.by_group
+            self.filter = paletable.filter
+
         self.palet.logger.info('Initializing Enrollment API')
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    @staticmethod
+    def create_da_run_id_view():
+        from pyspark.sql import SparkSession
+
+        spark = SparkSession.getActiveSession()
+
+        z = """
+                create or replace temporary view palet_da_run_id as
+                select
+                    fil_type,
+                    job_parms_txt,
+                    max(da_run_id) as da_run_id
+                from
+                    taf.job_cntl_parms
+                where
+                    fil_type = 'ade'
+                    and rfrsh_vw_flag is true
+                    and sucsfl_ind is true
+                group by
+                    fil_type,
+                    job_parms_txt
+                order by
+                    fil_type,
+                    job_parms_txt
+            """
+
+        # self.palet.logger.debug(z)
+        spark.sql(z)
 
     # ---------------------------------------------------------------------------------
     #
@@ -49,22 +82,143 @@ class Enrollment(Article):
 
     # ---------------------------------------------------------------------------------
     #
-    #  define the sql function here that has a class specific sql statement.
-    #  i.e. Enrollment sql query being built
+    #
     #
     #
     # ---------------------------------------------------------------------------------
+    class timeunit():
 
-    # TODO: put in month logic
+        breakdown = {
+            'year': """
+                sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
+                sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment""",
+            'month': """
+                stack(12,
+                    1, sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end),
+                    2, sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end),
+                    3, sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end),
+                    4, sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end),
+                    5, sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end),
+                    6, sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end),
+                    7, sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end),
+                    8, sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end),
+                    9, sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end),
+                    10,sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end),
+                    11,sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end),
+                    12,sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end)
+                ) as (month, mdcd_enrollment, chip_enrollment)"""
+        }
+
+        cull = {
+            'year': """(
+                (a.mdcd_enrlmt_days_yr > 0) or (a.chip_enrlmt_days_yr > 0))""",
+            'month': """(
+                (a.mdcd_enrlmt_days_01 > 0) or (a.chip_enrlmt_days_01 > 0) or
+                (a.mdcd_enrlmt_days_02 > 0) or (a.chip_enrlmt_days_02 > 0) or
+                (a.mdcd_enrlmt_days_03 > 0) or (a.chip_enrlmt_days_03 > 0) or
+                (a.mdcd_enrlmt_days_04 > 0) or (a.chip_enrlmt_days_04 > 0) or
+                (a.mdcd_enrlmt_days_05 > 0) or (a.chip_enrlmt_days_05 > 0) or
+                (a.mdcd_enrlmt_days_06 > 0) or (a.chip_enrlmt_days_06 > 0) or
+                (a.mdcd_enrlmt_days_07 > 0) or (a.chip_enrlmt_days_07 > 0) or
+                (a.mdcd_enrlmt_days_08 > 0) or (a.chip_enrlmt_days_08 > 0) or
+                (a.mdcd_enrlmt_days_09 > 0) or (a.chip_enrlmt_days_09 > 0) or
+                (a.mdcd_enrlmt_days_10 > 0) or (a.chip_enrlmt_days_10 > 0) or
+                (a.mdcd_enrlmt_days_11 > 0) or (a.chip_enrlmt_days_11 > 0) or
+                (a.mdcd_enrlmt_days_12 > 0) or (a.chip_enrlmt_days_12 > 0)
+            )"""
+        }
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getTimeunitBreakdown(self):
+        return Enrollment.timeunit.breakdown[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getByTimeunitCull(self):
+        return Enrollment.timeunit.cull[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def sql(self):
+
+        # create or replace temporary view enrollment_by_month as
+        z = f"""
+            select
+                {self._getByGroupWithAlias()}
+                a.de_fil_dt,
+                {self._getTimeunitBreakdown()}
+            from
+                taf.taf_ann_de_base as a
+            where
+                a.da_run_id in ( {self._getRunIds()} ) and
+                {self._getByTimeunitCull()}
+            group by
+                {self._getByGroupWithAlias()}
+                a.de_fil_dt
+            order by
+                {self._getByGroupWithAlias()}
+                a.de_fil_dt
+         """
+
+        self._addPostProcess(self._percentChange)
+        self._addPostProcess(self._decorate)
+
+        return z
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     # TODO: add sphinx documentation for this function
-    def byMonth(self, month=None):
-        for str_month in self._str_month_:
-            self.month_group.append("chip_enrlmt_days_" + str_month)
-            self.month_group.append("mdcd_enrlmt_days_" + str_month)
-        return self
-        # if month is not None:
-        #    self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
+    def byYear(self, year: int = None):
 
+        self.timeunit = 'year'
+        self.timeunitvalue = year
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    # TODO: add sphinx documentation for this function
+    def byMonth(self, month: int = None):
+
+        self.timeunit = 'month'
+        self.timeunitvalue = month
+
+        return self
+
+
+# -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
 
 # Statement of Purpose

@@ -1,80 +1,73 @@
 import pandas as pd
-from datetime import datetime
-import logging
 
 from pyspark.sql import SparkSession
 from palet.Palet import Palet
+from palet.PaletMetadata import PaletMetadata
 
 
-class Article:
+class Paletable:
 
     # TODO: Continue to clean up docstring using syntax formatting
     # Initialize the comann variables here.
     # All SQL objects should inherit from this class
-    # ----------------------------------------------
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def __init__(self):
-        self.by = {}
+        self.runids = [789]
+        self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
-        self.where = []
 
-        self.month_group = []
-        self._str_month_ = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+        self.preprocesses = []
+        self.postprocesses = []
 
-        self.postprocess = []
-
-        # TODO: remove this logic when ready
         self.palet = Palet('201801')
-        self._pctChangePeriod = -1
-        self._monthly_cnt_stmt = None
-        # This variable exists to save the sql statement from the sub-classbyes
-        # self._sql = None
 
     # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getRunIds(self):
+        return ','.join(map(str, self.runids))
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addPreProcess(self, cb):
+        if cb not in self.preprocesses:
+            self.preprocesses.append(cb)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addPostProcess(self, cb):
+        if cb not in self.postprocesses:
+            self.postprocesses.append(cb)
+
+    # ---------------------------------------------------------------------------------
+    #
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
     #       properly for the dynamic sql generation
+    #
     # ---------------------------------------------------------------------------------
     def _getByGroupWithAlias(self):
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
             for column in self.by_group:
-                z += "ann." + column + new_line_comma
+                z += "a." + column + new_line_comma
             return f"{z}"
         else:
             return ''
-
-    # call this if they want monthly counts
-    def _enroll_by_state_logic(self, logicType="count"):
-        self._monthly_cnt_stmt = ""
-        new_line_comma = ',\n\t\t\t\t\t'
-        if logicType == "count": 
-            for monthFld in self.month_group:
-                self._monthly_cnt_stmt += "count(" + "ann." + monthFld + ")" + new_line_comma
-            return self._monthly_cnt_stmt
-        elif logicType == "prefix":
-            for monthFld in self.month_group:
-                self._monthly_cnt_stmt += "ann." + monthFld + new_line_comma
-            return self._monthly_cnt_stmt
-
-    # Create a temporary table here to optimize our querying of the
-    # objects and data
-    def _createView_rid_x_annth_x_state(self):
-
-        # create or replace temporary view rid_x_annth_x_state as
-        # TODO: remove the hard coded file data below (2018)
-        z = """
-            (select
-            max(da_run_id) as max_da_run_id
-            from
-            taf.taf_ann_de_base
-            where
-            DE_FIL_DT = 2018
-            AND (
-            mdcd_enrlmt_days_yr > 1
-            OR chip_enrlmt_days_yr > 1
-            ))"""
-        return z
 
     # ---------------------------------------------------------------------------------
     #
@@ -89,7 +82,7 @@ class Article:
     # ---------------------------------------------------------------------------------
     #
     # slice and dice here to create the proper sytax for a where clause
-    #f
+    #
     #
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
@@ -106,7 +99,7 @@ class Article:
                 if str(values).find(" ") > -1:
                     splitRange = self._checkForMultiVarFilter(values)
                     for value in splitRange:
-                        clause = ("ann." + key, value)
+                        clause = ("a." + key, value)
                         where.append(' ((= '.join(clause))
 
                 # Check for multiples with , separator
@@ -116,15 +109,15 @@ class Article:
                         # check for age ranges here with the - separator
                         if str(values).find("-") > -1:
                             splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "ann." + key + " between " + splitRange[0] + " and " + splitRange[1]
+                            range_stmt = "a." + key + " between " + splitRange[0] + " and " + splitRange[1]
                         # check for greater than; i.e. x+ equals >= x
                         elif str(values).find("+") > -1:
-                            range_stmt = "ann." + key + " >= " + values.strip("+")
+                            range_stmt = "a." + key + " >= " + values.strip("+")
                         # take the x+ and strip out the +
                         where.append(range_stmt)
 
                 else:  # else parse the single value
-                    clause = ("ann." + key, self.filter[key])
+                    clause = ("a." + key, self.filter[key])
                     where.append(' = '.join(clause))
 
             return f"where {' and '.join(where)}"
@@ -141,16 +134,42 @@ class Article:
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _percentChange(self, df):
-        print('_percentChange')
+        self.palet.logger.debug('Percent Change')
 
-        # this appears to have to be a key variable based on user input. We need to look at it more
-        df['enrollment change'] = df['enrollment'].pct_change(self._pctChangePeriod)
+        if (len(self.by_group)) > 0:
+            df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+        else:
+            df['isfirst'] = 0
+
+        df['mdcd_pct'] = [
+            round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1, 5)
+            if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+            else float('NaN')
+            for x in range(len(df))]
+
+        df['chip_pct'] = [
+            round((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1, 5)
+            if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+            else float('NaN')
+            for x in range(len(df))]
 
         return df
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _decorate(self, df):
-        print('_decorate')
+        self.palet.logger.debug('Decorate')
 
         df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
         df = pd.merge(df, self.palet.st_name,
@@ -160,6 +179,10 @@ class Article:
 
         return df
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
         """Filter your query by Age Range. Most top level objects inherit this
@@ -174,10 +197,10 @@ class Article:
         Returns:
             :class:`Article` returns the updated object
         """
-        self.by_group.append("age_num")
+        self.by_group.append(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
-            self.filter.update({"age_num": age_range})
+            self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
 
         return self
 
@@ -197,36 +220,17 @@ class Article:
         Returns:
             :class:`Article`: returns the updated object
         """
-        self.by_group.append("race_ethncty_exp_flag")
-        
+        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
+
         if ethnicity is not None:
-            self.filter.update({"race_ethncty_exp_flag": "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
 
         return self
 
     # ---------------------------------------------------------------------------------
     #
-    # add any fileDates here
-    # TODO: Figure out the best way to accept dates in this API
     #
-    # ---------------------------------------------------------------------------------
-    def byFileDate(self, fileDate=None):
-        """Filter your query by File Date. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
-
-        Args:
-            fileDate: `str, optional`: Filter by a file date. Defaults to None.
-
-        Returns:
-            :class:`Article` returns the updated object
-        """
-        self.by_group.append("DE_FIL_DT")
-        
-        if fileDate is not None:
-            self.filter.update({"DE_FIL_DT": "'" + fileDate + "'"})
-
-        return self
-
+    #
     # ---------------------------------------------------------------------------------
     def byGender(self, gender=None):
         """Filter your query by Gender. Most top level objects inherit this function such as Enrollment, Trend, etc.
@@ -238,15 +242,22 @@ class Article:
         Returns:
             :Article Object: returns the updated object
         """
-        self.by_group.append("gndr_cd")
-        
+
+        self.palet.logger.info('Group by - gender')
+
+        self.by_group.append(PaletMetadata.Enrollment.identity.gender)
+
         if gender is not None:
-            self.filter.update({"gndr_cd": "'" + gender + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
 
         return self
 
     # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def bySubmittingState(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -259,15 +270,19 @@ class Article:
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append("SUBMTG_STATE_CD")
-        
+        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+
         if state_fips is not None:
-            self.filter.update({"SUBMTG_STATE_CD": "'" + state_fips + "'"})
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     # This function is just returning the straight data from the table
-    # TODO: If they are looking for analytics calculations we need more details
     def byIncomeBracket(self, bracket=None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
@@ -291,54 +306,26 @@ class Article:
 
         self.palet.logger.info('Group by - income bracket')
 
-        self.by_group.append("INCM_CD")
+        self.by_group.append(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
-            self.filter.update({"INCM_CD": "'" + bracket + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
         else:
-            self.filter.update({"INCM_CD": "null"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: "null"})
 
         return self
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def sql(self):
+        print(self.sql)
 
-        rms = self._createView_rid_x_annth_x_state()
-        ebs = self._enroll_by_state_logic()
-        pref = self._enroll_by_state_logic("prefix")
-
-        # new_line_comma = '\n\t\t\t   ,'
-
-        # Do we need to defaul to byState regardless? Is everything State reliant?
-        # If we don't have submtg_state_cd any call fails so we're forcing it in
-        # If the user decides to use it as their own byGroup we need to make sure
-        # not to add it twice
-        if 'SUBMTG_STATE_CD' not in self.by_group:
-            self = self.byState()
-
-        z = f"""
-                select
-                    {self._getByGroupWithAlias()}
-                    ann.DE_FIL_DT,
-                    {ebs}
-                    count(*) as num_enrolled
-                from
-                    taf.taf_ann_de_base as ann
-                {self._defineWhereClause()}
-                AND ann.da_run_id in
-                {rms}
-                group by
-                   {self._getByGroupWithAlias()}
-                   {pref}
-                    ann.DE_FIL_DT
-                order by
-                    {self._getByGroupWithAlias()}
-                    {pref}
-                    ann.DE_FIL_DT
-            """
-        self.postprocess.append(self._percentChange)
-        self.postprocess.append(self._decorate)
-        # self._sql = z
-        return z
-
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
     # ---------------------------------------------------------------------------------
     def fetch(self):
         """Call this function when you are ready for results
@@ -353,12 +340,24 @@ class Article:
         df = sparkDF.toPandas()
 
         # perform last minute add-ons here
-        for pp in self.postprocess:
+        for pp in self.postprocesses:
             df = pp(df)
 
         return df
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def log(self, viewname: str, sql=''):
+        self.palet.logger.info('\t' + viewname)
+        if sql != '':
+            # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))
+            self.palet.sql[viewname] = '\n'.join(sql.split('\n')[2:])
 
+
+# -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
 
 # Statement of Purpose
@@ -369,12 +368,12 @@ class Article:
 # authorship and/or a database (each, a "Work").
 
 # Certain owners wish to permanently relinquish those rights to a Work for the
-# purpose of contributing to a comanns of creative, cultural and scientific
-# works ("Comanns") that the public can reliably and without fear of later
+# purpose of contributing to a commons of creative, cultural and scientific
+# works ("Commons") that the public can reliably and without fear of later
 # claims of infringement build upon, modify, incorporate in other works, reuse
 # and redistribute as freely as possible in any form whatsoever and for any
 # purposes, including without limitation commercial purposes. These owners may
-# contribute to the Comanns to promote the ideal of a free culture and the
+# contribute to the Commons to promote the ideal of a free culture and the
 # further production of creative, cultural and scientific works, or to gain
 # reputation or greater distribution for their Work in part through the use and
 # efforts of others.
@@ -469,9 +468,9 @@ class Article:
 #   disclaims responsibility for obtaining any necessary consents, permissions
 #   or other rights required for any use of the Work.
 
-#   d. Affirmer understands and acknowledges that Creative Comanns is not a
+#   d. Affirmer understands and acknowledges that Creative Commons is not a
 #   party to this document and has no duty or obligation with respect to this
 #   CC0 or use of the Work.
 
 # For more information, please see
-# <http://creativecomanns.org/publicdomain/zero/1.0/>
+# <http://creativecommons.org/publicdomain/zero/1.0/>

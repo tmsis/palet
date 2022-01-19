@@ -1,4 +1,3 @@
-# TODO: Clean up docstring based on formatting similar to Article class
 
 from palet.Palet import Palet
 

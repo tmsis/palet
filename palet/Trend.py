@@ -1,55 +1,23 @@
-from palet.Article import Article
-from datetime import date
+from palet.Paletable import Paletable
 
 
-class Trend(Article):
+class Trend(Paletable):
 
     # ----------------------------------------------
     # Initialization of Trend class
     # ----------------------------------------------
-    def __init__(self, article: Article = None):
+    def __init__(self, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
-        if (article is not None):
-            self.by = article.by
-            self.by_group = article.by_group
-            self.filter = article.filter
-            self.where = article.where
-            self._pctChangePeriod = -1
-
-    # --------------------------------------------------
-    # getMonthOverMonth function for trends of measures
-    # --------------------------------------------------
-    def byMonth(self, year=None, interval='monthly'):
-        # from palet.Palet import Palet
-        period = -1
-
-        if year is None:
-            year = str(date.today().year)
-
-        if interval == 'monthly':
-            period = -1
-        elif interval == 'quarterly' or interval == '4':
-            period = -4
-        elif interval == 'yearly' or interval == '12':
-            period = -12
-
-        self._pctChangePeriod = period
-
-        # self.filter.update({"DE_FIL_DT":  Palet.Utils.createDateRange(str(year))})
-        # self.by_group.append("DE_FIL_DT")
-        # self.ann_group.append('ann.DE_FIL_DT')
-
-        return self
-
-    def mean(col: str):
-        print('Calculating Average ' + col)
+        if (paletable is not None):
+            self.by_group = paletable.by_group
+            self.filter = paletable.filter
 
     # ---------------------------------------------------------------------------------
     #
     #
-    # TODO: do we need to move the sql() function into Article?
+    # TODO: do we need to move the sql() function into paletable?
     # Is the logic the same for all? Having a issue with post processing
     # ---------------------------------------------------------------------------------
 
