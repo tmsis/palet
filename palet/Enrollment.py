@@ -13,11 +13,9 @@ class Enrollment(Paletable):
         super().__init__()
 
         if (paletable is not None):
-            self.by = paletable.by
             self.by_group = paletable.by_group
             self.filter = paletable.filter
-            self.where = paletable.where
-            self.month_group = paletable.month_group
+
         self.palet.logger.info('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -42,8 +40,6 @@ class Enrollment(Paletable):
                     taf.job_cntl_parms
                 where
                     fil_type = 'ade'
-                    and job_parms_txt in ('2021-01-31',
-                                          '2020-01-31')
                     and rfrsh_vw_flag is true
                     and sucsfl_ind is true
                 group by
@@ -188,10 +184,8 @@ class Enrollment(Paletable):
                 a.de_fil_dt
          """
 
-        if self._percentChange not in self.postprocess:
-            self.postprocess.append(self._percentChange)
-        if self._decorate not in self.postprocess:
-            self.postprocess.append(self._decorate)
+        self._addPostProcess(self._percentChange)
+        self._addPostProcess(self._decorate)
 
         return z
 
@@ -201,16 +195,26 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: Fix this for PaletMetadata
     # TODO: add sphinx documentation for this function
-    def byMonth(self, month=None):
-        if month is not None:
-            self.month_group.append("chip_enrlmnt_days" + self._chip_enrlmt_by_month_[month])
-            self.month_group.append("chip_enrlmnt_days" + self._mdcd_enrlmt_by_month_[month])
-        else:
-            for str_month in self._str_month_:
-                self.month_group.append("chip_enrlmt_days_" + str_month)
-                self.month_group.append("mdcd_enrlmt_days_" + str_month)
+    def byYear(self, year: int = None):
+
+        self.timeunit = 'year'
+        self.timeunitvalue = year
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    # TODO: add sphinx documentation for this function
+    def byMonth(self, month: int = None):
+
+        self.timeunit = 'month'
+        self.timeunitvalue = month
+
         return self
 
 

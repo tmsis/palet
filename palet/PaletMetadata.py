@@ -36,6 +36,7 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         class locale:
+            submittingState = 'SUBMTG_STATE_CD'
             address = ['elgbl_line_1_adr_home', 'elgbl_line_2_adr_home', 'elgbl_line_3_adr_home']
             city = 'elgbl_city_name_home'
             zip = 'elgbl_zip_cd_home'
@@ -84,34 +85,34 @@ class PaletMetadata:
             yearly = 'chip_enrlmt_days_yr'
 
             class monthly:
-                Jan = 'chip_enrlmt_days_01',
-                Feb = 'chip_enrlmt_days_02',
-                Mar = 'chip_enrlmt_days_03',
-                Apr = 'chip_enrlmt_days_04',
-                May = 'chip_enrlmt_days_05',
-                Jun = 'chip_enrlmt_days_06',
-                Jul = 'chip_enrlmt_days_07',
-                Aug = 'chip_enrlmt_days_08',
-                Sep = 'chip_enrlmt_days_09',
-                Oct = 'chip_enrlmt_days_10',
-                Nov = 'chip_enrlmt_days_11',
+                Jan = 'chip_enrlmt_days_01'
+                Feb = 'chip_enrlmt_days_02'
+                Mar = 'chip_enrlmt_days_03'
+                Apr = 'chip_enrlmt_days_04'
+                May = 'chip_enrlmt_days_05'
+                Jun = 'chip_enrlmt_days_06'
+                Jul = 'chip_enrlmt_days_07'
+                Aug = 'chip_enrlmt_days_08'
+                Sep = 'chip_enrlmt_days_09'
+                Oct = 'chip_enrlmt_days_10'
+                Nov = 'chip_enrlmt_days_11'
                 Dec = 'chip_enrlmt_days_12'
 
         class Medicaid:
             yearly = 'mdcd_enrlmt_days_yr'
-            
+
             class monthly:
-                Jan = 'mdcd_enrlmt_days_01',
-                Feb = 'mdcd_enrlmt_days_02',
-                Mar = 'mdcd_enrlmt_days_03',
-                Apr = 'mdcd_enrlmt_days_04',
-                May = 'mdcd_enrlmt_days_05',
-                Jun = 'mdcd_enrlmt_days_06',
-                Jul = 'mdcd_enrlmt_days_07',
-                Aug = 'mdcd_enrlmt_days_08',
-                Sep = 'mdcd_enrlmt_days_09',
-                Oct = 'mdcd_enrlmt_days_10',
-                Nov = 'mdcd_enrlmt_days_11',
+                Jan = 'mdcd_enrlmt_days_01'
+                Feb = 'mdcd_enrlmt_days_02'
+                Mar = 'mdcd_enrlmt_days_03'
+                Apr = 'mdcd_enrlmt_days_04'
+                May = 'mdcd_enrlmt_days_05'
+                Jun = 'mdcd_enrlmt_days_06'
+                Jul = 'mdcd_enrlmt_days_07'
+                Aug = 'mdcd_enrlmt_days_08'
+                Sep = 'mdcd_enrlmt_days_09'
+                Oct = 'mdcd_enrlmt_days_10'
+                Nov = 'mdcd_enrlmt_days_11'
                 Dec = 'mdcd_enrlmt_days_12'
 
         # ---------------------------------------------------------------------------------

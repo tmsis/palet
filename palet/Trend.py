@@ -1,5 +1,4 @@
 from palet.Paletable import Paletable
-from datetime import date
 
 
 class Trend(Paletable):
@@ -12,39 +11,8 @@ class Trend(Paletable):
         super().__init__()
 
         if (paletable is not None):
-            self.by = paletable.by
             self.by_group = paletable.by_group
             self.filter = paletable.filter
-            self.where = paletable.where
-            self._pctChangePeriod = -1
-
-    # --------------------------------------------------
-    # getMonthOverMonth function for trends of measures
-    # --------------------------------------------------
-    def byMonth(self, year=None, interval='monthly'):
-        # from palet.Palet import Palet
-        period = -1
-
-        if year is None:
-            year = str(date.today().year)
-
-        if interval == 'monthly':
-            period = -1
-        elif interval == 'quarterly' or interval == '4':
-            period = -4
-        elif interval == 'yearly' or interval == '12':
-            period = -12
-
-        self._pctChangePeriod = period
-
-        # self.filter.update({"DE_FIL_DT":  Palet.Utils.createDateRange(str(year))})
-        # self.by_group.append("DE_FIL_DT")
-        # self.ann_group.append('a.DE_FIL_DT')
-
-        return self
-
-    def mean(col: str):
-        print('Calculating Average ' + col)
 
     # ---------------------------------------------------------------------------------
     #
