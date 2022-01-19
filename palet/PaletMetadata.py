@@ -78,11 +78,17 @@ class PaletMetadata:
             race = 'race_ethncty_flag'
             raceExpanded = 'race_ethncty_exp_flag'
             hispanic = 'hspnc_ethncty_flag'
-            timestampAdd = 'rec_add_ts'
+            timestampAdd = 'rec_add_ts',
             timestampUpdate = 'rec_updt_ts'
 
         class CHIP:
             yearly = 'chip_enrlmt_days_yr'
+            quarter1 = ['chip_enrlmt_days_01', 'chip_enrlmt_days_02', 'chip_enrlmt_days_03']
+            quarter2 = ['chip_enrlmt_days_04', 'chip_enrlmt_days_05', 'chip_enrlmt_days_06']
+            quarter3 = ['chip_enrlmt_days_07', 'chip_enrlmt_days_08', 'chip_enrlmt_days_09']
+            quarter4 = ['chip_enrlmt_days_10', 'chip_enrlmt_days_11', 'chip_enrlmt_days_12']
+            half1 = [quarter1, quarter2]
+            half2 = [quarter3, quarter4]
 
             class monthly:
                 Jan = 'chip_enrlmt_days_01'
@@ -100,6 +106,12 @@ class PaletMetadata:
 
         class Medicaid:
             yearly = 'mdcd_enrlmt_days_yr'
+            quarter1 = ['mdcd_enrlmt_days_01', 'mdcd_enrlmt_days_02', 'mdcd_enrlmt_days_03']
+            quarter2 = ['mdcd_enrlmt_days_04', 'mdcd_enrlmt_days_05', 'mdcd_enrlmt_days_06']
+            quarter3 = ['mdcd_enrlmt_days_07', 'mdcd_enrlmt_days_08', 'mdcd_enrlmt_days_09']
+            quarter4 = ['mdcd_enrlmt_days_10', 'mdcd_enrlmt_days_11', 'mdcd_enrlmt_days_12']
+            half1 = [quarter1, quarter2]
+            half2 = [quarter3, quarter4]
 
             class monthly:
                 Jan = 'mdcd_enrlmt_days_01'
