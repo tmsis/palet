@@ -1,6 +1,7 @@
 import pandas as pd
 
 from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -120,10 +121,10 @@ class Paletable:
                     clause = ("a." + key, self.filter[key])
                     where.append(' = '.join(clause))
 
-            return f"where {' and '.join(where)}"
+            return f"{' and '.join(where)}"
 
         else:
-            return "where 1=1"
+            return "1=1"
 
     # ---------------------------------------------------------------------------------
     #
@@ -140,7 +141,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _percentChange(self, df):
+    def _percentChange(self, df: DataFrame):
         self.palet.logger.debug('Percent Change')
 
         if (len(self.by_group)) > 0:
@@ -162,6 +163,14 @@ class Paletable:
 
         return df
 
+    def _mergeStateEnrollments(self, df: DataFrame):
+        self.palet.logger.debug('Merging separate state enrollments')
+
+        df.drop(PaletMetadata.Enrollment.locale.submittingState)
+        df.groupBy(self.palet.st_name)
+
+        return df
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -176,6 +185,10 @@ class Paletable:
                       how='inner',
                       left_on=['USPS'],
                       right_on=['USPS'])
+        df.merge(df, self.palet.stabr,
+                 how='inner',
+                 left_on=['USPS'],
+                 right_on=['USPS'])
 
         return df
 

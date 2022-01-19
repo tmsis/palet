@@ -4,15 +4,15 @@
 
 from palet.Trend import Trend
 from palet.Enrollment import Enrollment
-from palet.State import State
+# from palet.State import State
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
-State = State('NC')
-t = Trend().byMonth()
-# e = Enrollment(t).byAgeRange('0-18,65+').byState(State.state_fips).byIncomeBracket('01')
+# t = Trend().byMonth()
+# e = Enrollment().byAgeRange('0-18,65+')
 # e = Enrollment(t).byIncomeBracket('01').byState(State.state_fips)
-e = Enrollment(t).byMonth(PaletMetadata.Enrollment.CHIP.monthly.Dec).byState(State.state_fips)
+# e = Enrollment(t).byMonth(PaletMetadata.Enrollment.CHIP.monthly.Dec).byState(State.state_fips)
+e = Enrollment().byGender('M')
 print(e.sql())
 e.fetch()
 
