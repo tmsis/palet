@@ -163,11 +163,17 @@ class Paletable:
 
         return df
 
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _mergeStateEnrollments(self, df: DataFrame):
         self.palet.logger.debug('Merging separate state enrollments')
 
-        df.drop(PaletMetadata.Enrollment.locale.submittingState)
-        df.groupBy(self.palet.st_name)
+        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isFirst'], axis=1)
+        df.groupBy(by=['STABBREV', 'de_fil_dt', 'month'])
 
         return df
 
@@ -180,15 +186,16 @@ class Paletable:
     def _decorate(self, df):
         self.palet.logger.debug('Decorate')
 
-        df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-        df = pd.merge(df, self.palet.st_name,
-                      how='inner',
-                      left_on=['USPS'],
-                      right_on=['USPS'])
-        df.merge(df, self.palet.stabr,
-                 how='inner',
-                 left_on=['USPS'],
-                 right_on=['USPS'])
+        if PaletMetadata.Enrollment.locale.submittingState in self.by_group:
+            df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
+            df = pd.merge(df, self.palet.st_name,
+                          how='inner',
+                          left_on=['USPS'],
+                          right_on=['USPS'])
+            df = pd.merge(df, self.palet.st_usps,
+                          how='inner',
+                          left_on=['USPS'],
+                          right_on=['USPS'])
 
         return df
 
@@ -281,6 +288,26 @@ class Paletable:
             :class:`Article` returns the updated object
         """
 
+        self.palet.logger.info('Group by - state_fips')
+
+        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+
+        if state_fips is not None:
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+
+        return self
+
+    def byState(self, state_fips=None):
+        """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+
+        Returns:
+            :class:`Article` returns the updated object
+        """
+
         self.palet.logger.info('Group by - state')
 
         self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
@@ -288,6 +315,39 @@ class Paletable:
         if state_fips is not None:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
+        self._mergeStateEnrollments
+
+        return self
+
+    # TODO: This is probably the wrong way of going about it
+    def byMedicaidOnly(self, state_fips=None):
+        """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+
+        Returns:
+            :class:`Article` returns the updated object
+        """
+
+        self.palet.logger.info('Group by - state')
+
+        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+
+        if state_fips is not None:
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+
+        for month in PaletMetadata.Enrollment.CHIP.half1:
+            for field in month:
+                if field in self.filter:
+                    del self.filter[field]
+                    del self.by_group[field]
+            for month in PaletMetadata.Enrollment.CHIP.half2:
+                for field in month:
+                    if field in self.filter:
+                        del self.filter[field]
+                        del self.by_group[field]
         return self
 
     # ---------------------------------------------------------------------------------

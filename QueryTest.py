@@ -12,7 +12,7 @@ from palet.PaletMetadata import PaletMetadata
 # e = Enrollment().byAgeRange('0-18,65+')
 # e = Enrollment(t).byIncomeBracket('01').byState(State.state_fips)
 # e = Enrollment(t).byMonth(PaletMetadata.Enrollment.CHIP.monthly.Dec).byState(State.state_fips)
-e = Enrollment().byGender('M')
+e = Enrollment().byGender('M').byMedicaidOnly()
 print(e.sql())
 e.fetch()
 
