@@ -297,6 +297,11 @@ class Paletable:
 
         return self
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def byState(self, state_fips=None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
@@ -320,6 +325,11 @@ class Paletable:
         return self
 
     # TODO: This is probably the wrong way of going about it
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def byMedicaidOnly(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
