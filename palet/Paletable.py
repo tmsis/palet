@@ -172,8 +172,8 @@ class Paletable:
     def _mergeStateEnrollments(self, df: DataFrame):
         self.palet.logger.debug('Merging separate state enrollments')
 
-        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isFirst'], axis=1)
-        df.groupBy(by=['STABBREV', 'de_fil_dt', 'month'])
+        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
+        df.groupBy(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
 
         return df
 
@@ -320,7 +320,7 @@ class Paletable:
         if state_fips is not None:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
-        self._mergeStateEnrollments
+        self._addPostProcess(self._mergeStateEnrollments)
 
         return self
 
