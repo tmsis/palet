@@ -1,5 +1,6 @@
 import pandas as pd
 from pyspark.sql import dataframe
+from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
@@ -187,6 +188,10 @@ class Enrollment(Paletable):
 
         self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
+
+        # compress rows from submitting state to state if it is in the by group
+        if (PaletMetadata.Enrollment.locale.submittingState in self.by_group):
+            self._addPostProcess(self._mergeStateEnrollments)
 
         return z
 

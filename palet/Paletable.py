@@ -186,6 +186,7 @@ class Paletable:
     def _decorate(self, df):
         self.palet.logger.debug('Decorate')
 
+        # for submitting state
         if PaletMetadata.Enrollment.locale.submittingState in self.by_group:
             df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
             df = pd.merge(df, self.palet.st_name,
@@ -277,31 +278,6 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def bySubmittingState(self, state_fips=None):
-        """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
-
-        Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
-
-        Returns:
-            :class:`Article` returns the updated object
-        """
-
-        self.palet.logger.info('Group by - state_fips')
-
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
-
-        if state_fips is not None:
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     def byState(self, state_fips=None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
@@ -320,11 +296,8 @@ class Paletable:
         if state_fips is not None:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
-        self._addPostProcess(self._mergeStateEnrollments)
-
         return self
 
-    # TODO: This is probably the wrong way of going about it
     # ---------------------------------------------------------------------------------
     #
     #
