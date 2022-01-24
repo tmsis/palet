@@ -230,7 +230,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEthnicity(self, ethnicity=None):
+    def byRaceEthnicity(self, ethnicity=None):
         """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -240,10 +240,44 @@ class Paletable:
         Returns:
             :class:`Article`: returns the updated object
         """
+        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.race)
+
+        if ethnicity is not None:
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
+
+        return self
+
+    def byRaceEthnicityExpanded(self, ethnicity=None):
+        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
+
+        Returns:
+            :class:`Article`: returns the updated object
+        """
         self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
+
+        return self
+
+    def byEthnicity(self, ethnicity=None):
+        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
+
+        Returns:
+            :class:`Article`: returns the updated object
+        """
+        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
+
+        if ethnicity is not None:
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
 
         return self
 
@@ -319,7 +353,7 @@ class Paletable:
 
         return self
 
-    # TODO: This is probably the wrong way of going about it
+    # TODO: Review this approach
     def byMedicaidOnly(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.

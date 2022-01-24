@@ -242,3 +242,6 @@ class PaletMetadata:
         thirdPartyLiabilityOther = 'tpl_othr_cvrg_ind'
         enrollmentIntervals = 'medicaid_enrollment_intervals'
         CHIPIntervals = 'chip_enrollment_intervals'
+
+    class Eligibility:
+        fileDate = 'DE_FIL_DT'
