@@ -14,12 +14,6 @@ class Trend(Paletable):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    # TODO: do we need to move the sql() function into paletable?
-    # Is the logic the same for all? Having a issue with post processing
-    # ---------------------------------------------------------------------------------
 
 # CC0 1.0 Universal
 

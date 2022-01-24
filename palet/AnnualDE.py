@@ -1,6 +1,5 @@
 
 # TODO: Find out if analysts want acronyms spelled out or are ok with something like Third Party Liability instead of TPL
-# TODO: Is "Latest in Year" an assumption or do we need to spell it out?
 class AnnualDE():
 
     columns = {
