@@ -332,15 +332,11 @@ class Paletable:
 
         return self
 
-<<<<<<< HEAD
     # ---------------------------------------------------------------------------------
     #
     #
     #
     # ---------------------------------------------------------------------------------
-=======
-    # TODO: Review this approach
->>>>>>> 0fbc26257e7b20dc99ba115237488fd4736a99ee
     def byMedicaidOnly(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
