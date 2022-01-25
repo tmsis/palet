@@ -150,17 +150,31 @@ class Paletable:
         else:
             df['isfirst'] = 0
 
-        df['mdcd_pct_mon'] = [
-            round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1, 5)
-            if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-            else float('NaN')
-            for x in range(len(df))]
+        if self.timeunit == 'month':
+            df['mdcd_pct_mon'] = [
+                round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1, 5)
+                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
 
-        df['chip_pct_mon'] = [
-            round((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1, 5)
-            if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-            else float('NaN')
-            for x in range(len(df))]
+            df['chip_pct_mon'] = [
+                round((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1, 5)
+                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+
+        elif self.timeunit == 'year':
+            df['mdcd_pct_yoy'] = [
+                round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) + 12, 5)
+                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+
+            df['chip_pct_yoy'] = [
+                round((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) + 12, 5)
+                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
 
         return df
 
