@@ -145,17 +145,18 @@ class Paletable:
         self.palet.logger.debug('Percent Change')
 
         if (len(self.by_group)) > 0:
+            df.sort(self.by_group)
             df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
         else:
             df['isfirst'] = 0
 
-        df['mdcd_pct'] = [
+        df['mdcd_pct_mon'] = [
             round((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1, 5)
             if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
             else float('NaN')
             for x in range(len(df))]
 
-        df['chip_pct'] = [
+        df['chip_pct_mon'] = [
             round((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1, 5)
             if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
             else float('NaN')
@@ -401,6 +402,34 @@ class Paletable:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
         else:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "null"})
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    # TODO: add sphinx documentation for this function
+    def byYear(self, year: int = None):
+
+        self.timeunit = 'year'
+        self.timeunitvalue = year
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    # TODO: add sphinx documentation for this function
+    def byMonth(self, month: int = None):
+
+        self.timeunit = 'month'
+        self.timeunitvalue = month
 
         return self
 

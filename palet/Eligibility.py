@@ -181,34 +181,6 @@ class Eligibility(Paletable):
 
         return z
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
-    def byYear(self, year: int = None):
-
-        self.timeunit = 'year'
-        self.timeunitvalue = year
-
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
-    def byMonth(self, month: int = None):
-
-        self.timeunit = 'month'
-        self.timeunitvalue = month
-
-        return self
-
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
