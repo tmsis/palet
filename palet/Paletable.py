@@ -141,37 +141,49 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: DataFrame):
+    def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
         if (len(self.by_group)) > 0:
-            df.sort(self.by_group)
+            df.sort_values(by=self.by_group, ascending=True)
             df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
         else:
             df['isfirst'] = 0
 
         if self.timeunit == 'month':
-            df['mdcd_pct_mon'] = [
+            df['mdcd_pct_mon_fmt'] = [
                 round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
                 if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
-            df['chip_pct_mon'] = [
+            df['chip_pct_mon_fmt'] = [
                 round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
+                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+
+            df['mdcd_pct_mon'] = [
+                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1), 5)
+                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+
+            df['chip_pct_mon'] = [
+                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1), 5)
                 if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
         elif self.timeunit == 'year':
             df['mdcd_pct_yoy'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 12) * 100, 5)
+                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
                 if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
             df['chip_pct_yoy'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 12) * 100, 5)
+                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
                 if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
