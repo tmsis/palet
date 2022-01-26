@@ -18,10 +18,11 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def __init__(self):
-        self.runids = [789]
+        self.runids = [4897,4898,4899,4900,4901,5149,6279,6280]
         self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
+        self.lookback = 1
 
         self.preprocesses = []
         self.postprocesses = []
@@ -426,10 +427,11 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     # TODO: add sphinx documentation for this function
-    def byYear(self, year: int = None):
+    def byYear(self, year: int = None, count: int = 1):
 
         self.timeunit = 'year'
         self.timeunitvalue = year
+        self.lookback = count
 
         return self
 
