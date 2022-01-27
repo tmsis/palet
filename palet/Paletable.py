@@ -142,14 +142,20 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _appendTimeUnitForSort(self, sortBy: str):
-        if('yoy'):
-            self.by_group.append('de_fil_dt')
-            self.by_group.append('month')
-        else:
-            self.by_group.append('month')
-            self.by_group.append('de_fil_dy')
+    def __buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
 
+        if isPct is True:
+            df[resultColumnName] = [
+                str(round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1) * 100, 3)) + '%'
+                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+        else:
+            df[resultColumnName] = [
+                round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
+                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
         return
 
     # ---------------------------------------------------------------------------------
@@ -169,42 +175,16 @@ class Paletable:
             df['isfirst'] = 0
 
         if self.timeunit == 'month':
-            df['mdcd_pct_mon_fmt'] = [
-                str(round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 3)) + '%'
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_mon_fmt'] = [
-                str(round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 3)) + '%'
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['mdcd_pct_mon'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1), 3)
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_mon'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1), 3)
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mon_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_mon_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mon', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_mon', 'chip_enrollment', 1, False)
 
         elif self.timeunit == 'year':
-            df['mdcd_pct_yoy'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 3)
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_yoy'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 3)
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
         return df
 
