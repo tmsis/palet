@@ -201,7 +201,7 @@ class Paletable:
         self.palet.logger.debug('Merging separate state enrollments')
 
         df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
-        df.groupBy(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
+        df.groupby(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
 
         return df
 
