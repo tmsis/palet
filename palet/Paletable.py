@@ -18,7 +18,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def __init__(self):
-        self.runids = [4897,4898,4899,4900,4901,5149,6279,6280]
+        self.runids = [4897, 4898, 4899, 4900, 4901, 5149, 6279, 6280]
         self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
@@ -142,10 +142,27 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _appendTimeUnitForSort(self, sortBy: str):
+        if('yoy'):
+            self.by_group.append('de_fil_dt')
+            self.by_group.append('month')
+        else:
+            self.by_group.append('month')
+            self.by_group.append('de_fil_dy')
+
+        return
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
         if (len(self.by_group)) > 0:
+
             df.sort_values(by=self.by_group, ascending=True)
             df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
         else:
@@ -153,38 +170,38 @@ class Paletable:
 
         if self.timeunit == 'month':
             df['mdcd_pct_mon_fmt'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
+                str(round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 3)) + '%'
                 if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
             df['chip_pct_mon_fmt'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
+                str(round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 3)) + '%'
                 if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
             df['mdcd_pct_mon'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1), 5)
+                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1), 3)
                 if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
             df['chip_pct_mon'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1), 5)
+                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1), 3)
                 if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
         elif self.timeunit == 'year':
             df['mdcd_pct_yoy'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
+                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 3)
                 if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
 
             df['chip_pct_yoy'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
+                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 3)
                 if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
@@ -489,6 +506,8 @@ class Paletable:
         # perform last minute add-ons here
         for pp in self.postprocesses:
             df = pp(df)
+
+        df = df.drop(columns=['isfirst'])
 
         return df
 

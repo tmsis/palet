@@ -1,5 +1,3 @@
-import pandas as pd
-from pyspark.sql import dataframe
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
