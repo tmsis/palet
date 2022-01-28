@@ -180,6 +180,12 @@ class Paletable:
             self.__buildPctChangeColumn(df, 'mdcd_pct_mon', 'mdcd_enrollment', 1, False)
             self.__buildPctChangeColumn(df, 'chip_pct_mon', 'chip_enrollment', 1, False)
 
+            # df.groupby(by=['month', 'de_fil_dt'] + self.by_group).sum().reset_index()
+            # df.sort_values(by=self.by_group, ascending=True)
+            # df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            # self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            # self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
         elif self.timeunit == 'year':
             self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
