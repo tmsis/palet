@@ -146,7 +146,7 @@ class Paletable:
 
         if isPct is True:
             df[resultColumnName] = [
-                str(round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1) * 100, 3)) + '%'
+                str(round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1) * 100, 2)) + '%'
                 if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
                 else float('NaN')
                 for x in range(len(df))]
@@ -167,26 +167,43 @@ class Paletable:
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
-        if (len(self.by_group)) > 0:
-
-            df.sort_values(by=self.by_group, ascending=True)
-            df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-        else:
-            df['isfirst'] = 0
+        df['year'] = df['de_fil_dt']
 
         if self.timeunit == 'month':
-            self.__buildPctChangeColumn(df, 'mdcd_pct_mon_fmt', 'mdcd_enrollment', 1, True)
-            self.__buildPctChangeColumn(df, 'chip_pct_mon_fmt', 'chip_enrollment', 1, True)
-            self.__buildPctChangeColumn(df, 'mdcd_pct_mon', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_mon', 'chip_enrollment', 1, False)
 
-            # df.groupby(by=['month', 'de_fil_dt'] + self.by_group).sum().reset_index()
-            # df.sort_values(by=self.by_group, ascending=True)
-            # df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            # self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            # self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+            # Month-over-Month
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mom_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_mom_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
+            # Re-sort Chronologically
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
 
         elif self.timeunit == 'year':
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
             self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
