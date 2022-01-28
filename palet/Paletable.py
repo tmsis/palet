@@ -18,7 +18,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def __init__(self):
-        self.runids = [4897,4898,4899,4900,4901,5149,6279,6280]
+        self.runids = [4897, 4898, 4899, 4900, 4901, 5149, 6279, 6280]
         self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
@@ -142,52 +142,49 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def __buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
+
+        if isPct is True:
+            df[resultColumnName] = [
+                str(round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1) * 100, 3)) + '%'
+                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+        else:
+            df[resultColumnName] = [
+                round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
+                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+                else float('NaN')
+                for x in range(len(df))]
+        return
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
         if (len(self.by_group)) > 0:
+
             df.sort_values(by=self.by_group, ascending=True)
             df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
         else:
             df['isfirst'] = 0
 
         if self.timeunit == 'month':
-            df['mdcd_pct_mon_fmt'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_mon_fmt'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['mdcd_pct_mon'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1), 5)
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_mon'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1), 5)
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mon_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_mon_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_mon', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_mon', 'chip_enrollment', 1, False)
 
         elif self.timeunit == 'year':
-            df['mdcd_pct_yoy'] = [
-                round(((df['mdcd_enrollment'].iat[x] / df['mdcd_enrollment'].iat[x-1]) - 1) * 100, 5)
-                if x != 0 and df['mdcd_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-
-            df['chip_pct_yoy'] = [
-                round(((df['chip_enrollment'].iat[x] / df['chip_enrollment'].iat[x-1]) - 1) * 100, 5)
-                if x != 0 and df['chip_enrollment'].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
+            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
         return df
 
@@ -201,7 +198,7 @@ class Paletable:
         self.palet.logger.debug('Merging separate state enrollments')
 
         df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
-        df.groupBy(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
+        df.groupby(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
 
         return df
 
@@ -489,6 +486,8 @@ class Paletable:
         # perform last minute add-ons here
         for pp in self.postprocesses:
             df = pp(df)
+
+        df = df.drop(columns=['isfirst'])
 
         return df
 
