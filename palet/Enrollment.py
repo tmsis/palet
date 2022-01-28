@@ -1,3 +1,4 @@
+import pandas as pd
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
@@ -154,6 +155,53 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self):
         return Enrollment.timeunit.cull[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _percentChange(self, df: pd.DataFrame):
+        self.palet.logger.debug('Percent Change')
+
+        df['year'] = df['de_fil_dt']
+
+        if self.timeunit == 'month':
+
+            # Month-over-Month
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
+            # Re-sort Chronologically
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+
+        elif self.timeunit == 'year':
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #

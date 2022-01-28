@@ -1,7 +1,4 @@
 import pandas as pd
-from pyspark.sql import dataframe
-from palet.PaletMetadata import PaletMetadata
-
 from palet.Paletable import Paletable
 
 
@@ -107,29 +104,9 @@ class Eligibility(Paletable):
                 (a.elgblty_grp_cd_09 > 0) or
                 (a.elgblty_grp_cd_10 > 0) or
                 (a.elgblty_grp_cd_11 > 0) or
-                (a.elgblty_grp_cd_12 > 0) or
+                (a.elgblty_grp_cd_12 > 0)
             )"""
         }
-
-    def byState(self, state_fips=None):
-        """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
-
-        Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
-
-        Returns:
-            :class:`Article` returns the updated object
-        """
-
-        self.palet.logger.info('Group by - state')
-
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
-
-        if state_fips is not None:
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -146,6 +123,44 @@ class Eligibility(Paletable):
     # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self):
         return Eligibility.timeunit.cull[self.timeunit]
+
+    def _percentChange(self, df: pd.DataFrame):
+        self.palet.logger.debug('Percent Change')
+
+        df['year'] = df['de_fil_dt']
+
+        if self.timeunit == 'month':
+
+            # Month-over-Month
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_eligible', 1, False)
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
+
+            # Re-sort Chronologically
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+
+        elif self.timeunit == 'year':
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #
@@ -176,7 +191,7 @@ class Eligibility(Paletable):
                 a.de_fil_dt
          """
 
-        # self._addPostProcess(self._percentChange)
+        self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
 
         return z
