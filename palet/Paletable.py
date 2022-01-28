@@ -296,6 +296,11 @@ class Paletable:
 
         return self
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def byRaceEthnicityExpanded(self, ethnicity=None):
         """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
@@ -313,6 +318,11 @@ class Paletable:
 
         return self
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def byEthnicity(self, ethnicity=None):
         """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
