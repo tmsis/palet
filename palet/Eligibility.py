@@ -26,41 +26,6 @@ class Eligibility(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    @staticmethod
-    def create_da_run_id_view():
-        from pyspark.sql import SparkSession
-
-        spark = SparkSession.getActiveSession()
-
-        z = """
-                create or replace temporary view palet_da_run_id as
-                select
-                    fil_type,
-                    job_parms_txt,
-                    max(da_run_id) as da_run_id
-                from
-                    taf.job_cntl_parms
-                where
-                    fil_type = 'ade'
-                    and rfrsh_vw_flag is true
-                    and sucsfl_ind is true
-                group by
-                    fil_type,
-                    job_parms_txt
-                order by
-                    fil_type,
-                    job_parms_txt
-            """
-
-        # self.palet.logger.debug(z)
-        spark.sql(z)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     def mc_plans(self):
         print('mc_plans')
 

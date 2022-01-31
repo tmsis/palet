@@ -19,7 +19,7 @@ class Palet():
         self.now = datetime.now()
         self.initialize_logger(self.now)
 
-        self.version = '1.0.1'
+        self.version = '1.2.20220130'
 
         self.report_month = datetime.strptime(report_month, '%Y%m')
         # self.start_month = datetime.strptime(start_month, '%Y%m')
@@ -53,6 +53,45 @@ class Palet():
         self.sql = {}
 
         self.actual_time = self.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
+
+    # --------------------------------------------------------------------
+    #
+    #
+    #
+    # --------------------------------------------------------------------
+    def cache_run_ids(self):
+        from pyspark.sql import SparkSession
+
+        z = """
+                select distinct
+                    fil_4th_node_txt,
+                    otpt_name,
+                    da_run_id,
+                    rptg_prd,
+                    fil_dt
+                    from
+                    taf.efts_fil_meta
+                where
+                    ltst_run_ind = true
+                    --   and otpt_name = 'TAF_ANN_DE_BASE'
+                    and fil_4th_node_txt = 'BSE'
+                group by
+                    fil_4th_node_txt,
+                    otpt_name,
+                    da_run_id,
+                    rptg_prd,
+                    fil_dt
+                order by
+                    fil_4th_node_txt,
+                    otpt_name,
+                    da_run_id,
+                    rptg_prd,
+                    fil_dt
+            """
+
+        spark = SparkSession.getActiveSession()
+        pdf = spark.sql(z).toPandas()
+        return pdf['da_run_id'].tolist()
 
     # --------------------------------------------------------------------
     #

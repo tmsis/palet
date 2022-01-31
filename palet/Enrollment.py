@@ -23,41 +23,6 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    @staticmethod
-    def create_da_run_id_view():
-        from pyspark.sql import SparkSession
-
-        spark = SparkSession.getActiveSession()
-
-        z = """
-                create or replace temporary view palet_da_run_id as
-                select
-                    fil_type,
-                    job_parms_txt,
-                    max(da_run_id) as da_run_id
-                from
-                    taf.job_cntl_parms
-                where
-                    fil_type = 'ade'
-                    and rfrsh_vw_flag is true
-                    and sucsfl_ind is true
-                group by
-                    fil_type,
-                    job_parms_txt
-                order by
-                    fil_type,
-                    job_parms_txt
-            """
-
-        # self.palet.logger.debug(z)
-        spark.sql(z)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     def medicaid_enrollment_intervals(self):
         print("Start date: " + self.start + " End date: " + self.end)
 
@@ -165,13 +130,15 @@ class Enrollment(Paletable):
     def sql(self):
 
         # create or replace temporary view enrollment_by_month as
+        # taf.taf_ann_de_base as a
+        # taf.data_anltcs_taf_ade_base_vw as a
         z = f"""
             select
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt,
                 {self._getTimeunitBreakdown()}
             from
-                taf.taf_ann_de_base as a
+                palet_mart.data_anltcs_taf_ade_base_delta as a
             where
                 a.da_run_id in ( {self._getRunIds()} ) and
                 {self._getByTimeunitCull()} AND
