@@ -18,7 +18,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def __init__(self):
-        self.runids = [4897, 4898, 4899, 4900, 4901, 5149, 6279, 6280]
+
         self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
@@ -28,6 +28,9 @@ class Paletable:
         self.postprocesses = []
 
         self.palet = Palet('201801')
+
+        # self.runids = [4897, 4898, 4899, 4900, 4901, 5149, 6279, 6280]
+        self.runids = self.palet.cache_run_ids()
 
     # ---------------------------------------------------------------------------------
     #
@@ -144,19 +147,11 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def __buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
 
-        if isPct is True:
-            df[resultColumnName] = [
-                str(round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1) * 100, 2)) + '%'
-                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-        else:
-            df[resultColumnName] = [
-                round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
-                if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
-                else float('NaN')
-                for x in range(len(df))]
-        return
+        df[resultColumnName] = [
+            round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
+            if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+            else float('NaN')
+            for x in range(len(df))]
 
     # ---------------------------------------------------------------------------------
     #
@@ -178,8 +173,6 @@ class Paletable:
             else:
                 df['isfirst'] = 0
 
-            self.__buildPctChangeColumn(df, 'mdcd_pct_mom_fmt', 'mdcd_enrollment', 1, True)
-            self.__buildPctChangeColumn(df, 'chip_pct_mom_fmt', 'chip_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
             self.__buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
 
@@ -187,8 +180,6 @@ class Paletable:
             df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
             df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
 
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
             self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
@@ -204,8 +195,6 @@ class Paletable:
             else:
                 df['isfirst'] = 0
 
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy_fmt', 'mdcd_enrollment', 1, True)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy_fmt', 'chip_enrollment', 1, True)
             self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
             self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
