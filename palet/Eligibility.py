@@ -27,9 +27,9 @@ class Eligibility(Paletable):
         print('mc_plans')
 
     # ---------------------------------------------------------------------------------
-    #
-    #
-    #
+    # timeunit class
+    # Create the proper summary columns based on the by timeunit selected.
+    # Use the stack SQL function to create columns
     #
     # ---------------------------------------------------------------------------------
     class timeunit():
@@ -74,21 +74,26 @@ class Eligibility(Paletable):
         }
 
     # ---------------------------------------------------------------------------------
-    #
-    #
-    #
+    # _getTimeunitBreakdown
+    # Tis function is used to dynamically generate the SQL statement by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
     def _getTimeunitBreakdown(self):
         return Eligibility.timeunit.breakdown[self.timeunit]
 
     # ---------------------------------------------------------------------------------
-    #
-    #
-    #
+    # _getByTimeunitCull
+    # Tis function is used to dynamically generate the SQL where clause by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self):
         return Eligibility.timeunit.cull[self.timeunit]
 
+    # ---------------------------------------------------------------------------------
+    # _percentChange protected/private method that is called by each fetch() call
+    # to calculate the % change columns. Each Paletable class should override this
+    # and create it's own logic.
+    # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
@@ -205,6 +210,7 @@ class Eligibility(Paletable):
 #   depicted in a Work;
 
 #   iv. rights protecting against unfair competition in regards to a Work,
+
 #   subject to the limitations in paragraph 4(a), below;
 
 #   v. rights protecting the extraction, dissemination, use and reuse of data in
