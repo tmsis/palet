@@ -185,7 +185,7 @@ class Enrollment(Paletable):
                 a.de_fil_dt,
                 {self._getTimeunitBreakdown()}
             from
-                palet_mart.data_anltcs_taf_ade_base_delta as a
+                taf.taf_ann_de_base as a
             where
                 a.da_run_id in ( {self._getRunIds()} ) and
                 {self._getByTimeunitCull()} AND
