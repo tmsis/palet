@@ -5,10 +5,12 @@ from palet.Paletable import Paletable
 
 class Enrollment(Paletable):
 
+    objPaletable = Paletable()
+
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, paletable: Paletable = None):
+    def __init__(self, isEnrolled: bool = True, paletable: Paletable = objPaletable):
         # print('Initializing Enrollment API')
         super().__init__()
 

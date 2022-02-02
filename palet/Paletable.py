@@ -1,7 +1,6 @@
 import pandas as pd
 
 from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -131,16 +130,17 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
-    #
+    # _chcekForMultiVarFilter
+    # This is a function that is called to check for multiple value input from the user.
+    # It is used internally and called during byGroup calls.
     # ---------------------------------------------------------------------------------
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
     # ---------------------------------------------------------------------------------
-    #
-    #
+    #  _buildPctChangeColumn
+    #  This function is used interally to create the pctChange
+    #  columns based on the field names to be calculated
     #
     #
     # ---------------------------------------------------------------------------------
@@ -152,64 +152,21 @@ class Paletable:
             else float('NaN')
             for x in range(len(df))]
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: pd.DataFrame):
-        self.palet.logger.debug('Percent Change')
-
-        df['year'] = df['de_fil_dt']
-
-        if self.timeunit == 'month':
-
-            # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
-
-            # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-
-        elif self.timeunit == 'year':
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
-
-        return df
-
     # --------------------------------------------------------------------------------
     #
     #
     #
     #
     # ---------------------------------------------------------------------------------
-    def _mergeStateEnrollments(self, df: DataFrame):
+    def _mergeStateEnrollments(self, df: pd.DataFrame):
         self.palet.logger.debug('Merging separate state enrollments')
+        timeunit = 'month'
+
+        if 'year' in df.columns:
+            timeunit = 'year'
 
         df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
-        df.groupby(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
+        df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
 
         return df
 
@@ -358,7 +315,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
+    def byState(self, state_cd=None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -373,7 +330,9 @@ class Paletable:
 
         self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_fips is not None:
+        if state_cd is not None:
+            if type(state_cd) is not int:
+                state_fips = state_cd # TODO need logic here for abbrev lookup
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
@@ -462,6 +421,9 @@ class Paletable:
         self.timeunit = 'year'
         self.timeunitvalue = year
         self.lookback = count
+
+        if year is not None:
+            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
 
         return self
 
