@@ -1,3 +1,10 @@
+"""
+The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top 
+level objects, such as enrollment, to filter data by a variety of meterics. These metrics include age range,
+ethnicity, file data, income bracket, gender and state. Paletable also contains fetch(), the attribute used to
+return datafranes created by high level objects. 
+"""
+
 import pandas as pd
 
 from pyspark.sql import SparkSession
@@ -6,6 +13,28 @@ from palet.PaletMetadata import PaletMetadata
 
 
 class Paletable:
+    """
+    Class containing attributes that can be combined with other classes from the PALET library. These
+    attributes allow users to filter and return the dataframes created by high level objects.
+
+    Note: 
+        The Paletable class is inherited from high level objects such as enrollment, as such it does not need to be imported seperately.
+        Once imported, the Article class is not called. Rather its attributes are called after a high level object.
+
+    Example:
+        Import enrollment:
+
+        >>> from palet.Enrollment import Enrollment
+        
+        Create dataframe:
+        
+        >>> e = Enrollment().byState()
+        
+        Return dataframe:
+        
+        >>> e.fetch()
+
+    """
 
     # TODO: Continue to clean up docstring using syntax formatting
     # Initialize the comann variables here.
@@ -209,8 +238,9 @@ class Paletable:
             18-21, or an inclusive number such as 65+. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
+
         self.by_group.append(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
@@ -225,15 +255,16 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byRaceEthnicity(self, ethnicity=None):
-        """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single ethnicity. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
+
         self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
@@ -247,14 +278,14 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byRaceEthnicityExpanded(self, ethnicity=None):
-        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Expanded Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
         self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
@@ -269,14 +300,14 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byEthnicity(self, ethnicity=None):
-        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
         self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
@@ -298,7 +329,7 @@ class Paletable:
             gender: `str, optional`: Filter by gender. Defaults to None.
 
         Returns:
-            :Article Object: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - gender')
@@ -323,7 +354,7 @@ class Paletable:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - state')
@@ -350,7 +381,7 @@ class Paletable:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - state')
@@ -388,7 +419,7 @@ class Paletable:
 
         Returns
         -------
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
 
         Examples
         --------
@@ -415,9 +446,16 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
     def byYear(self, year: int = None, count: int = 1):
+        """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
+        Args:
+            year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
+            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1. 
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
         self.timeunit = 'year'
         self.timeunitvalue = year
         self.lookback = count
@@ -433,9 +471,15 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
     def byMonth(self, month: int = None):
+        """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
+        Args:
+            month:`int, (optional)`: Filter by month using the month in numerical format. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
         self.timeunit = 'month'
         self.timeunitvalue = month
 
@@ -447,6 +491,31 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
+        """The SQL query that the Enrollment class uses to pull dataframes. 
+        
+        This can be called allowing an analyst to view the SQL the Enrollment is using.
+
+        Args:
+            None: No input required.
+        
+        Returns:
+            str: Returns a text string containing the SQL query run by the Enrollment class.
+        
+        Example:
+            Create object containing the SQL query:
+            
+            >>> q = Enrollment().byState().sql()
+            
+            Return the query as text:
+            
+            >>> print(q)
+
+            Alternatively
+
+            >>> print(Enrollment().byState().sql())
+
+        """
+        
         return self.sql
 
     # ---------------------------------------------------------------------------------
@@ -455,11 +524,30 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def fetch(self):
-        """Call this function when you are ready for results
+        """Call this method at the end of an object when you are ready for results. 
+
+        This can be leveraged with display() to quickly pivot results.
+
+        Args:
+            None: No input required
 
         Returns:
-            :class:`Dataframe`: Executes your query and returns a spark dataframe object.
+            Spark Datarame: Executes your query and returns a Spark Datarame.
+
+        Example:
+            Create object for enrollment by state and year
+
+            >>> api = Enrollment().byState()
+
+            Return Spark DataFrame:
+
+            >>> api.fetch
+
+            Lever display() to pivot from yearly to monthly
+
+            >>> display(api.byMonth().fetch())
         """
+
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
