@@ -78,7 +78,20 @@ class Palet():
     # --------------------------------------------------------------------
     def cache_run_ids(self):
         from pyspark.sql import SparkSession
+        """This method of the Palet class is responsible for pulling the most current valid run ids.
+
+        It uses the pyspark library to run a query on the efts_fil_meta TAF table. The most current valid run ids pulled from this method
+        are then used in any query run by a high level object like :class:`Enrollment` or :class:`Eligibility`.
+
+        Args:
+            self: None - no input required.
+
+        Returns:
+            Spark Datarame: Executes the query and returns a Spark Datarame with fil_4th_node_txt, otpt_name, da_run_id, rptg_prd, and fil_dt.
         
+        Note: Only returns the most current run ids available. 
+
+        """
 
         z = """
                 select distinct
