@@ -1,8 +1,8 @@
 """
-The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top 
+The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top
 level objects, such as enrollment, to filter data by a variety of meterics. These metrics include age range,
 ethnicity, file data, income bracket, gender and state. Paletable also contains fetch(), the attribute used to
-return datafranes created by high level objects. 
+return datafranes created by high level objects.
 """
 
 import pandas as pd
@@ -16,7 +16,7 @@ class Paletable:
     Class containing attributes that can be combined with other classes from the PALET library. These
     attributes allow users to filter and return the dataframes created by high level objects.
 
-    Note: 
+    Note:
         The Paletable class is inherited from high level objects such as enrollment, as such it does not need to be imported seperately.
         Once imported, the Article class is not called. Rather its attributes are called after a high level object.
 
@@ -24,13 +24,13 @@ class Paletable:
         Import enrollment:
 
         >>> from palet.Enrollment import Enrollment
-        
+
         Create dataframe:
-        
+
         >>> e = Enrollment().byState()
-        
+
         Return dataframe:
-        
+
         >>> e.fetch()
 
     """
@@ -57,7 +57,7 @@ class Paletable:
 
         self.palet = Palet('201801')
 
-        # self.runids = self.palet.cache_run_ids()
+        self.runids = self.palet.cache_run_ids()
 
     # ---------------------------------------------------------------------------------
     #
@@ -228,9 +228,16 @@ class Paletable:
             # lookup label with value
             return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag[y]
 
-    
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
-        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1) 
+        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #
@@ -488,7 +495,7 @@ class Paletable:
 
         Args:
             year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
-            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1. 
+            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -528,23 +535,23 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-        """The SQL query that the Enrollment class uses to pull dataframes. 
-        
+        """The SQL query that the Enrollment class uses to pull dataframes.
+
         This can be called allowing an analyst to view the SQL the Enrollment is using.
 
         Args:
             None: No input required.
-        
+
         Returns:
             str: Returns a text string containing the SQL query run by the Enrollment class.
-        
+
         Example:
             Create object containing the SQL query:
-            
+
             >>> q = Enrollment().byState().sql()
-            
+
             Return the query as text:
-            
+
             >>> print(q)
 
             Alternatively
@@ -552,7 +559,7 @@ class Paletable:
             >>> print(Enrollment().byState().sql())
 
         """
-        
+
         return self.sql
 
     # ---------------------------------------------------------------------------------
@@ -561,7 +568,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def fetch(self):
-        """Call this method at the end of an object when you are ready for results. 
+        """Call this method at the end of an object when you are ready for results.
 
         This can be leveraged with display() to quickly pivot results.
 
