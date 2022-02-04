@@ -74,6 +74,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _addPreProcess(self, cb):
         if cb not in self.preprocesses:
+            self.palet.logger.debug(f'Registering Pre Process {cb}')
             self.preprocesses.append(cb)
 
     # ---------------------------------------------------------------------------------
@@ -83,6 +84,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _addPostProcess(self, cb):
         if cb not in self.postprocesses:
+            self.palet.logger.debug(f'Registering Post Process {cb}')
             self.postprocesses.append(cb)
 
     # ---------------------------------------------------------------------------------
@@ -92,6 +94,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _addByGroup(self, var):
         if var not in self.by_group:
+            self.palet.logger.debug(f'Adding By Group {var}')
             self.by_group.append(var)
 
     # ---------------------------------------------------------------------------------
