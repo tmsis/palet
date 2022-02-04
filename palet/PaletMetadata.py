@@ -1,5 +1,31 @@
+"""
+The PaletMetadata module is composed of the PaletMetadata Class and its respective subclasses. The subclassess correspond
+to high level objects like Enrollment & Eligibility. These classes work to make TAF data more easily readable. Column names
+within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what 
+contructed code values correspond to. 
+"""
+
 class PaletMetadata:
+    """
+    In addition to the readability aspect discussed above, the PaletMetadata class is essential to converting 
+    data within the TAF files to the outputs returned by the API. This most often applies to assigning names to 
+    structered code or implementing column names that are more concise and easily understandable.
+
+    Note:
+        It is a best practice to import this class of the PALET library whenever running a high level 
+        object in the API.
+
+    Example:
+        >>> from palet.PaletMetadata import PaletMetadata
+        
+    """
     class Enrollment:
+        """
+        The Enrollment class is a subclass of PaletMetadata. This class primaryily assigns more readable
+        and concise column names to the TAF data pertaining to Medicaid and CHIP enrollment. Additionally, 
+        some of the subclassess within the Enrollment class contain dictionaries that explain the meaning 
+        of structed code within columns.  
+        """        
 
         fileDate = 'DE_FIL_DT'
 
@@ -10,6 +36,11 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         class identity:
+            """
+            The Identity class is a subclass within Enrollment. This subclass assigns column names to
+            beneficiary demographic data such as name, date of birth, SSN, etc.
+            """
+
             mediciadId = 'msis_ident_num'
             ssn = 'ssn_num'
             ssnIndicator = 'ssn_ind'
@@ -36,6 +67,10 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         class locale:
+            """
+            The locale class is a subclass within Enrollment. This subclass assigns column names to
+            beneficiary geographic data such as submitting state, city, mailing address, etc.
+            """
             submittingState = 'SUBMTG_STATE_CD'
             address = ['elgbl_line_1_adr_home', 'elgbl_line_2_adr_home', 'elgbl_line_3_adr_home']
             city = 'elgbl_city_name_home'
@@ -57,6 +92,12 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         class raceEthnicity:
+            """
+            The raceEthnicity class is a subclass within Enrollment. This subclass assigns column names to
+            beneficiary race and ethnicity data such as race, ethnicity, Native American certification, etc.
+            This subclass also contains dictionaries explaining the values that correspond to the structed code
+            in the following columns: race_ethncty_flag, race_ethncty_exp_flag, ethncty_cd, and crtfd_amrcn_indn_alskn_ntv_ind.
+            """
             certifiedAmericanIndian = 'crtfd_amrcn_indn_alskn_ntv_ind'
             ethnicity = 'ethncty_cd'
             nativeHawaiian = 'ntv_hi_flag'
@@ -128,6 +169,10 @@ class PaletMetadata:
             }
 
         class CHIP:
+            """
+            The CHIP class is a subclass within Enrollment. This subclass assigns time periods to
+            CHIP enrollment data such as yearly, quarterly, and biannually.
+            """
             yearly = 'chip_enrlmt_days_yr'
             quarter1 = ['chip_enrlmt_days_01', 'chip_enrlmt_days_02', 'chip_enrlmt_days_03']
             quarter2 = ['chip_enrlmt_days_04', 'chip_enrlmt_days_05', 'chip_enrlmt_days_06']
@@ -137,6 +182,10 @@ class PaletMetadata:
             half2 = [quarter3, quarter4]
 
             class monthly:
+                """
+                The Monthly class is a subclass within CHIP. This subclass assigns months to
+                CHIP enrollment data.
+                """
                 Jan = 'chip_enrlmt_days_01'
                 Feb = 'chip_enrlmt_days_02'
                 Mar = 'chip_enrlmt_days_03'
@@ -151,6 +200,10 @@ class PaletMetadata:
                 Dec = 'chip_enrlmt_days_12'
 
         class Medicaid:
+            """
+            The Medicaid class is a subclass within Enrollment. This subclass assigns time periods to
+            CHIP enrollment data such as yearly, quarterly, and biannually.
+            """
             yearly = 'mdcd_enrlmt_days_yr'
             quarter1 = ['mdcd_enrlmt_days_01', 'mdcd_enrlmt_days_02', 'mdcd_enrlmt_days_03']
             quarter2 = ['mdcd_enrlmt_days_04', 'mdcd_enrlmt_days_05', 'mdcd_enrlmt_days_06']
@@ -160,6 +213,10 @@ class PaletMetadata:
             half2 = [quarter3, quarter4]
 
             class monthly:
+                """
+                The Monthly class is a subclass within Medicaid. This subclass assigns months to
+                Medicaid enrollment data.
+                """
                 Jan = 'mdcd_enrlmt_days_01'
                 Feb = 'mdcd_enrlmt_days_02'
                 Mar = 'mdcd_enrlmt_days_03'
@@ -199,15 +256,6 @@ class PaletMetadata:
         eligibleThisMonth = 'elgbl_entir_mo_ind'
         eligibleLastDayThisMonth = 'elgbl_last_day_of_mo_ind'
         chip = 'chip_cd'
-        eligibiltyGroup = 'elgblty_grp_cd'
-        primaryEligibilityGroup = 'prmry_elgblty_grp_ind'
-        eligibiltyGroupCategory = 'elgblty_grp_ctgry_flag'
-        maintenanceAssistanceStatus = 'mas_cd'
-        eligibilityBasis = 'elgblty_mdcd_basis_cd'
-        masEligibilityBasis = 'masboe_cd'
-        stateEligibility = 'state_spec_elgblty_fctr_txt'
-        dualEligibilityCode = 'dual_elgbl_cd'
-        dualEligibility = 'dual_elgbl_flag'
         scope = 'rstrctd_bnfts_cd'
         ssdi = 'ssdi_ind'
         ssi = 'ssi_ind'
@@ -244,4 +292,20 @@ class PaletMetadata:
         CHIPIntervals = 'chip_enrollment_intervals'
 
     class Eligibility:
+        """
+        The Eiligibility class is a subclass of PaletMetadata. This class primaryily assigns more readable
+        and concise column names to the TAF data pertaining to Medicaid and CHIP eligibility.
+
+        Note:
+            Incomplete, work in progress. 
+        """
         fileDate = 'DE_FIL_DT'
+        eligibiltyGroup = 'elgblty_grp_cd'
+        primaryEligibilityGroup = 'prmry_elgblty_grp_ind'
+        eligibiltyGroupCategory = 'elgblty_grp_ctgry_flag'
+        maintenanceAssistanceStatus = 'mas_cd'
+        eligibilityBasis = 'elgblty_mdcd_basis_cd'
+        masEligibilityBasis = 'masboe_cd'
+        stateEligibility = 'state_spec_elgblty_fctr_txt'
+        dualEligibilityCode = 'dual_elgbl_cd'
+        dualEligibility = 'dual_elgbl_flag'

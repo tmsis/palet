@@ -14,6 +14,7 @@ class Eligibility(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
+            paletable.paletableObjs.append(Eligibility)
 
         self.palet.logger.info('Initializing Eligibility API')
 
@@ -74,22 +75,6 @@ class Eligibility(Paletable):
         }
 
     # ---------------------------------------------------------------------------------
-    # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getTimeunitBreakdown(self):
-        return Eligibility.timeunit.breakdown[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Eligibility.timeunit.cull[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
     # to calculate the % change columns. Each Paletable class should override this
     # and create it's own logic.
@@ -133,6 +118,22 @@ class Eligibility(Paletable):
         return df
 
     # ---------------------------------------------------------------------------------
+    # _getTimeunitBreakdown
+    # Tis function is used to dynamically generate the SQL statement by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getTimeunitBreakdown(self):
+        return Eligibility.timeunit.breakdown[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    # _getByTimeunitCull
+    # Tis function is used to dynamically generate the SQL where clause by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getByTimeunitCull(self):
+        return Eligibility.timeunit.cull[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
     #
     #
     #  SQL Alchemy for Eligibility series by year or year/month for Medicaid and CHIP
@@ -140,7 +141,7 @@ class Eligibility(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-
+        print(self.paletableObjs)
         # create or replace temporary view Eligibility_by_month as
         z = f"""
             select

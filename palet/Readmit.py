@@ -11,12 +11,12 @@ class Readmit:
 
     def byEthnicity(self):
         # print('by ethnicity...')
-        self.by_group.append('ethnicity')
+        self._addByGroup('ethnicity')
         return self
 
     def byState(self):
         # print('by state...')
-        self.by_group.append('state')
+        self._addByGroup('state')
         return self
 
     def ages(self, band):

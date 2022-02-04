@@ -1,12 +1,39 @@
+"""
+The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top 
+level objects, such as enrollment, to filter data by a variety of meterics. These metrics include age range,
+ethnicity, file data, income bracket, gender and state. Paletable also contains fetch(), the attribute used to
+return datafranes created by high level objects. 
+"""
+
 import pandas as pd
 
-from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
 
 class Paletable:
+    """
+    Class containing attributes that can be combined with other classes from the PALET library. These
+    attributes allow users to filter and return the dataframes created by high level objects.
+
+    Note: 
+        The Paletable class is inherited from high level objects such as enrollment, as such it does not need to be imported seperately.
+        Once imported, the Article class is not called. Rather its attributes are called after a high level object.
+
+    Example:
+        Import enrollment:
+
+        >>> from palet.Enrollment import Enrollment
+        
+        Create dataframe:
+        
+        >>> e = Enrollment().byState()
+        
+        Return dataframe:
+        
+        >>> e.fetch()
+
+    """
 
     # TODO: Continue to clean up docstring using syntax formatting
     # Initialize the comann variables here.
@@ -26,10 +53,11 @@ class Paletable:
 
         self.preprocesses = []
         self.postprocesses = []
+        self.paletableObjs = []
 
         self.palet = Palet('201801')
 
-        self.runids = self.palet.cache_run_ids()
+        # self.runids = self.palet.cache_run_ids()
 
     # ---------------------------------------------------------------------------------
     #
@@ -56,6 +84,15 @@ class Paletable:
     def _addPostProcess(self, cb):
         if cb not in self.postprocesses:
             self.postprocesses.append(cb)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addByGroup(self, var):
+        if var not in self.by_group:
+            self.by_group.append(var)
 
     # ---------------------------------------------------------------------------------
     #
@@ -131,16 +168,17 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
-    #
+    # _chcekForMultiVarFilter
+    # This is a function that is called to check for multiple value input from the user.
+    # It is used internally and called during byGroup calls.
     # ---------------------------------------------------------------------------------
     def _checkForMultiVarFilter(self, values: str, separator=" "):
         return values.split(separator)
 
     # ---------------------------------------------------------------------------------
-    #
-    #
+    #  _buildPctChangeColumn
+    #  This function is used interally to create the pctChange
+    #  columns based on the field names to be calculated
     #
     #
     # ---------------------------------------------------------------------------------
@@ -152,50 +190,21 @@ class Paletable:
             else float('NaN')
             for x in range(len(df))]
 
-    # ---------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     #
     #
     #
     #
     # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: pd.DataFrame):
-        self.palet.logger.debug('Percent Change')
+    def _mergeStateEnrollments(self, df: pd.DataFrame):
+        self.palet.logger.debug('Merging separate state enrollments')
+        timeunit = 'month'
 
-        df['year'] = df['de_fil_dt']
+        if 'year' in df.columns:
+            timeunit = 'year'
 
-        if self.timeunit == 'month':
-
-            # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
-
-            # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-
-        elif self.timeunit == 'year':
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self.__buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self.__buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
+        df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
 
         return df
 
@@ -205,13 +214,20 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _mergeStateEnrollments(self, df: DataFrame):
-        self.palet.logger.debug('Merging separate state enrollments')
+    def _findValueName(self, x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['race_ethncty_flag']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 'unknown'
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag[y]
 
-        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
-        df.groupby(by=['STABBREV', 'de_fil_dt', 'month']).sum().reset_index()
-
-        return df
+    
+    def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
+        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1) 
 
     # ---------------------------------------------------------------------------------
     #
@@ -252,9 +268,10 @@ class Paletable:
             18-21, or an inclusive number such as 65+. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.identity.age)
+
+        self._addByGroup(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
@@ -268,16 +285,17 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byRaceEthnicity(self, ethnicity=None):
-        """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single ethnicity. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.race)
+
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
@@ -290,16 +308,16 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byRaceEthnicityExpanded(self, ethnicity=None):
-        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Expanded Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
@@ -312,16 +330,16 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byEthnicity(self, ethnicity=None):
-        """Filter your query by Expanded Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
             ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
 
         Returns:
-            :class:`Article`: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
@@ -341,12 +359,12 @@ class Paletable:
             gender: `str, optional`: Filter by gender. Defaults to None.
 
         Returns:
-            :Article Object: returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - gender')
 
-        self.by_group.append(PaletMetadata.Enrollment.identity.gender)
+        self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
@@ -358,7 +376,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_fips=None):
+    def byState(self, state_cd=None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -366,14 +384,20 @@ class Paletable:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_fips is not None:
+        if state_cd is not None:
+            if type(state_cd) is not int:
+                lkup = self.palet.st_fips
+                fips = lkup[lkup['STABBREV'] == state_cd]['FIPS']
+                state_fips = fips.iloc[0]
+            else:
+                state_fips = state_cd
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
@@ -391,12 +415,12 @@ class Paletable:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
 
         Returns:
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
         if state_fips is not None:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
@@ -429,7 +453,7 @@ class Paletable:
 
         Returns
         -------
-            :class:`Article` returns the updated object
+            Spark DataFrame: :class:`Paletable`: returns the updated object
 
         Examples
         --------
@@ -442,7 +466,7 @@ class Paletable:
 
         self.palet.logger.info('Group by - income bracket')
 
-        self.by_group.append(PaletMetadata.Enrollment.identity.income)
+        self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
         else:
@@ -456,12 +480,22 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
     def byYear(self, year: int = None, count: int = 1):
+        """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
+        Args:
+            year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
+            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1. 
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
         self.timeunit = 'year'
         self.timeunitvalue = year
         self.lookback = count
+
+        if year is not None:
+            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
 
         return self
 
@@ -471,9 +505,15 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    # TODO: add sphinx documentation for this function
     def byMonth(self, month: int = None):
+        """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
+        Args:
+            month:`int, (optional)`: Filter by month using the month in numerical format. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
         self.timeunit = 'month'
         self.timeunitvalue = month
 
@@ -485,6 +525,31 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
+        """The SQL query that the Enrollment class uses to pull dataframes. 
+        
+        This can be called allowing an analyst to view the SQL the Enrollment is using.
+
+        Args:
+            None: No input required.
+        
+        Returns:
+            str: Returns a text string containing the SQL query run by the Enrollment class.
+        
+        Example:
+            Create object containing the SQL query:
+            
+            >>> q = Enrollment().byState().sql()
+            
+            Return the query as text:
+            
+            >>> print(q)
+
+            Alternatively
+
+            >>> print(Enrollment().byState().sql())
+
+        """
+        
         return self.sql
 
     # ---------------------------------------------------------------------------------
@@ -493,11 +558,30 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def fetch(self):
-        """Call this function when you are ready for results
+        """Call this method at the end of an object when you are ready for results. 
+
+        This can be leveraged with display() to quickly pivot results.
+
+        Args:
+            None: No input required
 
         Returns:
-            :class:`Dataframe`: Executes your query and returns a spark dataframe object.
+            Spark Datarame: Executes your query and returns a Spark Datarame.
+
+        Example:
+            Create object for enrollment by state and year
+
+            >>> api = Enrollment().byState()
+
+            Return Spark DataFrame:
+
+            >>> api.fetch
+
+            Lever display() to pivot from yearly to monthly
+
+            >>> display(api.byMonth().fetch())
         """
+        from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
@@ -508,7 +592,7 @@ class Paletable:
         for pp in self.postprocesses:
             df = pp(df)
 
-        df = df.drop(columns=['isfirst'])
+        # df = df.drop(columns=['isfirst'])
 
         return df
 
