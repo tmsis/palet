@@ -199,6 +199,27 @@ class Paletable:
 
         return df
 
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findValueName(x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['race_ethncty_flag']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 'unknown'
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag[y]
+
+    
+    def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
+        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1) 
+
     # ---------------------------------------------------------------------------------
     #
     #

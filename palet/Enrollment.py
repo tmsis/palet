@@ -294,6 +294,10 @@ class Enrollment(Paletable):
         self._addPostProcess(self._decorate)
 
         # compress rows from submitting state to state if it is in the by group
+        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
+            self._addPostProcess(self._buildRaceEthnicityColumn)
+
+        # compress rows from submitting state to state if it is in the by group
         if (PaletMetadata.Enrollment.locale.submittingState in self.by_group):
             self._addPostProcess(self._mergeStateEnrollments)
 
