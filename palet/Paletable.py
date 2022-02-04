@@ -7,7 +7,6 @@ return datafranes created by high level objects.
 
 import pandas as pd
 
-from pyspark.sql import SparkSession
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -54,10 +53,11 @@ class Paletable:
 
         self.preprocesses = []
         self.postprocesses = []
+        self.paletableObjs = []
 
         self.palet = Palet('201801')
 
-        self.runids = self.palet.cache_run_ids()
+        # self.runids = self.palet.cache_run_ids()
 
     # ---------------------------------------------------------------------------------
     #
@@ -393,7 +393,11 @@ class Paletable:
 
         if state_cd is not None:
             if type(state_cd) is not int:
-                state_fips = state_cd # TODO need logic here for abbrev lookup
+                lkup = self.palet.st_fips
+                fips = lkup[lkup['STABBREV'] == state_cd]['FIPS']
+                state_fips = fips.iloc[0]
+            else:
+                state_fips = state_cd
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
@@ -577,7 +581,7 @@ class Paletable:
 
             >>> display(api.byMonth().fetch())
         """
-
+        from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
