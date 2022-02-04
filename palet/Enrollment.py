@@ -1,22 +1,22 @@
 import pandas as pd
+from build.lib import palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
 class Enrollment(Paletable):
 
-    objPaletable = Paletable()
-
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, isEnrolled: bool = True, paletable: Paletable = objPaletable):
+    def __init__(self, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
+            paletable.paletableObjs.append(Enrollment)
 
         self.palet.logger.info('Initializing Enrollment API')
 
@@ -108,22 +108,6 @@ class Enrollment(Paletable):
         }
 
     # ---------------------------------------------------------------------------------
-    # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getTimeunitBreakdown(self):
-        return Enrollment.timeunit.breakdown[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Enrollment.timeunit.cull[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
     # to calculate the % change columns. Each Paletable class should override this
     # and create it's own logic.
@@ -170,6 +154,22 @@ class Enrollment(Paletable):
         return df
 
     # ---------------------------------------------------------------------------------
+    # _getTimeunitBreakdown
+    # Tis function is used to dynamically generate the SQL statement by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getTimeUnitBreakdown(self):
+        return Enrollment.timeunit.breakdown[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    # _getByTimeunitCull
+    # Tis function is used to dynamically generate the SQL where clause by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getByTimeunitCull(self):
+        return Enrollment.timeunit.cull[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
     #
     #
     #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
@@ -177,15 +177,13 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-
+        print(self.paletableObjs)
         # create or replace temporary view enrollment_by_month as
-        # taf.taf_ann_de_base as a
-        # taf.data_anltcs_taf_ade_base_vw as a
         z = f"""
             select
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt,
-                {self._getTimeunitBreakdown()}
+                {self._getTimeUnitBreakdown()}
             from
                 palet_mart.data_anltcs_taf_ade_base_delta as a
             where
