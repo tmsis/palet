@@ -1,3 +1,10 @@
+"""
+The flagship class the Palet lirbary is built around. This class provides the frame work for other classes in the library.
+The Palet module contains the Palet class, the Utils subclass (short for utilities), and attributes for initialization, loading
+metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from 
+the Paletable module inherit from Palet as well. 
+"""
+
 from datetime import datetime
 import logging
 
@@ -5,6 +12,16 @@ from typing import Any
 
 
 class Palet():
+    """The class responsible initialization, logging and utilities.
+    This class is critical to utilizing the PALET library. It initializes the API, logs data, and provides access to the Utils subclass.
+
+    Example:
+        from palet.Palet import Palet
+        
+    Note: 
+        This class is inherited from the Paletable, which is inherited from all high level objecsts. As such this class does not need to be
+        manually imported. 
+    """
 
     PERFORMANCE = 15
 
@@ -61,6 +78,20 @@ class Palet():
     # --------------------------------------------------------------------
     def cache_run_ids(self):
         from pyspark.sql import SparkSession
+        """This method of the Palet class is responsible for pulling the most current valid run ids.
+
+        It uses the pyspark library to run a query on the efts_fil_meta TAF table. The most current valid run ids pulled from this method
+        are then used in any query run by a high level object like :class:`Enrollment` or :class:`Eligibility`.
+
+        Args:
+            self: None - no input required.
+
+        Returns:
+            Spark Datarame: Executes the query and returns a Spark Datarame with fil_4th_node_txt, otpt_name, da_run_id, rptg_prd, and fil_dt.
+        
+        Note: Only returns the most current run ids available. 
+
+        """
 
         z = """
                 select distinct
@@ -99,6 +130,15 @@ class Palet():
     #
     # --------------------------------------------------------------------
     def initialize_logger(self, now: datetime):
+        """Attribute that initializes the logger within the Palet class.
+        Prints a datetime so it is clear to the user when the code was executed. 
+        
+        Args:
+            now: `datetime, optional`: Filter a date and time. Can be set but shouldn't. Defaults to when a log line is written. 
+        
+        Returns:
+            Prints a datetime to show when the code was executed.  
+        """
 
         file_date = now.strftime('%Y-%m-%d-%H-%M-%S')
 
@@ -141,6 +181,16 @@ class Palet():
     #
     # --------------------------------------------------------------------
     def load_metadata_file(self, fn):
+        """
+        Attribute for loading in Pickle metadata files sourced from Excel. 
+
+        Args:
+            fn: `str`: The name of the pkl file without the extension
+
+        Returns:
+            PDF file with the metadata from the specified pkl file. 
+        """
+
         import pandas as pd
         import os
         pdf = None
@@ -159,6 +209,9 @@ class Palet():
     #
     # ---------------------------------------------------------------------------------
     def show(self, v):
+        """
+        To be Determined.
+        """
         print(self.sql[v])
 
     # ---------------------------------------------------------------------------------
@@ -168,6 +221,9 @@ class Palet():
     #
     # ---------------------------------------------------------------------------------
     class Utils():
+        """Sub-class within the Palet class containing utilities.
+        The Utils subclass features static methods that can be used by CMS analysts.
+        """
 
         # ---------------------------------------------------------------------------------
         #
@@ -177,6 +233,16 @@ class Palet():
         # ---------------------------------------------------------------------------------
         @staticmethod
         def compress(string):
+            """
+            Static method to compress a string
+
+            Args:
+                string: `str`: The string a user wishes to compress
+
+            Returns:
+                A compressed string
+            """
+
             return ' '.join(string.split())
 
         # ---------------------------------------------------------------------------------
@@ -187,10 +253,28 @@ class Palet():
         # ---------------------------------------------------------------------------------
         @staticmethod
         def show(sql):
+            """
+            Static method allowing the analyst to return the sql functions being run by the palet library.
+
+            Args:
+                sql: `str`: The SQL function an analyst is utilizing when logging.
+
+            Returns:
+                Prints the SQL query an analyst is using for logging purposes. 
+            """
             print(Palet.utils.compress(sql.replace('\n', '')))
 
         @staticmethod
         def createDateRange(year: str):
+            """
+            Static method for creating a data range when viewing data.
+
+            Args:
+                year: `str`: The year an analyst wants to view data for.
+
+            Returns:
+                Data from the all 12 months of the specified year. 
+            """
             range = year + "01-" + year + "12"
             return range
 
