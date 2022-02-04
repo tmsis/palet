@@ -6,7 +6,6 @@ the Enrollment module inherits from the Paletable module.
 """
 
 import pandas as pd
-from build.lib import palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
