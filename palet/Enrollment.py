@@ -293,8 +293,9 @@ class Enrollment(Paletable):
         self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
 
-        # compress rows from submitting state to state if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
+        # compress rows from race ethnicity if it is in the by group
+        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group): 
+            self.palet.logger.info('hello world')
             self._addPostProcess(self._buildRaceEthnicityColumn)
 
         # compress rows from submitting state to state if it is in the by group

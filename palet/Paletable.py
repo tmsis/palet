@@ -87,6 +87,15 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addByGroup(self, var):
+        if var not in self.by_group:
+            self.by_group.append(var)
+
+    # ---------------------------------------------------------------------------------
+    #
     #   getByGroupWithAlias: This function allows our byGroup to be aliased
     #       properly for the dynamic sql generation
     #
@@ -205,7 +214,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _findValueName(x):
+    def _findValueName(self, x):
         import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
@@ -262,7 +271,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.by_group.append(PaletMetadata.Enrollment.identity.age)
+        self._addByGroup(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
@@ -286,7 +295,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.race)
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
@@ -308,7 +317,7 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
@@ -330,7 +339,7 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
-        self.by_group.append(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
+        self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
             self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
@@ -355,7 +364,7 @@ class Paletable:
 
         self.palet.logger.info('Group by - gender')
 
-        self.by_group.append(PaletMetadata.Enrollment.identity.gender)
+        self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
@@ -380,7 +389,7 @@ class Paletable:
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
         if state_cd is not None:
             if type(state_cd) is not int:
@@ -407,7 +416,7 @@ class Paletable:
 
         self.palet.logger.info('Group by - state')
 
-        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
         if state_fips is not None:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
@@ -453,7 +462,7 @@ class Paletable:
 
         self.palet.logger.info('Group by - income bracket')
 
-        self.by_group.append(PaletMetadata.Enrollment.identity.income)
+        self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
         else:
@@ -579,7 +588,7 @@ class Paletable:
         for pp in self.postprocesses:
             df = pp(df)
 
-        df = df.drop(columns=['isfirst'])
+        # df = df.drop(columns=['isfirst'])
 
         return df
 
