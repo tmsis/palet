@@ -2,11 +2,11 @@
 The Enrollment module allows CMS analysts to view enrollment. This module can be levereged with the Paletable module
 to apply specific filters. Doing so, analysts can view enrollment by state, income bracket, age, etc. This module
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
-the Enrollment module inherits from the Paletable module. 
+the Enrollment module inherits from the Paletable module.
 """
 
 import pandas as pd
-from build.lib import palet
+
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
@@ -16,22 +16,22 @@ class Enrollment(Paletable):
     The class within the PALET library for viewing enrollment. This class is used to view enrollment for Medicaid and CHIP. Attributes inherited from the Paletable class
     can be used to apply filters for enrollee age, ehtnicity, gender, state, income, etc.
 
-    Enrollment counts are the sum of the unique beneficiaries enrolled at least one day in a given month or year. 
+    Enrollment counts are the sum of the unique beneficiaries enrolled at least one day in a given month or year.
 
     Note:
-        If the Enrollment class is called without a by group, it defaults to by year. 
+        If the Enrollment class is called without a by group, it defaults to by year.
 
     Examples:
         Import enrollment:
-        
+
         >>> from palet.Enrollment import Enrollment
-        
-        Create object for enrollment 
-        
-        >>> api = Enrollment()    
-        
-        Return dataframe for yearly enrollment: 
-        
+
+        Create object for enrollment
+
+        >>> api = Enrollment()
+
+        Return dataframe for yearly enrollment:
+
         >>> api.fetch()
 
         Pivot to by state:
@@ -41,13 +41,13 @@ class Enrollment(Paletable):
         Pivot to by month and state:
 
         >>> display(api.byMonth().byState().fetch())
-    
+
     Args:
         Paletable: No input required, defaults to none
-    
+
     Returns:
         Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
-          
+
     Methods:
         byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
         byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
@@ -60,10 +60,10 @@ class Enrollment(Paletable):
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
         byMonth(): Filter your query by Month. See :meth:`~Paletable.Paletable.byMonth`.
         fetch(): Call this function when you are ready to return results. See :meth:`~Paletable.Paletable.fetch`.
-    
+
     Note:
         The above attributes are inherited from the :class:`Paletable` class. Attributes directly from the Enrollment class can be seen below.
-    
+
     """
 
     # -----------------------------------------------------------------------
@@ -115,11 +115,11 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     class timeunit():
         """
-        The timeunit class is a subclass within the Enrollment. This subclass provides units of measurement for time. 
+        The timeunit class is a subclass within the Enrollment. This subclass provides units of measurement for time.
         It is composed of two dictionaries: breakdown & cull.
 
         Note:
-            This class affects both Medicaid & CHIP Enrollment. 
+            This class affects both Medicaid & CHIP Enrollment.
         """
 
         breakdown = {
@@ -244,23 +244,23 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-        """The SQL query that the Enrollment class uses to pull dataframes. 
-        
+        """The SQL query that the Enrollment class uses to pull dataframes.
+
         This can be called allowing an analyst to view the SQL the Enrollment is using.
 
         Args:
             self: None - no input required.
-        
+
         Returns:
             str: Returns a text string containing the SQL query run by the Enrollment class.
-        
+
         Example:
             Create object containing the SQL query:
-    
+
             >>> q = Enrollment().sql()
-            
+
             Return the query as text:
-            
+
             >>> print(q)
 
             Alternative one line approach:
@@ -292,7 +292,7 @@ class Enrollment(Paletable):
         self._addPostProcess(self._decorate)
 
         # compress rows from race ethnicity if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group): 
+        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
             self.palet.logger.info('hello world')
             self._addPostProcess(self._buildRaceEthnicityColumn)
 
