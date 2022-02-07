@@ -1,31 +1,32 @@
 """
 The PaletMetadata module is composed of the PaletMetadata Class and its respective subclasses. The subclassess correspond
 to high level objects like Enrollment & Eligibility. These classes work to make TAF data more easily readable. Column names
-within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what 
-contructed code values correspond to. 
+within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what
+contructed code values correspond to.
 """
+
 
 class PaletMetadata:
     """
-    In addition to the readability aspect discussed above, the PaletMetadata class is essential to converting 
-    data within the TAF files to the outputs returned by the API. This most often applies to assigning names to 
+    In addition to the readability aspect discussed above, the PaletMetadata class is essential to converting
+    data within the TAF files to the outputs returned by the API. This most often applies to assigning names to
     structered code or implementing column names that are more concise and easily understandable.
 
     Note:
-        It is a best practice to import this class of the PALET library whenever running a high level 
+        It is a best practice to import this class of the PALET library whenever running a high level
         object in the API.
 
     Example:
         >>> from palet.PaletMetadata import PaletMetadata
-        
+
     """
     class Enrollment:
         """
         The Enrollment class is a subclass of PaletMetadata. This class primaryily assigns more readable
-        and concise column names to the TAF data pertaining to Medicaid and CHIP enrollment. Additionally, 
-        some of the subclassess within the Enrollment class contain dictionaries that explain the meaning 
-        of structed code within columns.  
-        """        
+        and concise column names to the TAF data pertaining to Medicaid and CHIP enrollment. Additionally,
+        some of the subclassess within the Enrollment class contain dictionaries that explain the meaning
+        of structed code within columns.
+        """
 
         fileDate = 'DE_FIL_DT'
 
@@ -297,7 +298,7 @@ class PaletMetadata:
         and concise column names to the TAF data pertaining to Medicaid and CHIP eligibility.
 
         Note:
-            Incomplete, work in progress. 
+            Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
         eligibiltyGroup = 'elgblty_grp_cd'
@@ -309,3 +310,14 @@ class PaletMetadata:
         stateEligibility = 'state_spec_elgblty_fctr_txt'
         dualEligibilityCode = 'dual_elgbl_cd'
         dualEligibility = 'dual_elgbl_flag'
+
+    class Coverage:
+        """
+        The Coverage class is a subclass of PaletMetadata. This class primaryily assigns more readable
+        and concise column names to the TAF data pertaining to Medicaid and CHIP coverage.
+
+        Note:
+            Incomplete, work in progress.
+        """
+        fileDate = 'DE_FIL_DT'
+        type = 'mc_plan_type_cd_'

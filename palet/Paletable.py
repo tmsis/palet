@@ -417,6 +417,32 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def byType(self, coverage_type=None):
+        """Filter your query by Age Range. Most top level objects inherit this
+            function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the
+            next by group.
+
+        Args:
+            age_range: `str, optional`: Filter a single age, range such as
+            18-21, or an inclusive number such as 65+. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
+
+        self._addByGroup(PaletMetadata.Coverage.type)
+
+        if coverage_type is not None:
+            self.filter.update({PaletMetadata.Coverage.type: coverage_type})
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def byMedicaidOnly(self, state_fips=None):
         """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
