@@ -217,7 +217,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _findValueName(self, x):
+    def _findRaceValueName(self, x):
         import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
@@ -235,7 +235,35 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
-        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1)
+        df['race'] = df.apply(lambda x: self._findRaceValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findRaceExpValueName(self, x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['race_ethncty_exp_flag']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 'unknown'
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_exp_flag[y]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildRaceEthnicityExpColumn(self, df: pd.DataFrame):
+        df['race expanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
 
         return df
 
@@ -409,32 +437,6 @@ class Paletable:
             else:
                 state_fips = state_cd
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byType(self, coverage_type=None):
-        """Filter your query by Age Range. Most top level objects inherit this
-            function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the
-            next by group.
-
-        Args:
-            age_range: `str, optional`: Filter a single age, range such as
-            18-21, or an inclusive number such as 65+. Defaults to None.
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-        """
-
-        self._addByGroup(PaletMetadata.Coverage.type)
-
-        if coverage_type is not None:
-            self.filter.update({PaletMetadata.Coverage.type: coverage_type})
 
         return self
 
