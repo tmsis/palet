@@ -263,7 +263,35 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityExpColumn(self, df: pd.DataFrame):
-        df['race expanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
+        df['raceExpanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findEthnicityValueName(self, x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['ethncty_cd']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 6 #6 = unspecified
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd[y]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildEthnicityColumn(self, df: pd.DataFrame):
+        df['ethnicity'] = df.apply(lambda x: self._findEthnicityValueName(x), axis=1)
 
         return df
 
