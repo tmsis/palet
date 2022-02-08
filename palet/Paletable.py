@@ -279,7 +279,7 @@ class Paletable:
         y = x['ethncty_cd']
         # if the value is NaN, default to unknown
         if math.isnan(y):
-            return 6 #6 = unspecified
+            return 'unspecified' 
         else:
             # lookup label with value
             return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd[y]
