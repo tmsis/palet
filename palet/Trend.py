@@ -12,7 +12,7 @@ class Trend(Paletable):
 
         if (paletable is not None):
             self.by_group = paletable.by_group
-            self.filter = paletable.filter
+            self.and_filter = paletable.and_filter
 
 
 # CC0 1.0 Universal

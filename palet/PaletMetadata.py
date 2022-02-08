@@ -320,4 +320,29 @@ class PaletMetadata:
             Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
-        type = 'mc_plan_type_cd_'
+        type = 'mdcd_coverage_type'
+        mdcd_coverage_type = {
+            '01': "Comprehensive Managed Care Organization",
+            '04': "Health Insuring Organization (HIO)",
+            '80': "Integrated Care for Dual Eligibles",
+            '08': "Mental Health (MH) PIHP",
+            '09': "Mental Health (MH) PAHP",
+            '10': "(SUD) PIHP",
+            '11': "Substance Use Disorders (SUD) PAHP",
+            '12': "Mental Health (MH) and (SUD) PIHP",
+            '13': "Mental Health (MH) and (SUD) PAHP",
+            '07': "Long-Term Services & Supports (LTSS) PIHP",
+            '17': "Prog All-Inclusive Care for the Elderly (PACE)",
+            '19': "LT Services & Supports (LTSS) and (MH) PIHP",
+            '05': "Medical-Only PIHP",
+            '06': "Medical-Only PAHP",
+            '14': "Dental PAHP",
+            '15': "Transportation PAHP",
+            '16': "Disease Management PAHP",
+            '18': "Pharmacy PAHP",
+            '02': "Traditional PCCM Provider arrangement",
+            '03': "Enhanced PCCM Provider arrangement",
+            '70': "Health/Medical Home (retired value)",
+            '20': "Other",
+            '60': "Accountable Care Organization"
+            }
