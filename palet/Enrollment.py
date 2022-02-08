@@ -2,7 +2,7 @@
 The Enrollment module allows CMS analysts to view enrollment. This module can be levereged with the Paletable module
 to apply specific filters. Doing so, analysts can view enrollment by state, income bracket, age, etc. This module
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
-the Enrollment module inherits from the Paletable module. 
+the Enrollment module inherits from the Paletable module.
 """
 
 import pandas as pd
@@ -291,15 +291,15 @@ class Enrollment(Paletable):
         self._addPostProcess(self._decorate)
 
         # compress rows from race ethnicity if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group): 
+        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
             self._addPostProcess(self._buildRaceEthnicityColumn)
 
         # compress rows from race ethnicity expanded if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.raceExpanded in self.by_group): 
+        if (PaletMetadata.Enrollment.raceEthnicity.raceExpanded in self.by_group):
             self._addPostProcess(self._buildRaceEthnicityExpColumn)
 
         # compress rows from ethnicity if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.ethnicity in self.by_group): 
+        if (PaletMetadata.Enrollment.raceEthnicity.ethnicity in self.by_group):
             self._addPostProcess(self._buildEthnicityColumn)
 
         # compress rows from submitting state to state if it is in the by group
