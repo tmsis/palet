@@ -1,8 +1,8 @@
 """
 The flagship class the Palet lirbary is built around. This class provides the frame work for other classes in the library.
 The Palet module contains the Palet class, the Utils subclass (short for utilities), and attributes for initialization, loading
-metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from 
-the Paletable module inherit from Palet as well. 
+metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from
+the Paletable module inherit from Palet as well.
 """
 
 from datetime import datetime
@@ -17,10 +17,10 @@ class Palet():
 
     Example:
         from palet.Palet import Palet
-        
-    Note: 
+
+    Note:
         This class is inherited from the Paletable, which is inherited from all high level objecsts. As such this class does not need to be
-        manually imported. 
+        manually imported.
     """
 
     PERFORMANCE = 15
@@ -88,8 +88,8 @@ class Palet():
 
         Returns:
             Spark Datarame: Executes the query and returns a Spark Datarame with fil_4th_node_txt, otpt_name, da_run_id, rptg_prd, and fil_dt.
-        
-        Note: Only returns the most current run ids available. 
+
+        Note: Only returns the most current run ids available.
 
         """
 
@@ -131,13 +131,13 @@ class Palet():
     # --------------------------------------------------------------------
     def initialize_logger(self, now: datetime):
         """Attribute that initializes the logger within the Palet class.
-        Prints a datetime so it is clear to the user when the code was executed. 
-        
+        Prints a datetime so it is clear to the user when the code was executed.
+
         Args:
-            now: `datetime, optional`: Filter a date and time. Can be set but shouldn't. Defaults to when a log line is written. 
-        
+            now: `datetime, optional`: Filter a date and time. Can be set but shouldn't. Defaults to when a log line is written.
+
         Returns:
-            Prints a datetime to show when the code was executed.  
+            Prints a datetime to show when the code was executed.
         """
 
         file_date = now.strftime('%Y-%m-%d-%H-%M-%S')
@@ -182,13 +182,13 @@ class Palet():
     # --------------------------------------------------------------------
     def load_metadata_file(self, fn):
         """
-        Attribute for loading in Pickle metadata files sourced from Excel. 
+        Attribute for loading in Pickle metadata files sourced from Excel.
 
         Args:
             fn: `str`: The name of the pkl file without the extension
 
         Returns:
-            PDF file with the metadata from the specified pkl file. 
+            PDF file with the metadata from the specified pkl file.
         """
 
         import pandas as pd
@@ -260,7 +260,7 @@ class Palet():
                 sql: `str`: The SQL function an analyst is utilizing when logging.
 
             Returns:
-                Prints the SQL query an analyst is using for logging purposes. 
+                Prints the SQL query an analyst is using for logging purposes.
             """
             print(Palet.utils.compress(sql.replace('\n', '')))
 
@@ -273,7 +273,7 @@ class Palet():
                 year: `str`: The year an analyst wants to view data for.
 
             Returns:
-                Data from the all 12 months of the specified year. 
+                Data from the all 12 months of the specified year.
             """
             range = year + "01-" + year + "12"
             return range

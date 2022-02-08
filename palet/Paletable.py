@@ -239,6 +239,36 @@ class Paletable:
 
         return df
 
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findValueName_(self, x):
+        # get this row's ref value from the column by name
+        print(x)
+        y = x[PaletMetadata.Coverage.md_plan_type]
+        # if the value is NaN, default to unknown
+        print(y)
+        if y is None or y == 'null':
+            return 'unknown'
+        else:
+            # lookup label with value
+            return PaletMetadata.Coverage.md_plan_type[y]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildValueColumn(self, df: pd.DataFrame):
+        newColumn = "coverage_type"
+        df[newColumn] = df.apply(lambda x: self._findValueName_(x), axis=1)
+
+        return df
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -411,30 +441,6 @@ class Paletable:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byType(self, coverage_type=None):
-        """Filter your query by Age Range. Most top level objects inherit this
-            function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the
-            next by group.
-
-        Args:
-            age_range: `str, optional`: Filter a single age, range such as
-            18-21, or an inclusive number such as 65+. Defaults to None.
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-        """
-
-        self._addByGroup(PaletMetadata.Coverage.type)
-
-        if coverage_type is not None:
-            self.filter.update({PaletMetadata.Coverage.type: coverage_type})
 
         return self
 

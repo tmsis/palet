@@ -62,52 +62,6 @@ class Coverage(Paletable):
 
     # ---------------------------------------------------------------------------------
     #
-    # slice and dice here to create the proper sytax for a where clause
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _defineWhereClause(self):
-        clause = ""
-        where = []
-
-        if len(self.filter) > 0:
-            for key in self.filter:
-
-                # get the value(s) in case there are multiple
-                values = self.filter[key]
-
-                # Check for multiple values here, space separator is default
-                if str(values).find(" ") > -1:
-                    splitRange = self._checkForMultiVarFilter(values)
-                    for value in splitRange:
-                        clause = ("a." + key, value)
-                        where.append(' ((= '.join(clause))
-
-                # Check for multiples with , separator
-                elif str(values).find(",") > -1:
-                    splitVals = self._checkForMultiVarFilter(values, ",")
-                    for values in splitVals:
-                        # check for age ranges here with the - separator
-                        if str(values).find("-") > -1:
-                            splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "a." + key + " between " + splitRange[0] + " and " + splitRange[1]
-                        # check for greater than; i.e. x+ equals >= x
-                        elif str(values).find("+") > -1:
-                            range_stmt = "a." + key + " >= " + values.strip("+")
-                        # take the x+ and strip out the +
-                        where.append(range_stmt)
-
-                else:  # else parse the single value
-                    clause = ("a." + key, self.filter[key])
-                    where.append(' = '.join(clause))
-
-            return f"{' and '.join(where)}"
-
-        else:
-            return "1=1"
-
-    # ---------------------------------------------------------------------------------
-    #
     # _chcekForMultiVarFilter
     # This is a function that is called to check for multiple value input from the user.
     # It is used internally and called during byGroup calls.
@@ -134,13 +88,13 @@ class Coverage(Paletable):
             else:
                 df['isfirst'] = 0
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_eligible', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_coverage_type', 1, False)
 
             # Year-over-Year
             df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
             df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type', 1, False)
 
             # Re-sort Chronologically
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -154,7 +108,7 @@ class Coverage(Paletable):
             else:
                 df['isfirst'] = 0
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type', 1, False)
 
         return df
 
@@ -247,6 +201,31 @@ class Coverage(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
+    #
+    # ---------------------------------------------------------------------------------
+    def byType(self, coverage_type=None):
+        """Filter your query by Coverage Type. Most top level objects inherit this
+            function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the
+            next by group.
+
+        Args:
+            age_range: `str, optional`: Filter a single age, range such as
+            18-21, or an inclusive number such as 65+. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
+
+        if coverage_type is not None:
+            self._addByGroup(PaletMetadata.Coverage.type + coverage_type)
+            self.and_filter.update({PaletMetadata.Coverage.type: coverage_type})
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
     #  SQL Alchemy for Eligibility series by year or year/month for Medicaid and CHIP
     #
     #
@@ -271,6 +250,8 @@ class Coverage(Paletable):
                 a.de_fil_dt
          """
 
+        # compress rows from coverage if it is in the by group
+        self._addPostProcess(self._buildValueColumn)
         self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
 
