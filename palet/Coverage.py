@@ -7,7 +7,6 @@ return datafranes created by high level objects.
 
 import pandas as pd
 
-from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
@@ -160,7 +159,7 @@ class Coverage(Paletable):
                     10,sum(case when a.MC_PLAN_TYPE_CD_10 > 0 then 1 else 0 end),
                     11,sum(case when a.MC_PLAN_TYPE_CD_11 > 0 then 1 else 0 end),
                     12,sum(case when a.MC_PLAN_TYPE_CD_12 > 0 then 1 else 0 end)
-                ) as (month, mdcd_coverage_type)"""
+                ) as (month, mdcd_coverage_type_summary)"""
         }
 
         cull = {
@@ -217,9 +216,10 @@ class Coverage(Paletable):
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
+        self._addByGroup(PaletMetadata.Coverage.mc_plan_type_cd + '01')
+
         if coverage_type is not None:
-            self._addByGroup(PaletMetadata.Coverage.type + coverage_type)
-            self.and_filter.update({PaletMetadata.Coverage.type: coverage_type})
+            self.filter.update({'MC_PLAN_TYPE_CD_01': coverage_type})
 
         return self
 
