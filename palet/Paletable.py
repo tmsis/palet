@@ -221,12 +221,8 @@ class Paletable:
         import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
-        # if the value is NaN, default to unknown
-        if math.isnan(y):
-            return 'unknown'
-        else:
-            # lookup label with value
-            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag[y]
+        # lookup label with value
+        return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag.get(y)
 
     # ---------------------------------------------------------------------------------
     #
@@ -249,12 +245,8 @@ class Paletable:
         import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_exp_flag']
-        # if the value is NaN, default to unknown
-        if math.isnan(y):
-            return 'unknown'
-        else:
-            # lookup label with value
-            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_exp_flag[y]
+        # lookup label with value
+        return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_exp_flag.get(y)
 
     # ---------------------------------------------------------------------------------
     #
@@ -274,15 +266,10 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findEthnicityValueName(self, x):
-        import math
         # get this row's ref value from the column by name
-        y = x['ethncty_cd']
-        # if the value is NaN, default to unknown
-        if math.isnan(y):
-            return 'unspecified' 
-        else:
-            # lookup label with value
-            return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd[y]
+        y = x[PaletMetadata.Enrollment.raceEthnicity.ethnicity]
+        # lookup label with value
+        return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd.get(y)
 
     # ---------------------------------------------------------------------------------
     #
@@ -311,7 +298,7 @@ class Paletable:
             return 'unknown'
         else:
             # lookup label with value
-            return PaletMetadata.Coverage.md_plan_type[y]
+            return PaletMetadata.Coverage.md_plan_type.get(y)
 
     # ---------------------------------------------------------------------------------
     #
@@ -679,12 +666,27 @@ class Paletable:
         """
         from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
+        from pyspark.sql.types import StructType, StructField, StringType, DecimalType, IntegerType, LongType, DoubleType
+
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
         sparkDF = session.sql(self.sql())
+
+        if (sparkDF is not None):
+
+            if PaletMetadata.Enrollment.raceEthnicity.ethnicity in sparkDF.columns:
+                sparkDF = sparkDF.withColumn(
+                    PaletMetadata.Enrollment.raceEthnicity.ethnicity,
+                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
+
         df = sparkDF.toPandas()
 
-        # perform last minute add-ons here
+        if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
+            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
+                = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
+            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('6', inplace=True)
+
+        # perform data enrichments
         for pp in self.postprocesses:
             df = pp(df)
 

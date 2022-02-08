@@ -123,36 +123,37 @@ class PaletMetadata:
             timestampAdd = 'rec_add_ts',
             timestampUpdate = 'rec_updt_ts'
 
+            # class lookup
             race_ethncty_flag = {
-                1: 'white',
-                2: 'black',
-                3: 'asian',
-                4: 'americanIndian',
-                5: 'islander',
-                6: 'mixed',
-                7: 'hispanic'
+                '1': 'white',
+                '2': 'black',
+                '3': 'asian',
+                '4': 'americanIndian',
+                '5': 'islander',
+                '6': 'mixed',
+                '7': 'hispanic'
             }
             race_ethncty_exp_flag = {
-                1: 'white',
-                2: 'black',
-                3: 'americanIndian',
-                4: 'indian',
-                5: 'chinese',
-                6: 'filipino',
-                7: 'japanese',
-                8: 'korean',
-                9: 'vietnamese',
-                10: 'otherAsian',
-                11: 'unknownAsian',
-                12: 'multiAsian',
-                13: 'hawaiian',
-                14: 'guamChamarro',
-                15: 'samoan',
-                16: 'otherIslander',
-                17: 'unkownIslander',
-                18: 'multiIslander',
-                19: 'multiRacial',
-                20: 'hispanic'
+                '1': 'white',
+                '2': 'black',
+                '3': 'americanIndian',
+                '4': 'indian',
+                '5': 'chinese',
+                '6': 'filipino',
+                '7': 'japanese',
+                '8': 'korean',
+                '9': 'vietnamese',
+                '10': 'otherAsian',
+                '11': 'unknownAsian',
+                '12': 'multiAsian',
+                '13': 'hawaiian',
+                '14': 'guamChamarro',
+                '15': 'samoan',
+                '16': 'otherIslander',
+                '17': 'unkownIslander',
+                '18': 'multiIslander',
+                '19': 'multiRacial',
+                '20': 'hispanic'
             }
             ethncty_cd = {
                 '0': 'notHispanic',
@@ -164,9 +165,9 @@ class PaletMetadata:
                 '6': 'unspecified'
             }
             crtfd_amrcn_indn_alskn_ntv_ind = {
-                0: 'notAmericanIndian',
-                1: 'americanIndian',
-                2: 'certifiedAmericanIndian'
+                '0': 'notAmericanIndian',
+                '1': 'americanIndian',
+                '2': 'certifiedAmericanIndian'
             }
 
         class CHIP:
