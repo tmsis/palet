@@ -155,13 +155,13 @@ class PaletMetadata:
                 20: 'hispanic'
             }
             ethncty_cd = {
-                0: 'notHispanic',
-                1: 'mexican',
-                2: 'puertoRican',
-                3: 'cuban',
-                4: 'otherHispanic',
-                5: 'unkownHispanic',
-                6: 'unspecified'
+                '0': 'notHispanic',
+                '1': 'mexican',
+                '2': 'puertoRican',
+                '3': 'cuban',
+                '4': 'otherHispanic',
+                '5': 'unkownHispanic',
+                '6': 'unspecified'
             }
             crtfd_amrcn_indn_alskn_ntv_ind = {
                 0: 'notAmericanIndian',
