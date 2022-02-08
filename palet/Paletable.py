@@ -217,7 +217,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def _findValueName(self, x):
+    def _findRaceValueName(self, x):
         import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
@@ -235,7 +235,63 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
-        df['race'] = df.apply(lambda x: self._findValueName(x), axis=1)
+        df['race'] = df.apply(lambda x: self._findRaceValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findRaceExpValueName(self, x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['race_ethncty_exp_flag']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 'unknown'
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_exp_flag[y]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildRaceEthnicityExpColumn(self, df: pd.DataFrame):
+        df['raceExpanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findEthnicityValueName(self, x):
+        import math
+        # get this row's ref value from the column by name
+        y = x['ethncty_cd']
+        # if the value is NaN, default to unknown
+        if math.isnan(y):
+            return 6 #6 = unspecified
+        else:
+            # lookup label with value
+            return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd[y]
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildEthnicityColumn(self, df: pd.DataFrame):
+        df['ethnicity'] = df.apply(lambda x: self._findEthnicityValueName(x), axis=1)
 
         return df
 
@@ -439,8 +495,6 @@ class Paletable:
             else:
                 state_fips = state_cd
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        return self
 
         return self
 
