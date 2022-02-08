@@ -320,6 +320,7 @@ class PaletMetadata:
             Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
+        mc_plan_type_cd = 'MC_PLAN_TYPE_CD_'
         type = 'mdcd_coverage_type'
         mdcd_coverage_type = {
             '01': "Comprehensive Managed Care Organization",
