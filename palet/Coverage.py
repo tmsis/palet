@@ -87,13 +87,13 @@ class Coverage(Paletable):
             else:
                 df['isfirst'] = 0
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_coverage_type', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_coverage_type_summary', 1, False)
 
             # Year-over-Year
             df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
             df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type_summary', 1, False)
 
             # Re-sort Chronologically
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -107,7 +107,7 @@ class Coverage(Paletable):
             else:
                 df['isfirst'] = 0
 
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type', 1, False)
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type_summary', 1, False)
 
         return df
 
@@ -144,7 +144,7 @@ class Coverage(Paletable):
 
         breakdown = {
             'year': """
-                sum(case when a.MC_PLAN_TYPE_CD_ltst > 0 then 1 else 0 end) as mdcd_coverage_type""",
+                sum(case when a.MC_PLAN_TYPE_CD_ltst > 0 then 1 else 0 end) as mdcd_coverage_type_summary""",
             'month': """
                 stack(12,
                     1, sum(case when a.MC_PLAN_TYPE_CD_01 > 0 then 1 else 0 end),

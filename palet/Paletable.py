@@ -303,15 +303,14 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _findValueName_(self, x):
         # get this row's ref value from the column by name
-        print(x)
-        y = x[PaletMetadata.Coverage.md_plan_type]
+        y = x[PaletMetadata.Coverage.mc_plan_type_cd + '01']
         # if the value is NaN, default to unknown
-        print(y)
         if y is None or y == 'null':
             return 'unknown'
         else:
             # lookup label with value
-            return PaletMetadata.Coverage.md_plan_type[y]
+            field = PaletMetadata.Coverage.mdcd_coverage_type
+            return field.get(y)
 
     # ---------------------------------------------------------------------------------
     #
