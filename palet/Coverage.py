@@ -21,17 +21,7 @@ class Coverage(Paletable):
         Once imported, the Article class is not called. Rather its attributes are called after a high level object.
 
     Example:
-        Import enrollment:
 
-        >>> from palet.Enrollment import Enrollment
-
-        Create dataframe:
-
-        >>> e = Enrollment().byState()
-
-        Return dataframe:
-
-        >>> e.fetch()
 
     """
 
@@ -45,157 +35,117 @@ class Coverage(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
-            paletable.paletableObjs.append(Coverage)
 
         self.palet.logger.info('Initializing Coverage API')
 
-    # ---------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     #
+    #  Multiple steps to create the coverage_type views
+    #  call this function with step 1, 2, or 3
+    #  They should be called in order for safety
     #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _getValueFromFilter(self, column: str):
-        value = self.filter.get(column)  # TODO: required columns handling?
-        return column + " = " + value
+    # -----------------------------------------------------------------------
+    def _transposeCoverageType(self):
 
-    # ---------------------------------------------------------------------------------
-    #
-    # _chcekForMultiVarFilter
-    # This is a function that is called to check for multiple value input from the user.
-    # It is used internally and called during byGroup calls.
-    # ---------------------------------------------------------------------------------
-    def _checkForMultiVarFilter(self, values: str, separator=" "):
-        return values.split(separator)
+        from pyspark.sql import SparkSession
+        session = SparkSession.getActiveSession()
 
-    # ---------------------------------------------------------------------------------
-    # _percentChange protected/private method that is called by each fetch() call
-    # to calculate the % change columns. Each Paletable class should override this
-    # and create it's own logic.
-    # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: pd.DataFrame):
-        self.palet.logger.debug('Percent Change')
+        # session.sql("""
+        #     create view if not exists compress_coverage_type as
+        #     select
+        #         a.de_fil_dt,
+        #         a.mc_plan_type_cd_01,
+        #         a.mc_plan_type_cd_02,
+        #         a.mc_plan_type_cd_03,
+        #         a.mc_plan_type_cd_04,
+        #         a.mc_plan_type_cd_05,
+        #         a.mc_plan_type_cd_06,
+        #         a.mc_plan_type_cd_07,
+        #         a.mc_plan_type_cd_08,
+        #         a.mc_plan_type_cd_09,
+        #         a.mc_plan_type_cd_10,
+        #         a.mc_plan_type_cd_11,
+        #         a.mc_plan_type_cd_12,
+        #         sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end) as mdcd_enrlmt_days_01,
+        #         sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end) as mdcd_enrlmt_days_02,
+        #         sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end) as mdcd_enrlmt_days_03,
+        #         sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end) as mdcd_enrlmt_days_04,
+        #         sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end) as mdcd_enrlmt_days_05,
+        #         sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end) as mdcd_enrlmt_days_06,
+        #         sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end) as mdcd_enrlmt_days_07,
+        #         sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end) as mdcd_enrlmt_days_08,
+        #         sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end) as mdcd_enrlmt_days_09,
+        #         sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end) as mdcd_enrlmt_days_10,
+        #         sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end) as mdcd_enrlmt_days_11,
+        #         sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end) as mdcd_enrlmt_days_12,
+        #         sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end) as chip_enrlmt_days_01,
+        #         sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end) as chip_enrlmt_days_02,
+        #         sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end) as chip_enrlmt_days_03,
+        #         sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end) as chip_enrlmt_days_04,
+        #         sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end) as chip_enrlmt_days_05,
+        #         sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end) as chip_enrlmt_days_06,
+        #         sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end) as chip_enrlmt_days_07,
+        #         sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end) as chip_enrlmt_days_08,
+        #         sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end) as chip_enrlmt_days_09,
+        #         sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end) as chip_enrlmt_days_10,
+        #         sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end) as chip_enrlmt_days_11,
+        #         sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end) as chip_enrlmt_days_12
+        #     from
+        #         taf.taf_ann_de_base as a
+        #     where
+        #         a.da_run_id in ( 6279, 6280 )
+        #         and a.de_fil_dt = 2021
+        #     group by
+        #         de_fil_dt,
+        #         a.mc_plan_type_cd_01,
+        #         a.mc_plan_type_cd_02,
+        #         a.mc_plan_type_cd_03,
+        #         a.mc_plan_type_cd_04,
+        #         a.mc_plan_type_cd_05,
+        #         a.mc_plan_type_cd_06,
+        #         a.mc_plan_type_cd_07,
+        #         a.mc_plan_type_cd_08,
+        #         a.mc_plan_type_cd_09,
+        #         a.mc_plan_type_cd_10,
+        #         a.mc_plan_type_cd_11,
+        #         a.mc_plan_type_cd_12
+        #     order by
+        #         de_fil_dt,
+        #         a.mc_plan_type_cd_01,
+        #         a.mc_plan_type_cd_02,
+        #         a.mc_plan_type_cd_03,
+        #         a.mc_plan_type_cd_04,
+        #         a.mc_plan_type_cd_05,
+        #         a.mc_plan_type_cd_06,
+        #         a.mc_plan_type_cd_07,
+        #         a.mc_plan_type_cd_08,
+        #         a.mc_plan_type_cd_09,
+        #         a.mc_plan_type_cd_10,
+        #         a.mc_plan_type_cd_11,
+        #         a.mc_plan_type_cd_12
+        # """)
 
-        df['year'] = df['de_fil_dt']
-
-        if self.timeunit == 'month':
-
-            # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_coverage_type_summary', 1, False)
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type_summary', 1, False)
-
-            # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-
-        elif self.timeunit == 'year':
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_coverage_type_summary', 1, False)
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _decorate(self, df):
-        self.palet.logger.debug('Decorate')
-
-        # for submitting state
-        if PaletMetadata.Enrollment.locale.submittingState in self.by_group:
-            df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-            df = pd.merge(df, self.palet.st_name,
-                          how='inner',
-                          left_on=['USPS'],
-                          right_on=['USPS'])
-            df = pd.merge(df, self.palet.st_usps,
-                          how='inner',
-                          left_on=['USPS'],
-                          right_on=['USPS'])
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    # timeunit class
-    # Create the proper summary columns based on the by timeunit selected.
-    # Use the stack SQL function to create columns
-    #
-    # ---------------------------------------------------------------------------------
-    class timeunit():
-
-        breakdown = {
-            'year': """
-                sum(case when a.MC_PLAN_TYPE_CD_ltst > 0 then 1 else 0 end) as mdcd_coverage_type_summary""",
-            'month': """
-                stack(12,
-                    1, sum(case when a.MC_PLAN_TYPE_CD_01 > 0 then 1 else 0 end),
-                    2, sum(case when a.MC_PLAN_TYPE_CD_02 > 0 then 1 else 0 end),
-                    3, sum(case when a.MC_PLAN_TYPE_CD_03 > 0 then 1 else 0 end),
-                    4, sum(case when a.MC_PLAN_TYPE_CD_04 > 0 then 1 else 0 end),
-                    5, sum(case when a.MC_PLAN_TYPE_CD_05 > 0 then 1 else 0 end),
-                    6, sum(case when a.MC_PLAN_TYPE_CD_06 > 0 then 1 else 0 end),
-                    7, sum(case when a.MC_PLAN_TYPE_CD_07 > 0 then 1 else 0 end),
-                    8, sum(case when a.MC_PLAN_TYPE_CD_08 > 0 then 1 else 0 end),
-                    9, sum(case when a.MC_PLAN_TYPE_CD_09 > 0 then 1 else 0 end),
-                    10,sum(case when a.MC_PLAN_TYPE_CD_10 > 0 then 1 else 0 end),
-                    11,sum(case when a.MC_PLAN_TYPE_CD_11 > 0 then 1 else 0 end),
-                    12,sum(case when a.MC_PLAN_TYPE_CD_12 > 0 then 1 else 0 end)
-                ) as (month, mdcd_coverage_type_summary)"""
-        }
-
-        cull = {
-            'year': """(
-                a.MC_PLAN_TYPE_CD_ltst > 0)""",
-            'month': """(
-                (a.MC_PLAN_TYPE_CD_01 > 0) or
-                (a.MC_PLAN_TYPE_CD_02 > 0) or
-                (a.MC_PLAN_TYPE_CD_03 > 0) or
-                (a.MC_PLAN_TYPE_CD_04 > 0) or
-                (a.MC_PLAN_TYPE_CD_05 > 0) or
-                (a.MC_PLAN_TYPE_CD_06 > 0) or
-                (a.MC_PLAN_TYPE_CD_07 > 0) or
-                (a.MC_PLAN_TYPE_CD_08 > 0) or
-                (a.MC_PLAN_TYPE_CD_09 > 0) or
-                (a.MC_PLAN_TYPE_CD_10 > 0) or
-                (a.MC_PLAN_TYPE_CD_11 > 0) or
-                (a.MC_PLAN_TYPE_CD_12 > 0)
-            )"""
-        }
-
-    # ---------------------------------------------------------------------------------
-    # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getTimeunitBreakdown(self):
-        return Coverage.timeunit.breakdown[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Coverage.timeunit.cull[self.timeunit]
+        session.sql("""
+            create view if not exists pivoted_coverage as
+            select
+            a.de_fil_dt,
+            stack(12,
+                1, a.mc_plan_type_cd_01, a.mdcd_enrlmt_days_01, a.chip_enrlmt_days_01,
+                2, a.mc_plan_type_cd_02, a.mdcd_enrlmt_days_02, a.chip_enrlmt_days_02,
+                3, a.mc_plan_type_cd_03, a.mdcd_enrlmt_days_03, a.chip_enrlmt_days_03,
+                4, a.mc_plan_type_cd_04, a.mdcd_enrlmt_days_04, a.chip_enrlmt_days_04,
+                5, a.mc_plan_type_cd_05, a.mdcd_enrlmt_days_05, a.chip_enrlmt_days_05,
+                6, a.mc_plan_type_cd_06, a.mdcd_enrlmt_days_06, a.chip_enrlmt_days_06,
+                7, a.mc_plan_type_cd_07, a.mdcd_enrlmt_days_07, a.chip_enrlmt_days_07,
+                8, a.mc_plan_type_cd_08, a.mdcd_enrlmt_days_08, a.chip_enrlmt_days_08,
+                9, a.mc_plan_type_cd_09, a.mdcd_enrlmt_days_09, a.chip_enrlmt_days_09,
+                10, a.mc_plan_type_cd_10, a.mdcd_enrlmt_days_10, a.chip_enrlmt_days_10,
+                11, a.mc_plan_type_cd_11, a.mdcd_enrlmt_days_11, a.chip_enrlmt_days_11,
+                12, a.mc_plan_type_cd_12, a.mdcd_enrlmt_days_12, a.chip_enrlmt_days_12
+                ) as (month, coverage_type, mdcd_enrlmt, chip_enrlmt)
+            from
+                palet_mart.compress_coverage_type as a
+        """)
 
     # ---------------------------------------------------------------------------------
     #
@@ -216,10 +166,10 @@ class Coverage(Paletable):
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self._addByGroup(PaletMetadata.Coverage.mc_plan_type_cd + '01')
+        # self._addByGroup(PaletMetadata.Coverage.mc_plan_type_cd + '01')
 
-        if coverage_type is not None:
-            self.filter.update({'MC_PLAN_TYPE_CD_01': coverage_type})
+        # if coverage_type is not None:
+        #     self.filter.update({'MC_PLAN_TYPE_CD_01': coverage_type})
 
         return self
 
@@ -231,29 +181,37 @@ class Coverage(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-        z = f"""
-            select
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt,
-                {self._getTimeunitBreakdown()}
-            from
-                taf.taf_ann_de_base as a
-            where
-                a.da_run_id in ( {self._getRunIds()} ) and
-                {self._getByTimeunitCull()} AND
-                {self._defineWhereClause()}
-            group by
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt
-            order by
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt
-         """
+
+        # self._addPreProcess(self._transposeCoverageType)
+
+        z = """
+                select
+                    a.de_fil_dt,
+                    a.month,
+                    a.coverage_type,
+                    sum(a.mdcd_enrlmt) as mdcd_enrlmt,
+                    sum(a.chip_enrlmt) as chip_enrlmt
+                from
+                    palet_mart.pivoted_coverage as a
+                where
+                    coverage_type is not null
+                group by
+                    a.de_fil_dt,
+                    a.coverage_type,
+                    a.month
+                order by
+                    a.de_fil_dt,
+                    a.coverage_type,
+                    a.month
+            """
+        #  TODO: {self._getRunIds()}
+        #  TODO: {self._defineWhereClause()}
+        #  TODO: {self._getByGroupWithAlias()}
 
         # compress rows from coverage if it is in the by group
         self._addPostProcess(self._buildValueColumn)
-        self._addPostProcess(self._percentChange)
-        self._addPostProcess(self._decorate)
+        # self._addPostProcess(self._percentChange)
+        # self._addPostProcess(self._decorate)
 
         return z
 
@@ -286,18 +244,25 @@ class Coverage(Paletable):
 
             >>> display(api.byMonth().fetch())
         """
+
         from pyspark.sql import SparkSession
+
         session = SparkSession.getActiveSession()
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
+        # post-processing callbacks
+        for pp in self.preprocesses:
+            pp()
+
+        # raw results
         sparkDF = session.sql(self.sql())
         df = sparkDF.toPandas()
 
-        # perform last minute add-ons here
+        # post-processing callbacks
         for pp in self.postprocesses:
             df = pp(df)
 
-        df = df.drop(columns=['isfirst'])
+        # df = df.drop(columns=['isfirst'])
 
         return df
 

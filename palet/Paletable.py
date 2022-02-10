@@ -53,11 +53,11 @@ class Paletable:
 
         self.preprocesses = []
         self.postprocesses = []
-        self.paletableObjs = []
 
         self.palet = Palet('201801')
 
-        self.runids = self.palet.cache_run_ids()
+        # self.runids = self.palet.cache_run_ids()
+        self.runids = [6280]
 
     # ---------------------------------------------------------------------------------
     #
@@ -123,7 +123,7 @@ class Paletable:
         value = self.filter.get(column)  # TODO: required columns handling?
         return column + " = " + value
 
-    # ---------------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------------p
     #
     # slice and dice here to create the proper sytax for a where clause
     #
@@ -290,13 +290,13 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _findValueName_(self, x):
         # get this row's ref value from the column by name
-        y = x[PaletMetadata.Coverage.mc_plan_type_cd + '01']
+        y = x[PaletMetadata.Coverage.mc_plan_type_cd]
         # if the value is NaN, default to unknown
         if y is None or y == 'null':
             return 'unknown'
         else:
             # lookup label with value
-            field = PaletMetadata.Coverage.mdcd_coverage_type
+            field = PaletMetadata.Coverage.coverage_type
             return field.get(y)
 
     # ---------------------------------------------------------------------------------
@@ -483,6 +483,30 @@ class Paletable:
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byCoverageType(self, type=None):
+        """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
+
+        from palet.Coverage import Coverage
+
+        self.palet.logger.info('Group by - state')
+
+        self._addByGroup(PaletMetadata.Coverage.type)
+
+        return Coverage(self)
 
     # ---------------------------------------------------------------------------------
     #
@@ -682,7 +706,7 @@ class Paletable:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.raceExpanded,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].cast(StringType()))
-            
+
             if PaletMetadata.Enrollment.raceEthnicity.ethnicity in sparkDF.columns:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
