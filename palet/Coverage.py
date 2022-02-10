@@ -5,9 +5,6 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
-import pandas as pd
-
-from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
@@ -37,115 +34,6 @@ class Coverage(Paletable):
             self.filter = paletable.filter
 
         self.palet.logger.info('Initializing Coverage API')
-
-    # -----------------------------------------------------------------------
-    #
-    #  Multiple steps to create the coverage_type views
-    #  call this function with step 1, 2, or 3
-    #  They should be called in order for safety
-    #
-    # -----------------------------------------------------------------------
-    def _transposeCoverageType(self):
-
-        from pyspark.sql import SparkSession
-        session = SparkSession.getActiveSession()
-
-        # session.sql("""
-        #     create view if not exists compress_coverage_type as
-        #     select
-        #         a.de_fil_dt,
-        #         a.mc_plan_type_cd_01,
-        #         a.mc_plan_type_cd_02,
-        #         a.mc_plan_type_cd_03,
-        #         a.mc_plan_type_cd_04,
-        #         a.mc_plan_type_cd_05,
-        #         a.mc_plan_type_cd_06,
-        #         a.mc_plan_type_cd_07,
-        #         a.mc_plan_type_cd_08,
-        #         a.mc_plan_type_cd_09,
-        #         a.mc_plan_type_cd_10,
-        #         a.mc_plan_type_cd_11,
-        #         a.mc_plan_type_cd_12,
-        #         sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end) as mdcd_enrlmt_days_01,
-        #         sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end) as mdcd_enrlmt_days_02,
-        #         sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end) as mdcd_enrlmt_days_03,
-        #         sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end) as mdcd_enrlmt_days_04,
-        #         sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end) as mdcd_enrlmt_days_05,
-        #         sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end) as mdcd_enrlmt_days_06,
-        #         sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end) as mdcd_enrlmt_days_07,
-        #         sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end) as mdcd_enrlmt_days_08,
-        #         sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end) as mdcd_enrlmt_days_09,
-        #         sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end) as mdcd_enrlmt_days_10,
-        #         sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end) as mdcd_enrlmt_days_11,
-        #         sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end) as mdcd_enrlmt_days_12,
-        #         sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end) as chip_enrlmt_days_01,
-        #         sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end) as chip_enrlmt_days_02,
-        #         sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end) as chip_enrlmt_days_03,
-        #         sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end) as chip_enrlmt_days_04,
-        #         sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end) as chip_enrlmt_days_05,
-        #         sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end) as chip_enrlmt_days_06,
-        #         sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end) as chip_enrlmt_days_07,
-        #         sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end) as chip_enrlmt_days_08,
-        #         sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end) as chip_enrlmt_days_09,
-        #         sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end) as chip_enrlmt_days_10,
-        #         sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end) as chip_enrlmt_days_11,
-        #         sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end) as chip_enrlmt_days_12
-        #     from
-        #         taf.taf_ann_de_base as a
-        #     where
-        #         a.da_run_id in ( 6279, 6280 )
-        #         and a.de_fil_dt = 2021
-        #     group by
-        #         de_fil_dt,
-        #         a.mc_plan_type_cd_01,
-        #         a.mc_plan_type_cd_02,
-        #         a.mc_plan_type_cd_03,
-        #         a.mc_plan_type_cd_04,
-        #         a.mc_plan_type_cd_05,
-        #         a.mc_plan_type_cd_06,
-        #         a.mc_plan_type_cd_07,
-        #         a.mc_plan_type_cd_08,
-        #         a.mc_plan_type_cd_09,
-        #         a.mc_plan_type_cd_10,
-        #         a.mc_plan_type_cd_11,
-        #         a.mc_plan_type_cd_12
-        #     order by
-        #         de_fil_dt,
-        #         a.mc_plan_type_cd_01,
-        #         a.mc_plan_type_cd_02,
-        #         a.mc_plan_type_cd_03,
-        #         a.mc_plan_type_cd_04,
-        #         a.mc_plan_type_cd_05,
-        #         a.mc_plan_type_cd_06,
-        #         a.mc_plan_type_cd_07,
-        #         a.mc_plan_type_cd_08,
-        #         a.mc_plan_type_cd_09,
-        #         a.mc_plan_type_cd_10,
-        #         a.mc_plan_type_cd_11,
-        #         a.mc_plan_type_cd_12
-        # """)
-
-        session.sql("""
-            create view if not exists pivoted_coverage as
-            select
-            a.de_fil_dt,
-            stack(12,
-                1, a.mc_plan_type_cd_01, a.mdcd_enrlmt_days_01, a.chip_enrlmt_days_01,
-                2, a.mc_plan_type_cd_02, a.mdcd_enrlmt_days_02, a.chip_enrlmt_days_02,
-                3, a.mc_plan_type_cd_03, a.mdcd_enrlmt_days_03, a.chip_enrlmt_days_03,
-                4, a.mc_plan_type_cd_04, a.mdcd_enrlmt_days_04, a.chip_enrlmt_days_04,
-                5, a.mc_plan_type_cd_05, a.mdcd_enrlmt_days_05, a.chip_enrlmt_days_05,
-                6, a.mc_plan_type_cd_06, a.mdcd_enrlmt_days_06, a.chip_enrlmt_days_06,
-                7, a.mc_plan_type_cd_07, a.mdcd_enrlmt_days_07, a.chip_enrlmt_days_07,
-                8, a.mc_plan_type_cd_08, a.mdcd_enrlmt_days_08, a.chip_enrlmt_days_08,
-                9, a.mc_plan_type_cd_09, a.mdcd_enrlmt_days_09, a.chip_enrlmt_days_09,
-                10, a.mc_plan_type_cd_10, a.mdcd_enrlmt_days_10, a.chip_enrlmt_days_10,
-                11, a.mc_plan_type_cd_11, a.mdcd_enrlmt_days_11, a.chip_enrlmt_days_11,
-                12, a.mc_plan_type_cd_12, a.mdcd_enrlmt_days_12, a.chip_enrlmt_days_12
-                ) as (month, coverage_type, mdcd_enrlmt, chip_enrlmt)
-            from
-                palet_mart.compress_coverage_type as a
-        """)
 
     # ---------------------------------------------------------------------------------
     #
@@ -181,8 +69,6 @@ class Coverage(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-
-        # self._addPreProcess(self._transposeCoverageType)
 
         z = """
                 select
