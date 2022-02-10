@@ -218,7 +218,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findRaceValueName(self, x):
-        import math
+        # import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
         # lookup label with value
@@ -733,7 +733,7 @@ class Paletable:
         for pp in self.postprocesses:
             df = pp(df)
 
-        df = df.drop(columns=['isfirst'])
+        # df = df.drop(columns=['isfirst'])
 
         return df
 

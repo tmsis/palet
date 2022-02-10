@@ -19,64 +19,10 @@ class Eligibility(Paletable):
 
     # ---------------------------------------------------------------------------------
     #
+    #  _percentChange protected/private method that is called by each fetch() call
+    #  to calculate the % change columns. Each Paletable class should override this
+    #  and create it's own logic.
     #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def mc_plans(self):
-        print('mc_plans')
-
-    # ---------------------------------------------------------------------------------
-    # timeunit class
-    # Create the proper summary columns based on the by timeunit selected.
-    # Use the stack SQL function to create columns
-    #
-    # ---------------------------------------------------------------------------------
-    class timeunit():
-
-        breakdown = {
-            'year': """
-                sum(case when a.elgblty_grp_cd_ltst > 0 then 1 else 0 end) as mdcd_eligible""",
-            'month': """
-                stack(12,
-                    1, sum(case when a.elgblty_grp_cd_01 > 0 then 1 else 0 end),
-                    2, sum(case when a.elgblty_grp_cd_02 > 0 then 1 else 0 end),
-                    3, sum(case when a.elgblty_grp_cd_03 > 0 then 1 else 0 end),
-                    4, sum(case when a.elgblty_grp_cd_04 > 0 then 1 else 0 end),
-                    5, sum(case when a.elgblty_grp_cd_05 > 0 then 1 else 0 end),
-                    6, sum(case when a.elgblty_grp_cd_06 > 0 then 1 else 0 end),
-                    7, sum(case when a.elgblty_grp_cd_07 > 0 then 1 else 0 end),
-                    8, sum(case when a.elgblty_grp_cd_08 > 0 then 1 else 0 end),
-                    9, sum(case when a.elgblty_grp_cd_09 > 0 then 1 else 0 end),
-                    10,sum(case when a.elgblty_grp_cd_10 > 0 then 1 else 0 end),
-                    11,sum(case when a.elgblty_grp_cd_11 > 0 then 1 else 0 end),
-                    12,sum(case when a.elgblty_grp_cd_12 > 0 then 1 else 0 end)
-                ) as (month, mdcd_eligible)"""
-        }
-
-        cull = {
-            'year': """(
-                a.elgblty_grp_cd_ltst > 0)""",
-            'month': """(
-                (a.elgblty_grp_cd_01 > 0) or
-                (a.elgblty_grp_cd_02 > 0) or
-                (a.elgblty_grp_cd_03 > 0) or
-                (a.elgblty_grp_cd_04 > 0) or
-                (a.elgblty_grp_cd_05 > 0) or
-                (a.elgblty_grp_cd_06 > 0) or
-                (a.elgblty_grp_cd_07 > 0) or
-                (a.elgblty_grp_cd_08 > 0) or
-                (a.elgblty_grp_cd_09 > 0) or
-                (a.elgblty_grp_cd_10 > 0) or
-                (a.elgblty_grp_cd_11 > 0) or
-                (a.elgblty_grp_cd_12 > 0)
-            )"""
-        }
-
-    # ---------------------------------------------------------------------------------
-    # _percentChange protected/private method that is called by each fetch() call
-    # to calculate the % change columns. Each Paletable class should override this
-    # and create it's own logic.
     # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
@@ -117,22 +63,6 @@ class Eligibility(Paletable):
         return df
 
     # ---------------------------------------------------------------------------------
-    # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getTimeunitBreakdown(self):
-        return Eligibility.timeunit.breakdown[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Eligibility.timeunit.cull[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
     #
     #
     #  SQL Alchemy for Eligibility series by year or year/month for Medicaid and CHIP
@@ -140,30 +70,33 @@ class Eligibility(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-        print(self.__class__)
 
         # create or replace temporary view Eligibility_by_month ass
         z = f"""
             select
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt,
-                {self._getTimeunitBreakdown()}
+                a.month,
+                a.elgblty_grp_cd,
+                sum(a.benes) as benes,
+                sum(a.mdcd_enrlmt) as mdcd_enrlmt,
+                sum(a.chip_enrlmt) as chip_enrlmt
             from
-                taf.taf_ann_de_base as a
-            where
-                a.da_run_id in ( {self._getRunIds()} ) and
-                {self._getByTimeunitCull()} AND
-                {self._defineWhereClause()}
+                palet_mart.pivoted_eligibility as a
             group by
                 {self._getByGroupWithAlias()}
-                a.de_fil_dt
+                a.de_fil_dt,
+                a.month,
+                a.elgblty_grp_cd
             order by
                 {self._getByGroupWithAlias()}
-                a.de_fil_dt
+                a.de_fil_dt,
+                a.month,
+                a.elgblty_grp_cd
          """
 
-        self._addPostProcess(self._percentChange)
-        self._addPostProcess(self._decorate)
+        # self._addPostProcess(self._percentChange)
+        # self._addPostProcess(self._decorate)
 
         return z
 

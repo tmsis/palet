@@ -79,33 +79,6 @@ class Enrollment(Paletable):
         self.palet.logger.info('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def medicaid_enrollment_intervals(self):
-        print("Start date: " + self.start + " End date: " + self.end)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def chip_enrollment_intervals(self):
-        print("Start date: " + self.start + " End date: " + self.end)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def mc_plans(self):
-        print('mc_plans')
-
-    # ---------------------------------------------------------------------------------
     # timeunit class
     # Create the proper summary columns based on the by timeunit selected.
     # Use the stack SQL function to create columns
