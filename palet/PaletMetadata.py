@@ -321,9 +321,9 @@ class PaletMetadata:
             Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
-        mc_plan_type_cd = 'MC_PLAN_TYPE_CD_'
-        type = 'mdcd_coverage_type'
-        mdcd_coverage_type = {
+        mc_plan_type_cd = 'coverage_type'
+        type = 'coverage_type'
+        coverage_type = {
             '01': "Comprehensive Managed Care Organization",
             '02': "Traditional PCCM Provider arrangement",
             '03': "Enhanced PCCM Provider arrangement",

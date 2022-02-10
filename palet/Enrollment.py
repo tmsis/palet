@@ -75,7 +75,6 @@ class Enrollment(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
-            paletable.paletableObjs.append(Enrollment)
 
         self.palet.logger.info('Initializing Enrollment API')
 

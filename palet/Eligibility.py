@@ -14,7 +14,6 @@ class Eligibility(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
-            paletable.paletableObjs.append(Eligibility)
 
         self.palet.logger.info('Initializing Eligibility API')
 
@@ -141,8 +140,9 @@ class Eligibility(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
-        print(self.paletableObjs)
-        # create or replace temporary view Eligibility_by_month as
+        print(self.__class__)
+
+        # create or replace temporary view Eligibility_by_month ass
         z = f"""
             select
                 {self._getByGroupWithAlias()}

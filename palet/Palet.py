@@ -64,9 +64,6 @@ class Palet():
         self.stc_cd = self.load_metadata_file('stc_cd')
         self.stc_cd['z_tos'] = self.stc_cd['TypeOfService'].map('{:03d}'.format)
 
-        # Call this function to chain the coverage_type views
-        self._create_coverage_views()
-
         # self.logger = None
         self.logfile = None
 
