@@ -673,6 +673,16 @@ class Paletable:
 
         if (sparkDF is not None):
 
+            if PaletMetadata.Enrollment.raceEthnicity.race in sparkDF.columns:
+                sparkDF = sparkDF.withColumn(
+                    PaletMetadata.Enrollment.raceEthnicity.race,
+                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.race].cast(StringType()))
+
+            if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in sparkDF.columns:
+                sparkDF = sparkDF.withColumn(
+                    PaletMetadata.Enrollment.raceEthnicity.raceExpanded,
+                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].cast(StringType()))
+            
             if PaletMetadata.Enrollment.raceEthnicity.ethnicity in sparkDF.columns:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
@@ -680,10 +690,20 @@ class Paletable:
 
         df = sparkDF.toPandas()
 
+        if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
+            df[PaletMetadata.Enrollment.raceEthnicity.race] \
+                = df[PaletMetadata.Enrollment.raceEthnicity.race].astype(pd.StringDtype())
+            df[PaletMetadata.Enrollment.raceEthnicity.race].fillna('-1', inplace=True)
+
+        if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in df.columns:
+            df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded] \
+                = df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].astype(pd.StringDtype())
+            df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].fillna('-1', inplace=True)
+
         if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
             df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
                 = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('6', inplace=True)
+            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
 
         # perform data enrichments
         for pp in self.postprocesses:
