@@ -54,6 +54,7 @@ class Enrollment(Paletable):
         byEthnicity(): Filter your query by Ethnicity. See :meth:`~Paletable.Paletable.byEthnicity`.
         byGender(): Filter your query by Gender. See :meth:`~Paletable.Paletable.byGender`.
         byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
+        byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.CoverageType`.
         byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
         byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.

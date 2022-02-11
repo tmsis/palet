@@ -490,11 +490,11 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byCoverageType(self, type=None):
-        """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+            type:`str, (optional)`: Filter by coverage type using coverage code. Defaults to None.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
