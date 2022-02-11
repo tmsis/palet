@@ -70,11 +70,11 @@ class Coverage(Paletable):
     # ---------------------------------------------------------------------------------
     def sql(self):
 
-        z = """
+        z = f"""
                 select
+                    {self._getByGroupWithAlias()}
                     a.de_fil_dt,
                     a.month,
-                    a.coverage_type,
                     sum(a.mdcd_enrlmt) as mdcd_enrlmt,
                     sum(a.chip_enrlmt) as chip_enrlmt
                 from
@@ -82,14 +82,15 @@ class Coverage(Paletable):
                 where
                     coverage_type is not null
                 group by
+                    {self._getByGroupWithAlias()}
                     a.de_fil_dt,
-                    a.coverage_type,
                     a.month
                 order by
+                    {self._getByGroupWithAlias()}
                     a.de_fil_dt,
-                    a.coverage_type,
                     a.month
             """
+
         #  TODO: {self._getRunIds()}
         #  TODO: {self._defineWhereClause()}
         #  TODO: {self._getByGroupWithAlias()}
