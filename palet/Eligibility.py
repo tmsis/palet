@@ -1,12 +1,13 @@
-import pandas as pd
-from palet.Paletable import Paletable
-
 """
 The Eligibility module allows CMS analysts to view eligible beneficiaries. This module can be levereged with the Paletable module
 to apply specific filters. Doing so, analysts can view eligibility by state, income bracket, age, etc. This module
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
+
+import pandas as pd
+from palet.Paletable import Paletable
+
 
 class Eligibility(Paletable):
     """
