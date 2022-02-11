@@ -1,8 +1,8 @@
 """
-The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top
-level objects, such as enrollment, to filter data by a variety of meterics. These metrics include age range,
-ethnicity, file data, income bracket, gender and state. Paletable also contains fetch(), the attribute used to
-return datafranes created by high level objects.
+The Coverage module contains the Coverage class. This class is called when an analyst uses the .byCoverageType()
+by group. It expands the query being run by the existing object so that filters are applied for various kinds fo coverage.
+For example, when this class is utilized along wit enrollment or eligibility, one can view the enrollment counts or 
+eligibilty counts for each different kind of coverage type.  
 """
 
 from palet.Paletable import Paletable
@@ -10,15 +10,26 @@ from palet.Paletable import Paletable
 
 class Coverage(Paletable):
     """
-    Class containing attributes that can be combined with other classes from the PALET library. These
-    attributes allow users to filter and return the dataframes created by high level objects.
+    Class called when an analyst uses the .byCoverageType by group. This can be used to manipulate the query is running
+    to break out counts by the specific coverage types. This class is combined with other Paletable objects like enrollment
+    eligibility. 
 
     Note:
-        The Paletable class is inherited from high level objects such as enrollment, as such it does not need to be imported seperately.
-        Once imported, the Article class is not called. Rather its attributes are called after a high level object.
+        The Coverage class does not need to be specifically imported from its respective module. The Coverage class is imported by
+        the :meth:`~Paletable.Paletable.byCoverageType` method in :class:`Paletable` when it is called.
 
-    Example:
+    Examples:
+        Create an object for Enrollment by month:
 
+        >>> api = Enrollment().byMonth()
+
+        Recreate object with Coverage Type by Group.
+
+        >>> api = api.byCoverageType()
+
+        Return dataframe:
+
+        >>> display(api.fetch())
 
     """
 

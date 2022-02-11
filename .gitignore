@@ -16,3 +16,5 @@ junk/test.py
 junk/test.py
 val.bat
 palet/PaletWikiTest/**
+palet/docs/**
+palet/SphinxSourceCode/**
