@@ -96,7 +96,7 @@ class Eligibility(Paletable):
          """
 
         # self._addPostProcess(self._percentChange)
-        # self._addPostProcess(self._decorate)
+        self._addPostProcess(self._decorate)
 
         return z
 

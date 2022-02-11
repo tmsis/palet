@@ -98,7 +98,7 @@ class Coverage(Paletable):
         # compress rows from coverage if it is in the by group
         self._addPostProcess(self._buildValueColumn)
         # self._addPostProcess(self._percentChange)
-        # self._addPostProcess(self._decorate)
+        self._addPostProcess(self._decorate)
 
         return z
 
@@ -148,8 +148,6 @@ class Coverage(Paletable):
         # post-processing callbacks
         for pp in self.postprocesses:
             df = pp(df)
-
-        # df = df.drop(columns=['isfirst'])
 
         return df
 

@@ -206,7 +206,8 @@ class Paletable:
         if 'year' in df.columns:
             timeunit = 'year'
 
-        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
+        # df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
+        df.drop(['USPS', 'SUBMTG_STATE_CD'], axis=1)
         df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
 
         return df
@@ -331,6 +332,22 @@ class Paletable:
                           how='inner',
                           left_on=['USPS'],
                           right_on=['USPS'])
+
+        # compress rows from race ethnicity if it is in the by group
+        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
+            self._addPostProcess(self._buildRaceEthnicityColumn)
+
+        # compress rows from race ethnicity expanded if it is in the by group
+        if (PaletMetadata.Enrollment.raceEthnicity.raceExpanded in self.by_group):
+            self._addPostProcess(self._buildRaceEthnicityExpColumn)
+
+        # compress rows from ethnicity if it is in the by group
+        if (PaletMetadata.Enrollment.raceEthnicity.ethnicity in self.by_group):
+            self._addPostProcess(self._buildEthnicityColumn)
+
+        # compress rows from submitting state to state if it is in the by group
+        if (PaletMetadata.Enrollment.locale.submittingState in self.by_group):
+            self._addPostProcess(self._mergeStateEnrollments)
 
         return df
 
@@ -732,8 +749,6 @@ class Paletable:
         # perform data enrichments
         for pp in self.postprocesses:
             df = pp(df)
-
-        # df = df.drop(columns=['isfirst'])
 
         return df
 
