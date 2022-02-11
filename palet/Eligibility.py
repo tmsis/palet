@@ -1,8 +1,69 @@
 import pandas as pd
 from palet.Paletable import Paletable
 
+"""
+The Eligibility module allows CMS analysts to view eligible beneficiaries. This module can be levereged with the Paletable module
+to apply specific filters. Doing so, analysts can view eligibility by state, income bracket, age, etc. This module
+uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
+the Enrollment module inherits from the Paletable module.
+"""
 
 class Eligibility(Paletable):
+    """
+    The class within the PALET library for viewing eligibility. This class is used to view eligibility for Medicaid and CHIP.
+    can be used to apply and_filters for beneficiary age, ehtnicity, gender, state, income, etc.
+
+    Attributes inherited from the Paletable class Eligibility counts are the sum of the unique beneficiaries eligible at least 
+    one day in a given month or year.
+
+    Note:
+        If the Eligibility class is called without a by group, it defaults to by year.
+
+    Examples:
+        Import eligibility:
+
+        >>> from palet.Eligibility import Eligibility
+
+        Create object for eligibility
+
+        >>> api = Eligibility()
+
+        Return dataframe for yearly eligibility:
+
+        >>> api.fetch()
+
+        Pivot to by state:
+
+        >>> display(api.byState().fetch())
+
+        Pivot to by month and state:
+
+        >>> display(api.byMonth().byState().fetch())
+
+    Args:
+        Paletable: No input required, defaults to none
+
+    Returns:
+        Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
+
+    Methods:
+        byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
+        byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
+        byRaceEthnicityExpanded(): Filter your query by Race (expanded options). See :meth:`~Paletable.Paletable.byRaceEthnicityExpanded`.
+        byEthnicity(): Filter your query by Ethnicity. See :meth:`~Paletable.Paletable.byEthnicity`.
+        byGender(): Filter your query by Gender. See :meth:`~Paletable.Paletable.byGender`.
+        byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
+        byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.CoverageType`.
+        byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
+        byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
+        byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
+        byMonth(): Filter your query by Month. See :meth:`~Paletable.Paletable.byMonth`.
+        fetch(): Call this function when you are ready to return results. See :meth:`~Paletable.Paletable.fetch`.
+
+    Note:
+        The above attributes are inherited from the :class:`Paletable` class. Attributes directly from the Eligibility class can be seen below.
+
+    """
 
     # -----------------------------------------------------------------------
     # Initialize the Eligibility API
@@ -70,6 +131,29 @@ class Eligibility(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
+        """The SQL query that the Eligibility class uses to pull dataframes.
+
+        This can be called allowing an analyst to view the SQL the Eligibility is using.
+
+        Args:
+            self: None - no input required.
+
+        Returns:
+            str: Returns a text string containing the SQL query run by the Eligibility class.
+
+        Example:
+            Create object containing the SQL query:
+
+            >>> q = Eligibility().sql()
+
+            Return the query as text:
+
+            >>> print(q)
+
+            Alternative one line approach:
+
+            >>> print(Eligibility.sql())
+        """
 
         # create or replace temporary view Eligibility_by_month ass
         z = f"""
