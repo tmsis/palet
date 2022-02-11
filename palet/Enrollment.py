@@ -13,9 +13,9 @@ from palet.Paletable import Paletable
 class Enrollment(Paletable):
     """
     The class within the PALET library for viewing enrollment. This class is used to view enrollment for Medicaid and CHIP.
-    can be used to apply and_filters for enrollee age, ehtnicity, gender, state, income, etc.
+    Attributes inherited from the Paletable class can be used to apply and_filters for enrollee age, ehtnicity, gender, state, income, etc.
 
-    Attributes inherited from the Paletable class Enrollment counts are the sum of the unique beneficiaries enrolled at least one day in a given month or year.
+    Enrollment counts are the sum of the unique beneficiaries enrolled at least one day in a given month or year.
 
     Note:
         If the Enrollment class is called without a by group, it defaults to by year.
@@ -54,7 +54,7 @@ class Enrollment(Paletable):
         byEthnicity(): Filter your query by Ethnicity. See :meth:`~Paletable.Paletable.byEthnicity`.
         byGender(): Filter your query by Gender. See :meth:`~Paletable.Paletable.byGender`.
         byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
-        byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.CoverageType`.
+        byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.byCoverageType`.
         byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
         byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
