@@ -243,7 +243,6 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findRaceExpValueName(self, x):
-        import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_exp_flag']
         # lookup label with value
@@ -706,7 +705,7 @@ class Paletable:
         """
         from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
-        from pyspark.sql.types import StructType, StructField, StringType, DecimalType, IntegerType, LongType, DoubleType
+        from pyspark.sql.types import StringType
 
         # self.palet.logger.info('Fetching data - \n' + self.sql())
 
