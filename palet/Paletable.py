@@ -704,11 +704,11 @@ class Paletable:
             >>> display(api.byMonth().fetch())
         """
         from pyspark.sql import SparkSession
+        self.palet.logger.debug(f'Getting active SparkSession')
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
 
-        # self.palet.logger.info('Fetching data - \n' + self.sql())
-
+        self.palet.logger.info('Fetching data - \n' + self.sql())
         sparkDF = session.sql(self.sql())
 
         if (sparkDF is not None):
@@ -728,26 +728,26 @@ class Paletable:
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
 
+        self.palet.logger.info(f'Coverting SparkDF to PandasDF')
         df = sparkDF.toPandas()
 
         if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.race] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.race].astype(pd.StringDtype())
             df[PaletMetadata.Enrollment.raceEthnicity.race].fillna('-1', inplace=True)
 
         if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].astype(pd.StringDtype())
             df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].fillna('-1', inplace=True)
 
         if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
             df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
 
         # perform data enrichments
         for pp in self.postprocesses:
+            self.palet.logger.info(f'Executing Post Process {pp}')
             df = pp(df)
+
+
+        self.palet.logger.debug(f'Converting DF objects to proper types')
+        df = df.convert_dtypes()
 
         return df
 
