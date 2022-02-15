@@ -704,7 +704,7 @@ class Paletable:
             >>> display(api.byMonth().fetch())
         """
         from pyspark.sql import SparkSession
-        self.palet.logger.debug(f'Getting active SparkSession')
+        self.palet.logger.debug('Getting active SparkSession')
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
 
@@ -728,7 +728,7 @@ class Paletable:
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
 
-        self.palet.logger.info(f'Coverting SparkDF to PandasDF')
+        self.palet.logger.info('Coverting SparkDF to PandasDF')
         df = sparkDF.toPandas()
 
         if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
@@ -745,8 +745,7 @@ class Paletable:
             self.palet.logger.info(f'Executing Post Process {pp}')
             df = pp(df)
 
-
-        self.palet.logger.debug(f'Converting DF objects to proper types')
+        self.palet.logger.debug('Converting DF objects to proper types')
         df = df.convert_dtypes()
 
         return df
