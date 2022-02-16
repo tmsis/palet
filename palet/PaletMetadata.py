@@ -62,7 +62,7 @@ class PaletMetadata:
             vet = 'vet_ind'
 
             # class lookup
-            race_ethncty_exp_flag = {
+            incm_cd = {
                 '01': '1-100% of FPL',
                 '02': '101-133% of FPL',
                 '03': '134-150% of FPL',
