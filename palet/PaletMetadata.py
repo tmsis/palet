@@ -61,6 +61,18 @@ class PaletMetadata:
             income = 'incm_cd'
             vet = 'vet_ind'
 
+            # class lookup
+            race_ethncty_exp_flag = {
+                '01': '1-100% of FPL',
+                '02': '101-133% of FPL',
+                '03': '134-150% of FPL',
+                '04': '151-200% of FPL',
+                '05': '201-255% of FPL',
+                '06': '256-300% of FPL',
+                '07': '301-400% of FPL',
+                '08': '>400% of FPL'
+            }
+
         # ---------------------------------------------------------------------------------
         #
         #   Regional
