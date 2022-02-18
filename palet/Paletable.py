@@ -288,6 +288,29 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _findIncomeValueName(self, x):
+        # get this row's ref value from the column by name
+        y = x[PaletMetadata.Enrollment.identity.income]
+        # lookup label with value
+        return PaletMetadata.Enrollment.identity.incm_cd.get(y)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildIncomeColumn(self, df: pd.DataFrame):
+        df['income'] = df.apply(lambda x: self._findIncomeValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _findValueName_(self, x):
         # get this row's ref value from the column by name
         y = x[PaletMetadata.Coverage.mc_plan_type_cd]
@@ -695,6 +718,9 @@ class Paletable:
 
         sparkDF = session.sql(self.sql())
 
+        #if len(sparkDF.head(1)) == 0:
+        #    print('Empty DataFrame')
+
         if (sparkDF is not None):
 
             if PaletMetadata.Enrollment.raceEthnicity.race in sparkDF.columns:
@@ -711,6 +737,12 @@ class Paletable:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
+            
+            if PaletMetadata.Enrollment.identity.income in sparkDF.columns:
+                sparkDF = sparkDF.withColumn(
+                    PaletMetadata.Enrollment.identity.income,
+                    sparkDF[PaletMetadata.Enrollment.identity.income].cast(StringType()))
+
 
         df = sparkDF.toPandas()
 
@@ -728,6 +760,12 @@ class Paletable:
             df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
                 = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
             df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
+
+        if PaletMetadata.Enrollment.identity.income in df.columns:
+            df[PaletMetadata.Enrollment.identity.income] \
+                = df[PaletMetadata.Enrollment.identity.income].astype(pd.StringDtype())
+            df[PaletMetadata.Enrollment.identity.income].fillna('-1', inplace=True)
+
 
         # perform data enrichments
         for pp in self.postprocesses:
