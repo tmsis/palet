@@ -771,7 +771,7 @@ class Paletable:
         for pp in self.postprocesses:
             df = pp(df)
 
-        # df = df.drop(columns=['isfirst'])
+        df = df.drop(columns=['isfirst'])
 
         return df
 
