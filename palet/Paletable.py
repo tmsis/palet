@@ -311,6 +311,29 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _findAgeGroupValueName(self, x):
+        # get this row's ref value from the column by name
+        y = x[PaletMetadata.Enrollment.identity.ageGroup]
+        # lookup label with value
+        return PaletMetadata.Enrollment.identity.age_grp_flag.get(y)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildAgeGroupColumn(self, df: pd.DataFrame):
+        df['ageGroup'] = df.apply(lambda x: self._findAgeGroupValueName(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _findValueName_(self, x):
         # get this row's ref value from the column by name
         y = x[PaletMetadata.Coverage.mc_plan_type_cd]
@@ -376,10 +399,28 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
+        self.palet.logger.info('Group by - age range')
+        
         self._addByGroup(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byAgeGroup(self, age_group=None):
+
+        self.palet.logger.info('Group by - age group')
+
+        self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
+
+        if age_group is not None:
+            self.filter.update({PaletMetadata.Enrollment.identity.ageGroup: age_group})
 
         return self
 
@@ -399,6 +440,8 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
+
+        self.palet.logger.info('Group by - Race Ethnicity')
 
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
@@ -422,6 +465,9 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
+
+        self.palet.logger.info('Group by - Race Ethnicity Expanded')
+
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
@@ -444,6 +490,9 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
+        
+        self.palet.logger.info('Group by - Ethnicity')
+
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
@@ -598,8 +647,6 @@ class Paletable:
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
-        else:
-            self.filter.update({PaletMetadata.Enrollment.identity.income: "null"})
 
         return self
 
@@ -714,7 +761,7 @@ class Paletable:
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StructType, StructField, StringType, DecimalType, IntegerType, LongType, DoubleType
 
-        # self.palet.logger.info('Fetching data - \n' + self.sql())
+        self.palet.logger.info('Fetching data - \n' + self.sql())
 
         sparkDF = session.sql(self.sql())
 
@@ -743,6 +790,11 @@ class Paletable:
                     PaletMetadata.Enrollment.identity.income,
                     sparkDF[PaletMetadata.Enrollment.identity.income].cast(StringType()))
 
+            if PaletMetadata.Enrollment.identity.ageGroup in sparkDF.columns:
+                sparkDF = sparkDF.withColumn(
+                    PaletMetadata.Enrollment.identity.ageGroup,
+                    sparkDF[PaletMetadata.Enrollment.identity.ageGroup].cast(StringType()))
+
 
         df = sparkDF.toPandas()
 
@@ -765,6 +817,11 @@ class Paletable:
             df[PaletMetadata.Enrollment.identity.income] \
                 = df[PaletMetadata.Enrollment.identity.income].astype(pd.StringDtype())
             df[PaletMetadata.Enrollment.identity.income].fillna('-1', inplace=True)
+
+        if PaletMetadata.Enrollment.identity.ageGroup in df.columns:
+            df[PaletMetadata.Enrollment.identity.ageGroup] \
+                = df[PaletMetadata.Enrollment.identity.ageGroup].astype(pd.StringDtype())
+            df[PaletMetadata.Enrollment.identity.ageGroup].fillna('-1', inplace=True)
 
 
         # perform data enrichments
