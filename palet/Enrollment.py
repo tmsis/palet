@@ -279,9 +279,13 @@ class Enrollment(Paletable):
         if (PaletMetadata.Enrollment.locale.submittingState in self.by_group):
             self._addPostProcess(self._mergeStateEnrollments)
 
-        # compress rows from ethnicity if it is in the by group
+        # compress rows from income if it is in the by group
         if (PaletMetadata.Enrollment.identity.income in self.by_group):
             self._addPostProcess(self._buildIncomeColumn)
+
+        # compress rows from age group if it is in the by group
+        if (PaletMetadata.Enrollment.identity.ageGroup in self.by_group):
+            self._addPostProcess(self._buildAgeGroupColumn)
 
         return z
 
