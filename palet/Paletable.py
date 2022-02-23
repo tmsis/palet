@@ -441,11 +441,20 @@ class Paletable:
 
         self.palet.logger.info('Group by - age range')
 
+        self._addByGroup(PaletMetadata.Enrollment.identity.age)
+        self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
+
         if age_range is not None:
             self.age_band = age_range
             self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
 
         return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    # 
+    #
+    # ---------------------------------------------------------------------------------
 
     def _renderAgeRange(self):
         if self.age_band is not None:
@@ -467,19 +476,19 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    #
+    # Likely will be removed - consolidated to be included in byAgeRange()
     #
     # ---------------------------------------------------------------------------------
-    def byAgeGroup(self, age_group=None):
+    # def byAgeGroup(self, age_group=None):
 
-        self.palet.logger.info('adding byAgeGroup to by Group')
+    #     self.palet.logger.info('adding byAgeGroup to by Group')
 
-        self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
+    #     self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
-        if age_group is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.ageGroup: age_group})
+    #     if age_group is not None:
+    #         self.filter.update({PaletMetadata.Enrollment.identity.ageGroup: age_group})
 
-        return self
+    #     return self
 
     # ---------------------------------------------------------------------------------
     #
