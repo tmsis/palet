@@ -50,6 +50,8 @@ class Paletable:
         self.by_group = []
         self.filter = {}
         self.lookback = 1
+        self.age_band = None
+        self.derived_by_group = []
 
         self.preprocesses = []
         self.postprocesses = []
@@ -96,6 +98,32 @@ class Paletable:
         if var not in self.by_group:
             self.palet.logger.debug(f'Adding By Group {var}')
             self.by_group.append(var)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _addDerivedByGroup(self, var):
+        if var not in self.derived_by_group:
+            # self.palet.logger.debug(f'Adding By Group {var}')
+            self.derived_by_group.append(var)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+
+    def _getDerivedByGroup(self):
+        z = ""
+        new_line_comma = '\n\t\t\t   ,'
+        if (len(self.derived_by_group)) > 0:
+            for column in self.derived_by_group:
+                z = column + new_line_comma
+            return f"{z}"
+        else:
+            return ''
 
     # ---------------------------------------------------------------------------------
     #
@@ -400,13 +428,30 @@ class Paletable:
         """
 
         self.palet.logger.info('Group by - age range')
-        
-        self._addByGroup(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.age: age_range})
+            self.age_band = age_range
+            self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
 
         return self
+
+    def _renderAgeRange(self):
+        if self.age_band is not None:
+            ageBandWhere = []
+
+            ageBandWhere.append(', case')
+
+            for i in self.age_band.keys():
+                a = self.age_band[i]
+                ab = f"when age_num >= {a[0]} and age_num <= {a[1]} then '{i}'"
+                ageBandWhere.append(ab)
+
+            ageBandWhere.append("else 'not found' end as age_band")
+
+            return ' '.join(ageBandWhere)
+
+        else:
+            return ''
 
     # ---------------------------------------------------------------------------------
     #

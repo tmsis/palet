@@ -55,6 +55,7 @@ class PaletMetadata:
             dod = 'death_dt'
             age = 'age_num'
             ageGroup = 'age_grp_flag'
+            age_band = 'age_band'
             died = 'dcsd_flag'
             gender = 'gndr_cd'
             maritalStatus = 'mrtl_stus_cd'

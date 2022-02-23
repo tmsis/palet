@@ -246,6 +246,7 @@ class Enrollment(Paletable):
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt,
                 {self._getTimeUnitBreakdown()}
+                {self._renderAgeRange()}
             from
                 taf.taf_ann_de_base as a
             where
@@ -254,9 +255,11 @@ class Enrollment(Paletable):
                 {self._defineWhereClause()}
             group by
                 {self._getByGroupWithAlias()}
+                {self._getDerivedByGroup()}
                 a.de_fil_dt
             order by
                 {self._getByGroupWithAlias()}
+                {self._getDerivedByGroup()}
                 a.de_fil_dt
          """
 
