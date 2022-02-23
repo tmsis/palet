@@ -411,7 +411,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byAgeRange to filter')
+        self.palet.logger.info('adding byAgeRange to by Group')
         self._addByGroup(PaletMetadata.Enrollment.identity.age)
 
         if age_range is not None:
@@ -426,7 +426,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def byAgeGroup(self, age_group=None):
 
-        self.palet.logger.info('Group by - age group')
+        self.palet.logger.info('adding byAgeGroup to by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
@@ -452,7 +452,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byRaceEthnicity to filter')
+        self.palet.logger.info('adding byRaceEthnicity to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
@@ -476,7 +476,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byRaceEthnicityExpanded to filter')
+        self.palet.logger.info('adding byRaceEthnicityExpanded to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
@@ -500,7 +500,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byEthnicity to filter')
+        self.palet.logger.info('adding byEthnicity to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
@@ -524,7 +524,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byGender to filter')
+        self.palet.logger.info('adding byGender to by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
@@ -549,7 +549,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byState to the filter')
+        self.palet.logger.info('adding byState to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
@@ -582,7 +582,7 @@ class Paletable:
 
         from palet.Coverage import Coverage
 
-        self.palet.logger.info('adding byCoverageType to the filter')
+        self.palet.logger.info('adding byCoverageType to the by Group')
 
         self._addByGroup(PaletMetadata.Coverage.type)
 
@@ -604,7 +604,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byMedicaidOnly to the filter')
+        self.palet.logger.info('adding byMedicaidOnly to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
@@ -650,7 +650,7 @@ class Paletable:
         >>> Trend.byIncomeBracket('02,03,05')
         """
 
-        self.palet.logger.info('adding byIncomeBracket to the filter')
+        self.palet.logger.info('adding byIncomeBracket to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
@@ -675,7 +675,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byYear to the filter')
+        self.palet.logger.info('adding byYear to the by Group')
 
         self.timeunit = 'year'
         self.timeunitvalue = year
@@ -702,7 +702,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('adding byMonth to the filter')
+        self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
         self.timeunitvalue = month
 
