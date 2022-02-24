@@ -259,6 +259,10 @@ class Eligibility(Paletable):
         # self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
 
+        # compress rows from elibigility type
+        if self.isNotEnrolled is True:
+            self._addPostProcess(self._buildEligibilityType)
+
         return z
 
 

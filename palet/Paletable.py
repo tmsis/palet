@@ -336,6 +336,52 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _findEnrollmentType(self, x):
+        self.palet.logger.debug('looking up the enrollmentType value from our metadata')
+        # get this row's ref value from the column by name
+        y = x[PaletMetadata.Enrollment.derived_enrollment_field]
+        # lookup label with value
+        return PaletMetadata.Enrollment.chip_cd.get(y)
+
+
+
+    def _buildEnrollmentType(self, df: pd.DataFrame):
+        self.palet.logger.debug('build our columns by looking for enrollmentType')
+        df['enrollment_type'] = df.apply(lambda x: self._findEnrollmentType(x), axis=1)
+
+        return df
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _findEligibiltyType(self, x):
+        self.palet.logger.debug('looking up the eligibility value from our metadata')
+        # get this row's ref value from the column by name
+        y = x[PaletMetadata.Eligibility.eligibiltyGroup]
+        # lookup label with value
+        return PaletMetadata.Eligibility.eligibility_cd.get(y)
+
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _buildEligibilityType(self, df: pd.DataFrame):
+        self.palet.logger.debug('build our columns by looking for eligibilty codes')
+        df['eligibility_category'] = df.apply(lambda x: self._findEligibiltyType(x), axis=1)
+
+        return df
+        
+    # --------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _findIncomeValueName(self, x):
         self.palet.logger.debug('looking up the incm_cd value from our metadata')
         # get this row's ref value from the column by name
@@ -427,6 +473,7 @@ class Paletable:
                           how='inner',
                           left_on=['USPS'],
                           right_on=['USPS'])
+            df = df.drop(['USPS'], axis=1)
 
         return df
 

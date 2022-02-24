@@ -294,6 +294,10 @@ class Enrollment(Paletable):
         if (PaletMetadata.Enrollment.identity.ageGroup in self.by_group):
             self._addPostProcess(self._buildAgeGroupColumn)
 
+        # compress rows from age group if it is in the by group
+        if (PaletMetadata.Enrollment.type in self.derived_by_group):
+            self._addPostProcess(self._buildEnrollmentType)
+
         return z
 
 
