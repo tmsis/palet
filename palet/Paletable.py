@@ -685,7 +685,7 @@ class Paletable:
 
         from palet.Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
-        self.by_group.append(PaletMetadata.Enrollment.type)
+        self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
         
         if type is not None:
             self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
