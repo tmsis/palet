@@ -77,7 +77,7 @@ class Enrollment(Paletable):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
 
-        self.palet.logger.info('Initializing Enrollment API')
+        self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
     # timeunit class

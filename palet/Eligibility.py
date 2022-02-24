@@ -79,7 +79,7 @@ class Eligibility(Paletable):
             self.filter = paletable.filter
             self.isNotEnrolled = False
 
-        self.palet.logger.info('Initializing Eligibility API')
+        self.palet.logger.debug('Initializing Eligibility API')
 
     # ---------------------------------------------------------------------------------
     #
@@ -135,7 +135,7 @@ class Eligibility(Paletable):
     #
     # ----------------------------------------------------------------------------------
     def notEnrolled(self):
-        self.palet.logger.info('notEnrolled called')
+        self.palet.logger.debug('notEnrolled called')
         self.isNotEnrolled = True
         self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
         return self
@@ -147,7 +147,7 @@ class Eligibility(Paletable):
     #
     # ----------------------------------------------------------------------------------
     def enrolled(self):
-        self.palet.logger.info('resetting to eligible enrolled called')
+        self.palet.logger.debug('resetting to eligible enrolled called')
         self.isNotEnrolled = False
         return self
 
