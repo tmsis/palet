@@ -247,6 +247,7 @@ class Enrollment(Paletable):
                 a.de_fil_dt,
                 {self._getTimeUnitBreakdown()}
                 {self._renderAgeRange()}
+                {self._stackChipCode()}
             from
                 taf.taf_ann_de_base as a
             where

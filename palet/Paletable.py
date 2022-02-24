@@ -473,9 +473,15 @@ class Paletable:
         else:
             return ''
 
+
+    # ----------------------------------------------------------
+    #
+    #
+    #
+    # ----------------------------------------------------------
     def _stackChipCode(self):
         if PaletMetadata.Enrollment.type in self.by_group:
-            select = """stack(12,
+            select = """,stack(12,
                             1,  a.chip_cd_01,
                             2,  a.chip_cd_02,
                             3,  a.chip_cd_03,
@@ -490,6 +496,7 @@ class Paletable:
                             12, a.chip_cd_12
                             ) as (month, enrollment_type)
                         """
+            return select
 
     # ---------------------------------------------------------------------------------
     #
@@ -678,12 +685,10 @@ class Paletable:
 
         from palet.Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
-
-        self._addByGroup(PaletMetadata.Enrollment.type)
+        self.by_group.append(PaletMetadata.Enrollment.type)
         
         if type is not None:
             self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
-
 
         return Enrollment(self)
 
