@@ -440,8 +440,8 @@ class Paletable:
         """
 
         self.palet.logger.info('adding byAgeRange to by Group')
-        self._addByGroup(PaletMetadata.Enrollment.identity.age)
-        self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
+        # self._addByGroup(PaletMetadata.Enrollment.identity.age)
+        # self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
         if age_range is not None:
             self.age_band = age_range
