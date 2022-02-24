@@ -29,6 +29,7 @@ class PaletMetadata:
         """
 
         fileDate = 'DE_FIL_DT'
+        type = 'enrollment_type'
 
         # ---------------------------------------------------------------------------------
         #

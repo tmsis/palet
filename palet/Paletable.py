@@ -486,6 +486,24 @@ class Paletable:
         else:
             return ''
 
+    def _stackChipCode(self):
+        if PaletMetadata.Enrollment.type in self.by_group:
+            select = """stack(12,
+                            1,  a.chip_cd_01,
+                            2,  a.chip_cd_02,
+                            3,  a.chip_cd_03,
+                            4,  a.chip_cd_04,
+                            5,  a.chip_cd_05,
+                            6,  a.chip_cd_06,
+                            7,  a.chip_cd_07,
+                            8,  a.chip_cd_08,
+                            9,  a.chip_cd_09,
+                            10, a.chip_cd_10,
+                            11, a.chip_cd_11,
+                            12, a.chip_cd_12
+                            ) as (month, enrollment_type)
+                        """
+
     # ---------------------------------------------------------------------------------
     #
     # Likely will be removed - consolidated to be included in byAgeRange()
@@ -675,6 +693,10 @@ class Paletable:
         self.palet.logger.info('adding byEnrollmentType to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.type)
+        
+        if type is not None:
+            self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+
 
         return Enrollment(self)
 
