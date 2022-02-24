@@ -6,6 +6,7 @@ the Enrollment module inherits from the Paletable module.
 """
 
 import pandas as pd
+from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
@@ -76,6 +77,7 @@ class Eligibility(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
+            self.isNotEnrolled = False
 
         self.palet.logger.info('Initializing Eligibility API')
 
@@ -124,6 +126,31 @@ class Eligibility(Paletable):
 
         return df
 
+  
+    # ---------------------------------------------------------------------------------
+    # notEnrolled 
+    # method is a public function to get all Eligible but NOT enrolled
+    # this call switches contexts to notEnrolled and reforms the sql call
+    #
+    #
+    # ----------------------------------------------------------------------------------
+    def notEnrolled(self):
+        self.palet.logger.info('notEnrolled called')
+        self.isNotEnrolled = True
+        self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
+        return self
+
+    # ---------------------------------------------------------------------------------
+    # Enrolled 
+    # call this method to reset the context to all enrolled instead of NOT enrolled
+    #
+    #
+    # ----------------------------------------------------------------------------------
+    def enrolled(self):
+        self.palet.logger.info('resetting to eligible enrolled called')
+        self.isNotEnrolled = False
+        return self
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -156,32 +183,54 @@ class Eligibility(Paletable):
             >>> print(Eligibility.sql())
         """
 
-        # create or replace temporary view Eligibility_by_month ass
-        z = f"""
-            select
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt,
-                a.month,
-                a.elgblty_grp_cd,
-                sum(a.benes) as benes,
-                sum(a.mdcd_enrlmt) as mdcd_enrlmt,
-                sum(a.chip_enrlmt) as chip_enrlmt
-            from
-                palet_mart.pivoted_eligibility as a
-            group by
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt,
-                a.month,
-                a.elgblty_grp_cd
-            order by
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt,
-                a.month,
-                a.elgblty_grp_cd
-         """
+
+        if self.isNotEnrolled is True:
+            z = f"""select 
+                        SUBMTG_STATE_CD,
+                        de_fil_dt,
+                        month,
+                        elgblty_grp_cd,
+                        mdcd_not_enrolled
+                    from
+                        palet_mart.aggregate_eligibility_vs_enrollment
+                    group by
+                        submtg_state_cd,
+                        de_fil_dt,
+                        month,
+                        elgblty_grp_cd,
+                        mdcd_not_enrolled
+                    order by
+                        submtg_state_cd,
+                        de_fil_dt,
+                        month
+                """
+        else:
+            # create or replace temporary view Eligibility_by_month
+            z = f"""
+                select
+                    {self._getByGroupWithAlias()}
+                    a.de_fil_dt,
+                    a.month,
+                    a.elgblty_grp_cd,
+                    sum(a.benes) as benes,
+                    sum(a.mdcd_enrlmt) as mdcd_enrlmt,
+                    sum(a.chip_enrlmt) as chip_enrlmt
+                from
+                    palet_mart.pivoted_eligibility as a
+                group by
+                    {self._getByGroupWithAlias()}
+                    a.de_fil_dt,
+                    a.month,
+                    a.elgblty_grp_cd
+                order by
+                    {self._getByGroupWithAlias()}
+                    a.de_fil_dt,
+                    a.month,
+                    a.elgblty_grp_cd
+            """
 
         # self._addPostProcess(self._percentChange)
-        # self._addPostProcess(self._decorate)
+        self._addPostProcess(self._decorate)
 
         return z
 
