@@ -156,24 +156,25 @@ class Palet():
         self.logger = logging.getLogger('palet_log')
         self.logger.setLevel(logging.INFO)
 
-        fh = logging.FileHandler(p_logfile, mode='a')
         ch = logging.StreamHandler()
-        # ch.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
+
         ch.setFormatter(formatter)
 
         if (self.logger.hasHandlers()):
             self.logger.handlers.clear()
 
-        self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+
+        # fh = logging.FileHandler(p_logfile, mode='a')
+        # fh.setFormatter(formatter)
+        # self.logger.addHandler(fh)
 
         self.logfile = p_logfile
         self.logfilename = p_filename
 
-        self.logger.debug('DQ Measures log file: ' + p_logfile)
+        self.logger.debug('PALET log file: ' + p_logfile)
 
     # --------------------------------------------------------------------
     #
