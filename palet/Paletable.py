@@ -6,7 +6,6 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
-from palet.Enrollment import Enrollment
 
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
@@ -659,6 +658,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
+        from palet.Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.type)
