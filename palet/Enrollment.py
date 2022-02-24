@@ -75,6 +75,7 @@ class Enrollment(Paletable):
 
         if (paletable is not None):
             self.by_group = paletable.by_group
+            self.derived_by_group = paletable.derived_by_group
             self.filter = paletable.filter
 
         self.palet.logger.debug('Initializing Enrollment API')
