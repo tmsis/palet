@@ -140,8 +140,6 @@ class Palet():
             Prints a datetime to show when the code was executed.
         """
 
-        file_date = now.strftime('%Y-%m-%d-%H-%M-%S')
-
         logging.addLevelName(Palet.PERFORMANCE, 'PERFORMANCE')
 
         def performance(self, message, *args, **kws):
@@ -149,31 +147,19 @@ class Palet():
 
         logging.Logger.performance = performance
 
-        p_dir = '/tmp/'
-        p_filename = 'custom_log_' + file_date + '.log'
-        p_logfile = p_dir + p_filename
-
         self.logger = logging.getLogger('palet_log')
         self.logger.setLevel(logging.INFO)
 
-        fh = logging.FileHandler(p_logfile, mode='a')
         ch = logging.StreamHandler()
-        # ch.setLevel(logging.INFO)
+        ch.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
         if (self.logger.hasHandlers()):
             self.logger.handlers.clear()
 
-        self.logger.addHandler(fh)
         self.logger.addHandler(ch)
-
-        self.logfile = p_logfile
-        self.logfilename = p_filename
-
-        self.logger.debug('DQ Measures log file: ' + p_logfile)
 
     # --------------------------------------------------------------------
     #

@@ -6,6 +6,7 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
+from palet.Enrollment import Enrollment
 
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
@@ -439,8 +440,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        self.palet.logger.info('Group by - age range')
-
+        self.palet.logger.info('adding byAgeRange to by Group')
         self._addByGroup(PaletMetadata.Enrollment.identity.age)
         self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
@@ -452,7 +452,7 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    # 
+    #
     #
     # ---------------------------------------------------------------------------------
 
@@ -642,6 +642,28 @@ class Paletable:
         self._addByGroup(PaletMetadata.Coverage.type)
 
         return Coverage(self)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byEnrollmentType(self, type=None):
+        """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            type:`str, (optional)`: Filter by coverage type using enrollment type code. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+        """
+
+        self.palet.logger.info('adding byEnrollmentType to the by Group')
+
+        self._addByGroup(PaletMetadata.Enrollment.type)
+
+        return Enrollment(self)
 
     # ---------------------------------------------------------------------------------
     #
@@ -900,7 +922,7 @@ class Paletable:
         self.palet.logger.debug('is isfirst exists then drop the column')
         if 'isfirst' in df.columns:
             df = df.drop(columns=['isfirst'])
-        
+
         if 'age_band' in df.columns:
             df = df.loc[df['age_band'] != 'not found']
 
