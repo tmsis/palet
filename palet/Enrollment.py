@@ -240,6 +240,8 @@ class Enrollment(Paletable):
             >>> print(Enrollment.sql())
         """
 
+        super().sql()
+
         # create or replace temporary view enrollment_by_month as
         z = f"""
             select
@@ -291,6 +293,7 @@ class Enrollment(Paletable):
             self._addPostProcess(self._buildAgeGroupColumn)
 
         return z
+
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
