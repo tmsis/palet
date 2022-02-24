@@ -135,6 +135,20 @@ class Eligibility(Paletable):
     #
     # ----------------------------------------------------------------------------------
     def notEnrolled(self):
+        """This function changes the context of Eligibility to return those who are 
+        NOT enrolled
+
+        Args:
+            self: None - no input required.
+
+        Returns:
+            str: Returns the Eligibily class with NOT enrolled context.
+
+        Example:
+            Switch the context of Eligibility:
+            
+            >>> Eligibility().notEnrolled()
+        """
         self.palet.logger.info('notEnrolled called')
         self.isNotEnrolled = True
         self.by_group.append(PaletMetadata.Enrollment.locale.submittingState)
@@ -147,6 +161,19 @@ class Eligibility(Paletable):
     #
     # ----------------------------------------------------------------------------------
     def enrolled(self):
+        """This function changes the context of Eligibility to back those who are enrolled
+
+        Args:
+            self: None - no input required.
+
+        Returns:
+            str: Returns the Eligibily class with enrolled context.
+
+        Example:
+            Switch the context of Eligibility:
+            
+            >>> Eligibility().enrolled()
+        """
         self.palet.logger.info('resetting to eligible enrolled called')
         self.isNotEnrolled = False
         return self
