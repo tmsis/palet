@@ -456,9 +456,8 @@ class Paletable:
             self.age_band = age_range
             self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
 
-        else: 
+        else:
             self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
-
 
         return self
 
@@ -693,7 +692,7 @@ class Paletable:
         self.palet.logger.info('adding byEnrollmentType to the by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.type)
-        
+
         if type is not None:
             self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
@@ -851,6 +850,8 @@ class Paletable:
 
         """
 
+        self.postprocesses = []
+
         return self.sql
 
     # ---------------------------------------------------------------------------------
@@ -909,7 +910,7 @@ class Paletable:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
-            
+
             if PaletMetadata.Enrollment.identity.income in sparkDF.columns:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.identity.income,
