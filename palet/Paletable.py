@@ -900,6 +900,9 @@ class Paletable:
         self.palet.logger.debug('is isfirst exists then drop the column')
         if 'isfirst' in df.columns:
             df = df.drop(columns=['isfirst'])
+        
+        if 'age_band' in df.columns:
+            df = df.loc[df['age_band'] != 'not found']
 
         return df
 
