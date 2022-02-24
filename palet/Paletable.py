@@ -105,6 +105,16 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _removeByGroup(self, var):
+        if var in self.by_group:
+            self.palet.logger.info(f'Removing By Group {var}')
+            self.by_group.remove(var)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _addDerivedByGroup(self, var):
         if var not in self.derived_by_group:
             # self.palet.logger.debug(f'Adding By Group {var}')
@@ -440,12 +450,15 @@ class Paletable:
         """
 
         self.palet.logger.info('adding byAgeRange to by Group')
-        # self._addByGroup(PaletMetadata.Enrollment.identity.age)
-        # self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
         if age_range is not None:
+            self._removeByGroup(PaletMetadata.Enrollment.identity.ageGroup)
             self.age_band = age_range
             self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
+
+        else: 
+            self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
+
 
         return self
 
