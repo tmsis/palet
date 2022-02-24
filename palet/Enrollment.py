@@ -77,7 +77,7 @@ class Enrollment(Paletable):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
 
-        self.palet.logger.info('Initializing Enrollment API')
+        self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
     # timeunit class
@@ -240,6 +240,8 @@ class Enrollment(Paletable):
             >>> print(Enrollment.sql())
         """
 
+        super().sql()
+
         # create or replace temporary view enrollment_by_month as
         z = f"""
             select
@@ -292,6 +294,7 @@ class Enrollment(Paletable):
             self._addPostProcess(self._buildAgeGroupColumn)
 
         return z
+
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal

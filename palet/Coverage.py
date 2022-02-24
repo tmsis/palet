@@ -44,7 +44,7 @@ class Coverage(Paletable):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
 
-        self.palet.logger.info('Initializing Coverage API')
+        self.palet.logger.debug('Initializing Coverage API')
 
     # ---------------------------------------------------------------------------------
     #
@@ -146,7 +146,7 @@ class Coverage(Paletable):
         from pyspark.sql import SparkSession
 
         session = SparkSession.getActiveSession()
-        # self.palet.logger.info('Fetching data - \n' + self.sql())
+        # self.palet.logger.debug('Fetching data - \n' + self.sql())
 
         # post-processing callbacks
         for pp in self.preprocesses:
@@ -170,7 +170,7 @@ class Coverage(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
-        self.palet.logger.info('\t' + viewname)
+        self.palet.logger.debug('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))
             self.palet.sql[viewname] = '\n'.join(sql.split('\n')[2:])

@@ -79,7 +79,7 @@ class Eligibility(Paletable):
             self.filter = paletable.filter
             self.isNotEnrolled = False
 
-        self.palet.logger.info('Initializing Eligibility API')
+        self.palet.logger.debug('Initializing Eligibility API')
 
     # ---------------------------------------------------------------------------------
     #

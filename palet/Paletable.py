@@ -60,7 +60,7 @@ class Paletable:
 
         # self.runids = self.palet.cache_run_ids()
         self.runids = [6280]
-        self.palet.logger.info('Initializing Paletable super class')
+        self.palet.logger.debug('Initializing Paletable super class')
 
     # ---------------------------------------------------------------------------------
     #
@@ -77,7 +77,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _addPreProcess(self, cb):
         if cb not in self.preprocesses:
-            self.palet.logger.info(f'Registering Pre Process {cb}')
+            self.palet.logger.debug(f'Registering Pre Process {cb}')
             self.preprocesses.append(cb)
 
     # ---------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _addPostProcess(self, cb):
         if cb not in self.postprocesses:
-            self.palet.logger.info(f'Registering Post Process {cb}')
+            self.palet.logger.debug(f'Registering Post Process {cb}')
             self.postprocesses.append(cb)
 
     # ---------------------------------------------------------------------------------
@@ -99,6 +99,16 @@ class Paletable:
         if var not in self.by_group:
             self.palet.logger.info(f'Adding By Group {var}')
             self.by_group.append(var)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _removeByGroup(self, var):
+        if var in self.by_group:
+            self.palet.logger.debug(f'Removing By Group {var}')
+            self.by_group.remove(var)
 
     # ---------------------------------------------------------------------------------
     #
@@ -133,7 +143,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _getByGroupWithAlias(self):
-        self.palet.logger.info('Forming SQL by Groups')
+        self.palet.logger.debug('Forming SQL by Groups')
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
@@ -150,7 +160,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _getValueFromFilter(self, column: str):
-        self.palet.logger.info('creating filter values for SQL')
+        self.palet.logger.debug('creating filter values for SQL')
         value = self.filter.get(column)  # TODO: required columns handling?
         return column + " = " + value
 
@@ -161,7 +171,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
-        self.palet.logger.info('defining our where clause based on api calls')
+        self.palet.logger.debug('defining our where clause based on api calls')
         clause = ""
         where = []
 
@@ -208,7 +218,7 @@ class Paletable:
     # It is used internally and called during byGroup calls.
     # ---------------------------------------------------------------------------------
     def _checkForMultiVarFilter(self, values: str, separator=" "):
-        self.palet.logger.info('checking for any delimited filter values and separating them')
+        self.palet.logger.debug('checking for any delimited filter values and separating them')
         return values.split(separator)
 
     # ---------------------------------------------------------------------------------
@@ -219,7 +229,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
-        self.palet.logger.info('master function to create pctChange columns based on column passed')
+        self.palet.logger.debug('master function to create pctChange columns based on column passed')
         df[resultColumnName] = [
             round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
             if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
@@ -233,7 +243,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _mergeStateEnrollments(self, df: pd.DataFrame):
-        self.palet.logger.info('Merging separate state enrollments')
+        self.palet.logger.debug('Merging separate state enrollments')
         timeunit = 'month'
 
         if 'year' in df.columns:
@@ -251,7 +261,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findRaceValueName(self, x):
-        self.palet.logger.info('looking up the race_ethncty_flag value from our metadata')
+        self.palet.logger.debug('looking up the race_ethncty_flag value from our metadata')
         # import math
         # get this row's ref value from the column by name
         y = x['race_ethncty_flag']
@@ -265,7 +275,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
-        self.palet.logger.info('build our columns by looking for race value')
+        self.palet.logger.debug('build our columns by looking for race value')
         df['race'] = df.apply(lambda x: self._findRaceValueName(x), axis=1)
 
         return df
@@ -277,7 +287,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findRaceExpValueName(self, x):
-        self.palet.logger.info('looking up the race_ethncty_exp_flag value from our metadata')
+        self.palet.logger.debug('looking up the race_ethncty_exp_flag value from our metadata')
         # get this row's ref value from the column by name
         y = x['race_ethncty_exp_flag']
         # lookup label with value
@@ -290,7 +300,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildRaceEthnicityExpColumn(self, df: pd.DataFrame):
-        self.palet.logger.info('build our columns by looking for race_ethncty_exp_flag')
+        self.palet.logger.debug('build our columns by looking for race_ethncty_exp_flag')
         df['raceExpanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
 
         return df
@@ -302,7 +312,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findEthnicityValueName(self, x):
-        self.palet.logger.info('looking up the ethncty_cd value from our metadata')
+        self.palet.logger.debug('looking up the ethncty_cd value from our metadata')
         # get this row's ref value from the column by name
         y = x[PaletMetadata.Enrollment.raceEthnicity.ethnicity]
         # lookup label with value
@@ -315,7 +325,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildEthnicityColumn(self, df: pd.DataFrame):
-        self.palet.logger.info('build our columns by looking for ethncty_cd')
+        self.palet.logger.debug('build our columns by looking for ethncty_cd')
         df['ethnicity'] = df.apply(lambda x: self._findEthnicityValueName(x), axis=1)
 
         return df
@@ -327,7 +337,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _findIncomeValueName(self, x):
-        self.palet.logger.info('looking up the incm_cd value from our metadata')
+        self.palet.logger.debug('looking up the incm_cd value from our metadata')
         # get this row's ref value from the column by name
         y = x[PaletMetadata.Enrollment.identity.income]
         # lookup label with value
@@ -340,7 +350,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _buildIncomeColumn(self, df: pd.DataFrame):
-        self.palet.logger.info('build our columns by looking for income_cd')
+        self.palet.logger.debug('build our columns by looking for income_cd')
         df['income'] = df.apply(lambda x: self._findIncomeValueName(x), axis=1)
 
         return df
@@ -404,7 +414,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _decorate(self, df):
-        self.palet.logger.info('Decorate')
+        self.palet.logger.debug('Decorate')
 
         # for submitting state
         if PaletMetadata.Enrollment.locale.submittingState in self.by_group:
@@ -440,12 +450,14 @@ class Paletable:
         """
 
         self.palet.logger.info('adding byAgeRange to by Group')
-        # self._addByGroup(PaletMetadata.Enrollment.identity.age)
-        # self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
         if age_range is not None:
+            self._removeByGroup(PaletMetadata.Enrollment.identity.ageGroup)
             self.age_band = age_range
             self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
+
+        else:
+            self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
         return self
 
@@ -843,6 +855,8 @@ class Paletable:
 
         """
 
+        self.postprocesses = []
+
         return self.sql
 
     # ---------------------------------------------------------------------------------
@@ -901,7 +915,7 @@ class Paletable:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.raceEthnicity.ethnicity,
                     sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
-            
+
             if PaletMetadata.Enrollment.identity.income in sparkDF.columns:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.identity.income,
@@ -961,7 +975,7 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
-        self.palet.logger.info('\t' + viewname)
+        self.palet.logger.debug('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))
             self.palet.sql[viewname] = '\n'.join(sql.split('\n')[2:])
