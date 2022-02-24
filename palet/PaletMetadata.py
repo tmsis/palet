@@ -337,6 +337,7 @@ class PaletMetadata:
         stateEligibility = 'state_spec_elgblty_fctr_txt'
         dualEligibilityCode = 'dual_elgbl_cd'
         dualEligibility = 'dual_elgbl_flag'
+        notEnrolled = 'mdcd_not_enrolled'
 
         eligibility_cd = {
             "01": "Parents & Other Caretaker Relatives",
