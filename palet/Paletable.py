@@ -539,6 +539,7 @@ class Paletable:
     #
     # ----------------------------------------------------------
     def _stackChipCode(self):
+        select = ""
         if PaletMetadata.Enrollment.type in self.derived_by_group:
             select = """,stack(12,
                             1,  a.chip_cd_01,
@@ -555,7 +556,7 @@ class Paletable:
                             12, a.chip_cd_12
                             ) as (month, enrollment_type)
                         """
-            return select
+        return select
 
     # ---------------------------------------------------------------------------------
     #

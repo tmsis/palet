@@ -77,6 +77,7 @@ class Eligibility(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
+            self.derived_by_group = paletable.derived_by_group
             self.isNotEnrolled = False
 
         self.palet.logger.debug('Initializing Eligibility API')
