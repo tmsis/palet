@@ -131,7 +131,7 @@ class Paletable:
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.derived_by_group)) > 0:
             for column in self.derived_by_group:
-                z = z + column + new_line_comma
+                z += column + new_line_comma
             return f"{z}"
         else:
             return ''
