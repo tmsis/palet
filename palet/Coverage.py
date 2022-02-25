@@ -43,6 +43,8 @@ class Coverage(Paletable):
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
+            self.derived_by_group = paletable.derived_by_group
+            self._user_runids = paletable._user_runids
 
         self.palet.logger.debug('Initializing Coverage API')
 
@@ -91,7 +93,8 @@ class Coverage(Paletable):
                 from
                     palet_mart.pivoted_coverage as a
                 where
-                    coverage_type is not null
+                    coverage_type is not null AND
+                    a.da_run_id in ( {self._getRunIds()} )
                 group by
                     {self._getByGroupWithAlias()}
                     a.de_fil_dt,

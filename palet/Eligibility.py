@@ -79,6 +79,7 @@ class Eligibility(Paletable):
             self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
             self.isNotEnrolled = False
+            self._user_runids = paletable._user_runids
 
         self.palet.logger.debug('Initializing Eligibility API')
 
@@ -213,7 +214,8 @@ class Eligibility(Paletable):
 
 
         if self.isNotEnrolled is True:
-            z = f"""select 
+            z = f"""select
+                        da_run_id
                         SUBMTG_STATE_CD,
                         de_fil_dt,
                         month,
@@ -221,12 +223,15 @@ class Eligibility(Paletable):
                         mdcd_not_enrolled
                     from
                         palet_mart.aggregate_eligibility_vs_enrollment
+                    where
+                        a.da_run_id in ( {self._getRunIds()} )
                     group by
                         submtg_state_cd,
                         de_fil_dt,
                         month,
                         elgblty_grp_cd,
                         mdcd_not_enrolled
+                        da_run_id
                     order by
                         submtg_state_cd,
                         de_fil_dt,
@@ -245,6 +250,8 @@ class Eligibility(Paletable):
                     sum(a.chip_enrlmt) as chip_enrlmt
                 from
                     palet_mart.pivoted_eligibility as a
+                where
+                    a.da_run_id in ( {self._getRunIds()} )
                 group by
                     {self._getByGroupWithAlias()}
                     a.de_fil_dt,

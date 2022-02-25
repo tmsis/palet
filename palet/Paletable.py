@@ -58,8 +58,9 @@ class Paletable:
 
         self.palet = Palet('201801')
 
-        # self.runids = self.palet.cache_run_ids()
-        self.runids = [6280]
+        self._user_runids = []
+        self._runids = self.palet.cache_run_ids()
+
         self.palet.logger.debug('Initializing Paletable super class')
 
     # ---------------------------------------------------------------------------------
@@ -68,7 +69,10 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
-        return ','.join(map(str, self.runids))
+        if len(self._user_runids) > 0:
+            return ','.join(map(str, self._user_runids))
+        else:
+            return ','.join(map(str, self._runids))
 
     # ---------------------------------------------------------------------------------
     #
@@ -558,6 +562,23 @@ class Paletable:
                         """
         return select
 
+    
+    # ---------------------------------------------------------------------------------
+    #
+    # Use this method to pass in user defined runIds
+    #
+    # ---------------------------------------------------------------------------------
+    def usingRunIds(self, ids: list=[]):
+        if len(ids) > 0:
+            self._user_runids = ids
+        else:
+            self._user_runids = []
+
+        return
+    
+    def displayCurrentRunIds(self):
+        print("Current RunIds: " + str(self._getRunIds()))
+
     # ---------------------------------------------------------------------------------
     #
     # Likely will be removed - consolidated to be included in byAgeRange()
@@ -1008,7 +1029,7 @@ class Paletable:
         for pp in self.postprocesses:
             df = pp(df)
 
-        self.palet.logger.debug('is isfirst exists then drop the column')
+        self.palet.logger.debug('if isfirst exists then drop the column')
         if 'isfirst' in df.columns:
             df = df.drop(columns=['isfirst'])
 
