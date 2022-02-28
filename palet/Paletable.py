@@ -65,8 +65,8 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
+    # _getRunIds
+    #  Determine if there are any user defined run Ids and use them instead.
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
         if len(self._user_runids) > 0:
@@ -539,8 +539,9 @@ class Paletable:
 
     # ----------------------------------------------------------
     #
-    #
-    #
+    # _stackChipCode
+    #  Use this method if we have entrollment type request
+    #  within the derived by groups
     # ----------------------------------------------------------
     def _stackChipCode(self):
         select = ""
@@ -569,6 +570,18 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def usingRunIds(self, ids: list=[]):
+        """For users who which to pass in their own Run Ids, call this method by passning 
+        in a list of run ids separated by comma. e.g. [6279, 6280]
+        Args:
+            ids: `list, optional`: Filter by specific runids by passing in a list of one or more.
+                  Defaults to an Empty List [] and will clear user defined run ids when called by default
+
+        Returns:
+            No return values
+
+        Example:
+            >>> api.usingRunIds([6279, 6280])
+        """
         if len(ids) > 0:
             self._user_runids = ids
         else:
@@ -577,6 +590,14 @@ class Paletable:
         return
     
     def displayCurrentRunIds(self):
+        """If you'd like to get a display of the current run ids set in the query then you can call this function
+           or check the full sql statement by :func:sql()
+        Args:
+            None
+
+        Returns:
+            Prints the current list of run ids to the screen.
+        """
         print("Current RunIds: " + str(self._getRunIds()))
 
     # ---------------------------------------------------------------------------------
