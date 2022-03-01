@@ -569,6 +569,26 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def usingRunIds(self, ids: list=[]):
+        """
+        Specify the run IDs you want included in your query. If this function is not called, the query
+        will utilize the most recent run IDs. 
+
+        Args:
+            ids: `list, required`: Enter a list of the run IDs you wish to include
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Examples:
+            Create a paletable object:
+
+            >>> api = Enrollment().byMonth()
+
+            Specify run IDs:
+
+            >>> api.usingRunIds([6279,6280])
+
+        """
         if len(ids) > 0:
             self._user_runids = ids
         else:
@@ -577,6 +597,25 @@ class Paletable:
         return
     
     def displayCurrentRunIds(self):
+        """
+        Call this function to check or confirm which run IDs are included in your query.
+
+        Args:
+            None: no input required.
+
+        Returns:
+            List of the run ids included in the query.
+
+        Example:
+            Create a Paletable object:
+
+            >>> api = Enrollment().byMonth()
+
+            Check or confirm the run ids the query will include:
+
+            >>> api.displayCurrentRunIds()
+
+        """
         print("Current RunIds: " + str(self._getRunIds()))
 
     # ---------------------------------------------------------------------------------
@@ -738,9 +777,11 @@ class Paletable:
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note: The :class:`Coverage` class is automatically imported when this by group is called. 
         """
 
-        from palet.Coverage import Coverage
+        from Coverage import Coverage
 
         self.palet.logger.info('adding byCoverageType to the by Group')
 
@@ -764,7 +805,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        from palet.Enrollment import Enrollment
+        from Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
         
@@ -779,8 +820,9 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byMedicaidOnly(self, state_fips=None):
-        """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects 
+        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this 
+        will add it as the next by group.
 
         Args:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
@@ -1044,6 +1086,10 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
+        """
+        This attribute enhances logging. Logging contains multiple levels: INFO, DEBUG, WARNING,
+        ERROR and TRACE.
+        """
         self.palet.logger.debug('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))
