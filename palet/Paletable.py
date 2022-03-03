@@ -65,8 +65,8 @@ class Paletable:
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
+    # _getRunIds
+    #  Determine if there are any user defined run Ids and use them instead.
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
         if len(self._user_runids) > 0:
@@ -539,8 +539,9 @@ class Paletable:
 
     # ----------------------------------------------------------
     #
-    #
-    #
+    # _stackChipCode
+    #  Use this method if we have entrollment type request
+    #  within the derived by groups
     # ----------------------------------------------------------
     def _stackChipCode(self):
         select = ""
@@ -569,25 +570,17 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def usingRunIds(self, ids: list=[]):
-        """
-        Specify the run IDs you want included in your query. If this function is not called, the query
-        will utilize the most recent run IDs. 
-
+        """For users who which to pass in their own Run Ids, call this method by passning 
+        in a list of run ids separated by comma. e.g. [6279, 6280]
         Args:
-            ids: `list, required`: Enter a list of the run IDs you wish to include
+            ids: `list, optional`: Filter by specific runids by passing in a list of one or more.
+                  Defaults to an Empty List [] and will clear user defined run ids when called by default
 
         Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
+            No return values
 
-        Examples:
-            Create a paletable object:
-
-            >>> api = Enrollment().byMonth()
-
-            Specify run IDs:
-
-            >>> api.usingRunIds([6279,6280])
-
+        Example:
+            >>> api.usingRunIds([6279, 6280])
         """
         if len(ids) > 0:
             self._user_runids = ids
@@ -597,24 +590,13 @@ class Paletable:
         return
     
     def displayCurrentRunIds(self):
-        """
-        Call this function to check or confirm which run IDs are included in your query.
-
+        """If you'd like to get a display of the current run ids set in the query then you can call this function
+           or check the full sql statement by :func:sql()
         Args:
-            None: no input required.
+            None
 
         Returns:
-            List of the run ids included in the query.
-
-        Example:
-            Create a Paletable object:
-
-            >>> api = Enrollment().byMonth()
-
-            Check or confirm the run ids the query will include:
-
-            >>> api.displayCurrentRunIds()
-
+            Prints the current list of run ids to the screen.
         """
         print("Current RunIds: " + str(self._getRunIds()))
 
@@ -781,7 +763,7 @@ class Paletable:
         Note: The :class:`Coverage` class is automatically imported when this by group is called. 
         """
 
-        from Coverage import Coverage
+        from palet.Coverage import Coverage
 
         self.palet.logger.info('adding byCoverageType to the by Group')
 
@@ -805,7 +787,7 @@ class Paletable:
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        from Enrollment import Enrollment
+        from palet.Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
         
