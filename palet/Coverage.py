@@ -55,13 +55,12 @@ class Coverage(Paletable):
     # ---------------------------------------------------------------------------------
     def byType(self, coverage_type=None):
         """Filter your query by Coverage Type. Most top level objects inherit this
-            function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the
-            next by group.
+        function such as Enrollment, Trend, etc.
+        If your object is already set by a by group this will add it as the
+        next by group.
 
         Args:
-            age_range: `str, optional`: Filter a single age, range such as
-            18-21, or an inclusive number such as 65+. Defaults to None.
+            coverage_type: `str, optional`: Filter a single coverage tye or multiple coverage types. Defaults to None.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -173,6 +172,10 @@ class Coverage(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
+        """
+        This attribute enhances logging. Logging contains multiple levels: INFO, DEBUG, WARNING,
+        ERROR and TRACE.
+        """
         self.palet.logger.debug('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))

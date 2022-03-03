@@ -785,6 +785,8 @@ class Paletable:
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note: The :class:`Coverage` class is automatically imported when this by group is called. 
         """
 
         from palet.Coverage import Coverage
@@ -826,8 +828,9 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byMedicaidOnly(self, state_fips=None):
-        """Filter your query by State. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects 
+        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this 
+        will add it as the next by group.
 
         Args:
             state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
@@ -1100,6 +1103,10 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
+        """
+        This attribute enhances logging. Logging contains multiple levels: INFO, DEBUG, WARNING,
+        ERROR and TRACE.
+        """
         self.palet.logger.debug('\t' + viewname)
         if sql != '':
             # self.palet.logger.debug(DQPrepETL.compress(sql.replace('\n', '')))

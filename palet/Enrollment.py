@@ -48,6 +48,8 @@ class Enrollment(Paletable):
         Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
 
     Methods:
+        usingRundIds(): Specify the run ids you would like to query. See :meth:`~Paletable.Paletable.usingRunIds`.
+        displayCurrentRunIds(): Return a list of the run ids included in your query. See :meth:`~Paletable.Paletable.displayCurrentRunIds`.
         byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
         byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
         byRaceEthnicityExpanded(): Filter your query by Race (expanded options). See :meth:`~Paletable.Paletable.byRaceEthnicityExpanded`.
@@ -55,6 +57,7 @@ class Enrollment(Paletable):
         byGender(): Filter your query by Gender. See :meth:`~Paletable.Paletable.byGender`.
         byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
         byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.byCoverageType`.
+        byEnrollmentType(): Filter your query by Enrollment Type. See :meth:`~Paletable.Paletable.byEnrollmentType`.
         byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
         byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
@@ -89,8 +92,10 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     class timeunit():
         """
-        The timeunit class is a subclass within the Enrollment. This subclass provides units of measurement for time.
-        It is composed of two dictionaries: breakdown & cull.
+        The timeunit class is a subclass within the Enrollment. It is composed of two dictionaries: breakdown & cull.
+        This class specifies how counts for enrollment are calculated. When looking at enrollment by year, enrollment
+        refers to beneficiaries who are enrolled at least one day in a given year. When looking at enrollment by
+        month, enrollment refers to beneficiaries who are enrolled at least one day in a given month.
 
         Note:
             This class affects both Medicaid & CHIP Enrollment.

@@ -49,6 +49,8 @@ class Eligibility(Paletable):
         Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
 
     Methods:
+        usingRundIds(): Specify the run ids you would like to query. See :meth:`~Paletable.Paletable.usingRunIds`.
+        displayCurrentRunIds(): Return a list of the run ids included in your query. See :meth:`~Paletable.Paletable.displayCurrentRunIds`.
         byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
         byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
         byRaceEthnicityExpanded(): Filter your query by Race (expanded options). See :meth:`~Paletable.Paletable.byRaceEthnicityExpanded`.
@@ -56,6 +58,7 @@ class Eligibility(Paletable):
         byGender(): Filter your query by Gender. See :meth:`~Paletable.Paletable.byGender`.
         byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
         byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.byCoverageType`.
+        byEnrollmentType(): Filter your query by Enrollment Type. See :meth:`~Paletable.Paletable.byEnrollmentType`.
         byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
         byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
