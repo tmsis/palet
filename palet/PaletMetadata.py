@@ -461,3 +461,16 @@ class PaletMetadata:
             '70': "Health/Medical Home (retired value)",
             '80': "Integrated Care for Dual Eligibles"
             }
+
+    class Enrichment:
+        defined_columns = {
+            'isfirst': 'self.removeIsFirst', 
+            'age_band': 'self._buildRaceEthnicityExpColumn', 
+            'race_ethncty_flag': 'self._buildRaceEthnicityColumn', 
+            'SUBMTG_STATE_CD': 'self._mergeStateEnrollments', 
+            'race_ethncty_exp_flag': 'self._buildRaceEthnicityExpColumn', 
+            'ethncty_cd': 'self._buildEthnicityColumn', 
+            'enrl_type_flag': 'self._buildEnrollmentType', 
+            'elgblty_grp_cd': 'self._buildEligibilityType', 
+            'incm_cd': 'self._buildIncomeColumn', 
+            }

@@ -330,6 +330,7 @@ class Paletable:
     # ---------------------------------------------------------------------------------
     def _buildEthnicityColumn(self, df: pd.DataFrame):
         self.palet.logger.debug('build our columns by looking for ethncty_cd')
+        print("calling build race ethnicity")
         df['ethnicity'] = df.apply(lambda x: self._findEthnicityValueName(x), axis=1)
 
         return df
@@ -377,7 +378,6 @@ class Paletable:
     def _buildEligibilityType(self, df: pd.DataFrame):
         self.palet.logger.debug('build our columns by looking for eligibilty codes')
         df['eligibility_category'] = df.apply(lambda x: self._findEligibiltyType(x), axis=1)
-
         return df
         
     # --------------------------------------------------------------------------------
@@ -451,11 +451,35 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
+    def _findValueName_(self, x, **columns):
+        # get this row's ref value from the column by name
+        y = x[columns[0]]
+        # if the value is NaN, default to unknown
+        if y is None or y == 'null':
+            return 'unknown'
+        else:
+            # lookup label with value
+            field = columns[1]
+            return field.get(y)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _buildValueColumn(self, df: pd.DataFrame):
         newColumn = "coverage_type"
         df[newColumn] = df.apply(lambda x: self._findValueName_(x), axis=1)
 
         return df
+
+    # ---------------------------------------------------------------------------------
+    # _buildValueColumn_ is provided to convert codes to values
+    # for **kwargs use columnToAdd1, columnToAdd2, etc.
+    # ---------------------------------------------------------------------------------
+    def _buildValueColumn_(self, df: pd.DataFrame, **kwargs):
+        column1 = kwargs[0]
+        df[column1] = df.apply(lambda x: self._findValueName_(x), axis=1)
 
     # ---------------------------------------------------------------------------------
     #
@@ -544,6 +568,7 @@ class Paletable:
     #  within the derived by groups
     # ----------------------------------------------------------
     def _stackChipCode(self):
+        self.palet.logger.debug("Stacking the chip codes for enrollment type")
         select = ""
         if PaletMetadata.Enrollment.type in self.derived_by_group:
             select = """,stack(12,
@@ -582,6 +607,7 @@ class Paletable:
         Example:
             >>> api.usingRunIds([6279, 6280])
         """
+        self.palet.logger.debug("using RunIds: " + str(list))
         if len(ids) > 0:
             self._user_runids = ids
         else:
@@ -988,7 +1014,7 @@ class Paletable:
 
         #if len(sparkDF.head(1)) == 0:
         #    print('Empty DataFrame')
-
+                      
         if (sparkDF is not None):
 
             if PaletMetadata.Enrollment.raceEthnicity.race in sparkDF.columns:
@@ -1015,7 +1041,6 @@ class Paletable:
                 sparkDF = sparkDF.withColumn(
                     PaletMetadata.Enrollment.identity.ageGroup,
                     sparkDF[PaletMetadata.Enrollment.identity.ageGroup].cast(StringType()))
-
 
         df = sparkDF.toPandas()
 
@@ -1045,17 +1070,27 @@ class Paletable:
             df[PaletMetadata.Enrollment.identity.ageGroup].fillna('-1', inplace=True)
 
 
-        # perform data enrichments
-        self.palet.logger.debug('Beginning call to run post-processes')
-        for pp in self.postprocesses:
-            df = pp(df)
+        # perform data enrichments & post
+        if (sparkDF is not None):
+            self.palet.logger.debug('Beginning call to run post-processes')
+            for column in PaletMetadata.Enrichment.defined_columns:
+                print(column)
+                if column in df.columns:
+                    self.palet.logger.debug("Calling post-process " + column)
+                    col = eval(PaletMetadata.Enrichment.defined_columns[column])
+                    df = col(df)
 
-        self.palet.logger.debug('if isfirst exists then drop the column')
-        if 'isfirst' in df.columns:
-            df = df.drop(columns=['isfirst'])
 
-        if 'age_band' in df.columns:
-            df = df.loc[df['age_band'] != 'not found']
+
+        # for pp in self.postprocesses:
+        #     df = pp(df)
+
+        # self.palet.logger.debug('if isfirst exists then drop the column')
+        # if 'isfirst' in df.columns:
+        #     df = df.drop(columns=['isfirst'])
+
+        # if 'age_band' in df.columns:
+        #     df = df.loc[df['age_band'] != 'not found']
 
         return df
 

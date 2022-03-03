@@ -271,34 +271,6 @@ class Enrollment(Paletable):
         self._addPostProcess(self._percentChange)
         self._addPostProcess(self._decorate)
 
-        # compress rows from race ethnicity if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.race in self.by_group):
-            self._addPostProcess(self._buildRaceEthnicityColumn)
-
-        # compress rows from race ethnicity expanded if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.raceExpanded in self.by_group):
-            self._addPostProcess(self._buildRaceEthnicityExpColumn)
-
-        # compress rows from ethnicity if it is in the by group
-        if (PaletMetadata.Enrollment.raceEthnicity.ethnicity in self.by_group):
-            self._addPostProcess(self._buildEthnicityColumn)
-
-        # compress rows from submitting state to state if it is in the by group
-        if (PaletMetadata.Enrollment.locale.submittingState in self.by_group):
-            self._addPostProcess(self._mergeStateEnrollments)
-
-        # compress rows from income if it is in the by group
-        if (PaletMetadata.Enrollment.identity.income in self.by_group):
-            self._addPostProcess(self._buildIncomeColumn)
-
-        # compress rows from age group if it is in the by group
-        if (PaletMetadata.Enrollment.identity.ageGroup in self.by_group):
-            self._addPostProcess(self._buildAgeGroupColumn)
-
-        # compress rows from age group if it is in the by group
-        if (PaletMetadata.Enrollment.type in self.derived_by_group):
-            self._addPostProcess(self._buildEnrollmentType)
-
         return z
 
 
