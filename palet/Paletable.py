@@ -493,11 +493,27 @@ class Paletable:
             next by group.
 
         Args:
-            age_range: `str, optional`: Filter a single age, range such as
-            18-21, or an inclusive number such as 65+. Defaults to None.
+            age_range: `dict, optional`: Utilize a dictionary to specify a label,
+            maximum age, and minimum age. Analysts can create as few or as many age
+            ranges as they desire. See example below for dictionary format. 
+            Defaults to None. Default options produces pre-determined age ranges
+            available in the age_grp_flag column. 
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Default option:
+
+            >>> display(Enrollment().byAgeRange().fetch())
+
+            Single user defined age range:
+
+            >>> display(Enrollment().byAgeRange({'Child': [0,12]}).fetch()) 
+
+            Multiple user defined age ranges:
+
+            >>> >>> display(Enrollment().byAgeRange({'Early 20's': [20,23],'Mid 20's': [24-26],'Late 20's': [27-29]}).fetch()) 
         """
 
         self.palet.logger.info('adding byAgeRange to by Group')

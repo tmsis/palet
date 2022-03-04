@@ -138,7 +138,10 @@ class Eligibility(Paletable):
     # ----------------------------------------------------------------------------------
     def notEnrolled(self):
         """This function changes the context of Eligibility to return those who are 
-        NOT enrolled
+        NOT enrolled. Given enrolled is counted as those who are enrolled at least one 
+        day in a month or year, eligible but not enrolled are counts of people who are
+        in an eligible group but do not have a least one day of enrollment in a given 
+        month or year.  
 
         Args:
             self: None - no input required.
