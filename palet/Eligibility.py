@@ -230,7 +230,7 @@ class Eligibility(Paletable):
                         de_fil_dt,
                         month,
                         elgblty_grp_cd,
-                        mdcd_not_enrolled
+                        mdcd_not_enrolled,
                         da_run_id
                     order by
                         submtg_state_cd,
