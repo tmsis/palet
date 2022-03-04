@@ -10,12 +10,12 @@ from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
-class Eligibility(Paletable):
+class Eligibility(Paletable, list):
     """
     The class within the PALET library for viewing eligibility. This class is used to view eligibility for Medicaid and CHIP.
     Attributes inherited from the Paletable class can be used to apply and_filters for beneficiary age, ehtnicity, gender, state, income, etc.
 
-    Eligibility counts are the sum of the unique beneficiaries eligible at least 
+    Eligibility counts are the sum of the unique beneficiaries eligible at least
     one day in a given month or year.
 
     Note:
@@ -73,7 +73,7 @@ class Eligibility(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Eligibility API
     # -----------------------------------------------------------------------
-    def __init__(self, paletable: Paletable = None):
+    def __init__(self, runIds: list = None, paletable: Paletable = None):
         # print('Initializing Eligibility API')
         super().__init__()
 
@@ -82,8 +82,8 @@ class Eligibility(Paletable):
             self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
             self.isNotEnrolled = False
-            self._user_runids = paletable._user_runids
 
+        self._user_runids = paletable._user_runids
         self.palet.logger.debug('Initializing Eligibility API')
 
     # ---------------------------------------------------------------------------------
@@ -131,16 +131,15 @@ class Eligibility(Paletable):
 
         return df
 
-  
     # ---------------------------------------------------------------------------------
-    # notEnrolled 
+    # notEnrolled
     # method is a public function to get all Eligible but NOT enrolled
     # this call switches contexts to notEnrolled and reforms the sql call
     #
     #
     # ----------------------------------------------------------------------------------
     def notEnrolled(self):
-        """This function changes the context of Eligibility to return those who are 
+        """This function changes the context of Eligibility to return those who are
         NOT enrolled
 
         Args:
@@ -151,7 +150,7 @@ class Eligibility(Paletable):
 
         Example:
             Switch the context of Eligibility:
-            
+
             >>> Eligibility().notEnrolled()
         """
         self.palet.logger.info('notEnrolled called')
@@ -160,7 +159,7 @@ class Eligibility(Paletable):
         return self
 
     # ---------------------------------------------------------------------------------
-    # Enrolled 
+    # Enrolled
     # call this method to reset the context to all enrolled instead of NOT enrolled
     #
     #
@@ -176,7 +175,7 @@ class Eligibility(Paletable):
 
         Example:
             Switch the context of Eligibility:
-            
+
             >>> Eligibility().enrolled()
         """
         self.palet.logger.info('resetting to eligible enrolled called')
@@ -214,7 +213,6 @@ class Eligibility(Paletable):
 
             >>> print(Eligibility.sql())
         """
-
 
         if self.isNotEnrolled is True:
             z = f"""select

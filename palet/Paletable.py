@@ -11,7 +11,7 @@ from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
 
-class Paletable:
+class Paletable():
     """
     Class containing attributes that can be combined with other classes from the PALET library. These
     attributes allow users to filter and return the dataframes created by high level objects.
@@ -44,7 +44,7 @@ class Paletable:
     #
     #
     # ---------------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, runIds: list = None):
 
         self.timeunit = 'year'
         self.by_group = []
@@ -55,10 +55,12 @@ class Paletable:
 
         self.preprocesses = []
         self.postprocesses = []
+        self._user_runids = runIds
 
         self.palet = Palet('201801')
 
-        self._user_runids = []
+        if runIds is not None:
+            self._user_runids = self.usingRunIds(runIds)
         self._runids = self.palet.cache_run_ids()
 
         self.palet.logger.debug('Initializing Paletable super class')
@@ -69,7 +71,7 @@ class Paletable:
     #  Determine if there are any user defined run Ids and use them instead.
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
-        if len(self._user_runids) > 0:
+        if self._user_runids is not None:
             return ','.join(map(str, self._user_runids))
         else:
             return ','.join(map(str, self._runids))
@@ -240,247 +242,6 @@ class Paletable:
             else float('NaN')
             for x in range(len(df))]
 
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _mergeStateEnrollments(self, df: pd.DataFrame):
-        self.palet.logger.debug('Merging separate state enrollments')
-        timeunit = 'month'
-
-        if 'year' in df.columns:
-            timeunit = 'year'
-
-        df.drop(['USPS', 'SUBMTG_STATE_CD', 'isfirst'], axis=1)
-        df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findRaceValueName(self, x):
-        self.palet.logger.debug('looking up the race_ethncty_flag value from our metadata')
-        # import math
-        # get this row's ref value from the column by name
-        y = x['race_ethncty_flag']
-        # lookup label with value
-        return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildRaceEthnicityColumn(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for race value')
-        df['race'] = df.apply(lambda x: self._findRaceValueName(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findRaceExpValueName(self, x):
-        self.palet.logger.debug('looking up the race_ethncty_exp_flag value from our metadata')
-        # get this row's ref value from the column by name
-        y = x['race_ethncty_exp_flag']
-        # lookup label with value
-        return PaletMetadata.Enrollment.raceEthnicity.race_ethncty_exp_flag.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildRaceEthnicityExpColumn(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for race_ethncty_exp_flag')
-        df['raceExpanded'] = df.apply(lambda x: self._findRaceExpValueName(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findEthnicityValueName(self, x):
-        self.palet.logger.debug('looking up the ethncty_cd value from our metadata')
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Enrollment.raceEthnicity.ethnicity]
-        # lookup label with value
-        return PaletMetadata.Enrollment.raceEthnicity.ethncty_cd.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildEthnicityColumn(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for ethncty_cd')
-        print("calling build race ethnicity")
-        df['ethnicity'] = df.apply(lambda x: self._findEthnicityValueName(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findEnrollmentType(self, x):
-        self.palet.logger.debug('looking up the enrollmentType value from our metadata')
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Enrollment.derived_enrollment_field]
-        # lookup label with value
-        return PaletMetadata.Enrollment.chip_cd.get(y)
-
-
-
-    def _buildEnrollmentType(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for enrollmentType')
-        df['enrollment_type'] = df.apply(lambda x: self._findEnrollmentType(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findEligibiltyType(self, x):
-        self.palet.logger.debug('looking up the eligibility value from our metadata')
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Eligibility.eligibiltyGroup]
-        # lookup label with value
-        return PaletMetadata.Eligibility.eligibility_cd.get(y)
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildEligibilityType(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for eligibilty codes')
-        df['eligibility_category'] = df.apply(lambda x: self._findEligibiltyType(x), axis=1)
-        return df
-        
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findIncomeValueName(self, x):
-        self.palet.logger.debug('looking up the incm_cd value from our metadata')
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Enrollment.identity.income]
-        # lookup label with value
-        return PaletMetadata.Enrollment.identity.incm_cd.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildIncomeColumn(self, df: pd.DataFrame):
-        self.palet.logger.debug('build our columns by looking for income_cd')
-        df['income'] = df.apply(lambda x: self._findIncomeValueName(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findAgeGroupValueName(self, x):
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Enrollment.identity.ageGroup]
-        # lookup label with value
-        return PaletMetadata.Enrollment.identity.age_grp_flag.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildAgeGroupColumn(self, df: pd.DataFrame):
-        df['ageGroup'] = df.apply(lambda x: self._findAgeGroupValueName(x), axis=1)
-
-        return df
-
-    # --------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findValueName_(self, x):
-        # get this row's ref value from the column by name
-        y = x[PaletMetadata.Coverage.mc_plan_type_cd]
-        # if the value is NaN, default to unknown
-        if y is None or y == 'null':
-            return 'unknown'
-        else:
-            # lookup label with value
-            field = PaletMetadata.Coverage.coverage_type
-            return field.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _findValueName_(self, x, **columns):
-        # get this row's ref value from the column by name
-        y = x[columns[0]]
-        # if the value is NaN, default to unknown
-        if y is None or y == 'null':
-            return 'unknown'
-        else:
-            # lookup label with value
-            field = columns[1]
-            return field.get(y)
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _buildValueColumn(self, df: pd.DataFrame):
-        newColumn = "coverage_type"
-        df[newColumn] = df.apply(lambda x: self._findValueName_(x), axis=1)
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    # _buildValueColumn_ is provided to convert codes to values
-    # for **kwargs use columnToAdd1, columnToAdd2, etc.
-    # ---------------------------------------------------------------------------------
-    def _buildValueColumn_(self, df: pd.DataFrame, **kwargs):
-        column1 = kwargs[0]
-        df[column1] = df.apply(lambda x: self._findValueName_(x), axis=1)
-
     # ---------------------------------------------------------------------------------
     #
     #
@@ -560,7 +321,6 @@ class Paletable:
         else:
             return ''
 
-
     # ----------------------------------------------------------
     #
     # _stackChipCode
@@ -588,14 +348,13 @@ class Paletable:
                         """
         return select
 
-    
     # ---------------------------------------------------------------------------------
     #
     # Use this method to pass in user defined runIds
     #
     # ---------------------------------------------------------------------------------
-    def usingRunIds(self, ids: list=[]):
-        """For users who which to pass in their own Run Ids, call this method by passning 
+    def usingRunIds(self, ids: list = None):
+        """For users who which to pass in their own Run Ids, call this method by passing
         in a list of run ids separated by comma. e.g. [6279, 6280]
         Args:
             ids: `list, optional`: Filter by specific runids by passing in a list of one or more.
@@ -607,14 +366,14 @@ class Paletable:
         Example:
             >>> api.usingRunIds([6279, 6280])
         """
-        self.palet.logger.debug("using RunIds: " + str(list))
-        if len(ids) > 0:
+        self.palet.logger.debug("using RunIds: " + str(ids))
+        if ids is not None:
             self._user_runids = ids
         else:
             self._user_runids = []
 
         return
-    
+
     def displayCurrentRunIds(self):
         """If you'd like to get a display of the current run ids set in the query then you can call this function
            or check the full sql statement by :func:sql()
@@ -786,7 +545,7 @@ class Paletable:
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
 
-        Note: The :class:`Coverage` class is automatically imported when this by group is called. 
+        Note: The :class:`Coverage` class is automatically imported when this by group is called.
         """
 
         from palet.Coverage import Coverage
@@ -816,7 +575,7 @@ class Paletable:
         from palet.Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
-        
+
         if type is not None:
             self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
@@ -828,8 +587,8 @@ class Paletable:
     #
     # ---------------------------------------------------------------------------------
     def byMedicaidOnly(self, state_fips=None):
-        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects 
-        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this 
+        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects
+        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this
         will add it as the next by group.
 
         Args:
@@ -1009,15 +768,15 @@ class Paletable:
         """
         from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
-        from pyspark.sql.types import StructType, StructField, StringType, DecimalType, IntegerType, LongType, DoubleType
+        from pyspark.sql.types import StringType
 
         self.palet.logger.debug('Fetching data - \n' + self.sql())
 
         sparkDF = session.sql(self.sql())
 
-        #if len(sparkDF.head(1)) == 0:
+        # if len(sparkDF.head(1)) == 0:
         #    print('Empty DataFrame')
-                      
+
         if (sparkDF is not None):
 
             if PaletMetadata.Enrollment.raceEthnicity.race in sparkDF.columns:
@@ -1047,42 +806,44 @@ class Paletable:
 
         df = sparkDF.toPandas()
 
-        if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.race] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.race].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.raceEthnicity.race].fillna('-1', inplace=True)
+        if df.empty is False:
 
-        if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].fillna('-1', inplace=True)
+            if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
+                df[PaletMetadata.Enrollment.raceEthnicity.race] \
+                    = df[PaletMetadata.Enrollment.raceEthnicity.race].astype(pd.StringDtype())
+                df[PaletMetadata.Enrollment.raceEthnicity.race].fillna('-1', inplace=True)
 
-        if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
-            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
-                = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
+            if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in df.columns:
+                df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded] \
+                    = df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].astype(pd.StringDtype())
+                df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].fillna('-1', inplace=True)
 
-        if PaletMetadata.Enrollment.identity.income in df.columns:
-            df[PaletMetadata.Enrollment.identity.income] \
-                = df[PaletMetadata.Enrollment.identity.income].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.identity.income].fillna('-1', inplace=True)
+            if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
+                df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
+                    = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
+                df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
 
-        if PaletMetadata.Enrollment.identity.ageGroup in df.columns:
-            df[PaletMetadata.Enrollment.identity.ageGroup] \
-                = df[PaletMetadata.Enrollment.identity.ageGroup].astype(pd.StringDtype())
-            df[PaletMetadata.Enrollment.identity.ageGroup].fillna('-1', inplace=True)
+            if PaletMetadata.Enrollment.identity.income in df.columns:
+                df[PaletMetadata.Enrollment.identity.income] \
+                    = df[PaletMetadata.Enrollment.identity.income].astype(pd.StringDtype())
+                df[PaletMetadata.Enrollment.identity.income].fillna('-1', inplace=True)
 
+            if PaletMetadata.Enrollment.identity.ageGroup in df.columns:
+                df[PaletMetadata.Enrollment.identity.ageGroup] \
+                    = df[PaletMetadata.Enrollment.identity.ageGroup].astype(pd.StringDtype())
+                df[PaletMetadata.Enrollment.identity.ageGroup].fillna('-1', inplace=True)
 
-        # perform data enrichments & post
-        if (sparkDF is not None):
-            self.palet.logger.debug('Beginning call to run post-processes')
-            for column in PaletMetadata.Enrichment.defined_columns:
-                if column in df.columns:
-                    self.palet.logger.debug("Calling post-process " + column)
-                    col = eval(PaletMetadata.Enrichment.defined_columns[column])
-                    df = col(df)
-
-
+            # perform data enrichments & post
+            if (sparkDF is not None):
+                self.palet.logger.debug('Beginning call to run post-processes')
+                for column in PaletMetadata.Enrichment.defined_columns:
+                    if column in df.columns:
+                        self.palet.logger.debug("Calling post-process " + column)
+                        col = PaletMetadata.Enrichment.defined_columns[column]
+                        df = col(df)
+            return df
+        else:
+            return print('No results')
 
         # for pp in self.postprocesses:
         #     df = pp(df)
@@ -1093,8 +854,6 @@ class Paletable:
 
         # if 'age_band' in df.columns:
         #     df = df.loc[df['age_band'] != 'not found']
-
-        return df
 
     # ---------------------------------------------------------------------------------
     #

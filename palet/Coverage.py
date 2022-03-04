@@ -1,8 +1,8 @@
 """
 The Coverage module contains the Coverage class. This class is called when an analyst uses the .byCoverageType()
 by group. It expands the query being run by the existing object so that filters are applied for various kinds fo coverage.
-For example, when this class is utilized along wit enrollment or eligibility, one can view the enrollment counts or 
-eligibilty counts for each different kind of coverage type.  
+For example, when this class is utilized along wit enrollment or eligibility, one can view the enrollment counts or
+eligibilty counts for each different kind of coverage type.
 """
 
 from palet.Paletable import Paletable
@@ -12,7 +12,7 @@ class Coverage(Paletable):
     """
     Class called when an analyst uses the .byCoverageType by group. This can be used to manipulate the query is running
     to break out counts by the specific coverage types. This class is combined with other Paletable objects like enrollment
-    eligibility. 
+    eligibility.
 
     Note:
         The Coverage class does not need to be specifically imported from its respective module. The Coverage class is imported by
@@ -36,7 +36,7 @@ class Coverage(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Coverage API
     # -----------------------------------------------------------------------
-    def __init__(self, paletable: Paletable = None):
+    def __init__(self, runIds: list = None, paletable: Paletable = None):
         # print('Initializing Enrollment API')
         super().__init__()
 
@@ -44,8 +44,8 @@ class Coverage(Paletable):
             self.by_group = paletable.by_group
             self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
-            self._user_runids = paletable._user_runids
 
+        self._user_runids = paletable._user_runids
         self.palet.logger.debug('Initializing Coverage API')
 
     # ---------------------------------------------------------------------------------

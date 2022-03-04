@@ -6,7 +6,6 @@ the Enrollment module inherits from the Paletable module.
 """
 
 import pandas as pd
-from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
@@ -72,16 +71,16 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, paletable: Paletable = None):
+    def __init__(self, runIds: list = None, paletable: Paletable = None):
         # print('Initializing Enrollment API')
-        super().__init__()
+        super().__init__(runIds)
 
         if (paletable is not None):
             self.by_group = paletable.by_group
             self.derived_by_group = paletable.derived_by_group
             self.filter = paletable.filter
-            self._user_runids = paletable._user_runids
 
+        self._user_runids = runIds
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
