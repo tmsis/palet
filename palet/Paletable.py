@@ -1077,7 +1077,6 @@ class Paletable:
         if (sparkDF is not None):
             self.palet.logger.debug('Beginning call to run post-processes')
             for column in PaletMetadata.Enrichment.defined_columns:
-                print(column)
                 if column in df.columns:
                     self.palet.logger.debug("Calling post-process " + column)
                     col = eval(PaletMetadata.Enrichment.defined_columns[column])
