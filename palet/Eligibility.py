@@ -227,7 +227,7 @@ class Eligibility(Paletable):
                     from
                         palet_mart.aggregate_eligibility_vs_enrollment
                     where
-                        a.da_run_id in ( {self._getRunIds()} )
+                        da_run_id in ( {self._getRunIds()} )
                     group by
                         submtg_state_cd,
                         de_fil_dt,
