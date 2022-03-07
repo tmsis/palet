@@ -705,9 +705,17 @@ class PaletMetadata:
             column1 = kwargs[0]
             df[column1] = df.apply(lambda x: self._findValueName_(x), axis=1)
 
-        def _removeIsFirst():
-            return
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        # ----------------------------------------------------------------------------------
+        def _removeIsFirst(self, df: pd.DataFrame):
+            df = df.drop(columns=['isfirst'])
+            return df
 
+        # add to this list of columns if you have a field that must define a label value
+        # from a coded column
         defined_columns = {
             'isfirst': _removeIsFirst,
             'age_grp_flag': _buildAgeGroupColumn,

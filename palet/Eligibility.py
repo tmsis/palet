@@ -42,8 +42,19 @@ class Eligibility(Paletable, list):
 
         >>> display(api.byMonth().byState().fetch())
 
+        User defined run ids:
+
+        >>> api = Enrollment([6278, 6280])
+
+        Specifying run ids and switching context
+
+        >>> api = Coverage([6278, 6280], Enrollment()) or
+
+        >>> api = Coverage([], Enrollment())
+
     Args:
-        Paletable: No input required, defaults to none
+        list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
+        Paletable: No input required, defaults to None.
 
     Returns:
         Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
@@ -216,7 +227,6 @@ class Eligibility(Paletable, list):
 
         if self.isNotEnrolled is True:
             z = f"""select
-                        da_run_id
                         SUBMTG_STATE_CD,
                         de_fil_dt,
                         month,
@@ -243,6 +253,7 @@ class Eligibility(Paletable, list):
             z = f"""
                 select
                     {self._getByGroupWithAlias()}
+                    a.da_run_id,
                     a.de_fil_dt,
                     a.month,
                     a.elgblty_grp_cd,
@@ -255,6 +266,7 @@ class Eligibility(Paletable, list):
                     a.da_run_id in ( {self._getRunIds()} )
                 group by
                     {self._getByGroupWithAlias()}
+                    a.da_run_id,
                     a.de_fil_dt,
                     a.month,
                     a.elgblty_grp_cd

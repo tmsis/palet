@@ -31,6 +31,20 @@ class Coverage(Paletable):
 
         >>> display(api.fetch())
 
+        User defined run ids:
+
+        >>> api = Enrollment([6278, 6280])
+
+        Specifying run ids and switching context
+
+        >>> api = Coverage([6278, 6280], Enrollment()) or
+
+        >>> api = Coverage([], Enrollment())
+
+    Args:
+        list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
+        Paletable: No input required, defaults to None.
+
     """
 
     # -----------------------------------------------------------------------

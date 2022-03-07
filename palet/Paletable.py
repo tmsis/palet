@@ -808,30 +808,9 @@ class Paletable():
 
         if df.empty is False:
 
-            if PaletMetadata.Enrollment.raceEthnicity.race in df.columns:
-                df[PaletMetadata.Enrollment.raceEthnicity.race] \
-                    = df[PaletMetadata.Enrollment.raceEthnicity.race].astype(pd.StringDtype())
-                df[PaletMetadata.Enrollment.raceEthnicity.race].fillna('-1', inplace=True)
-
-            if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in df.columns:
-                df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded] \
-                    = df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].astype(pd.StringDtype())
-                df[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].fillna('-1', inplace=True)
-
-            if PaletMetadata.Enrollment.raceEthnicity.ethnicity in df.columns:
-                df[PaletMetadata.Enrollment.raceEthnicity.ethnicity] \
-                    = df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].astype(pd.StringDtype())
-                df[PaletMetadata.Enrollment.raceEthnicity.ethnicity].fillna('-1', inplace=True)
-
-            if PaletMetadata.Enrollment.identity.income in df.columns:
-                df[PaletMetadata.Enrollment.identity.income] \
-                    = df[PaletMetadata.Enrollment.identity.income].astype(pd.StringDtype())
-                df[PaletMetadata.Enrollment.identity.income].fillna('-1', inplace=True)
-
-            if PaletMetadata.Enrollment.identity.ageGroup in df.columns:
-                df[PaletMetadata.Enrollment.identity.ageGroup] \
-                    = df[PaletMetadata.Enrollment.identity.ageGroup].astype(pd.StringDtype())
-                df[PaletMetadata.Enrollment.identity.ageGroup].fillna('-1', inplace=True)
+            for column in self.by_group:
+                df[column] = df[column].astype(pd.StringDtype())
+                df[column].fillna('-1', inplace=True)
 
             # perform data enrichments & post
             if (sparkDF is not None):
@@ -841,16 +820,12 @@ class Paletable():
                         self.palet.logger.debug("Calling post-process " + column)
                         col = PaletMetadata.Enrichment.defined_columns[column]
                         df = col(df)
+
+                for pp in self.postprocesses:
+                    df = pp(df)
             return df
         else:
             return print('No results')
-
-        # for pp in self.postprocesses:
-        #     df = pp(df)
-
-        # self.palet.logger.debug('if isfirst exists then drop the column')
-        # if 'isfirst' in df.columns:
-        #     df = df.drop(columns=['isfirst'])
 
         # if 'age_band' in df.columns:
         #     df = df.loc[df['age_band'] != 'not found']
