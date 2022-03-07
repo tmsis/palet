@@ -41,14 +41,14 @@ class Enrollment(Paletable):
         >>> display(api.byMonth().byState().fetch())
 
         User defined run ids:
-    
+
         >>> api = Enrollment([6278, 6280])
 
         Specifying run ids and switching context
 
-        >>> api = Coverage([6278, 6280], Enrollment()) or
+        >>> api = Coverage([6278, 6280], api) or
 
-        >>> api = Coverage([], Enrollment())
+        >>> api = Coverage([], api)
 
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
