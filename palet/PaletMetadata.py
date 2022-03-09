@@ -481,7 +481,9 @@ class PaletMetadata:
                 'ethncty_cd': PaletMetadata.Enrichment._buildEthnicityColumn,
                 'enrl_type_flag': PaletMetadata.Enrichment._buildEnrollmentType,
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
-                'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn
+                'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
+                'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound
+
             }
 
             return self.defined_columns
@@ -681,9 +683,37 @@ class PaletMetadata:
         # ---------------------------------------------------------------------------------
         def _buildAgeGroupColumn(df: pd.DataFrame):
             df['ageGroup'] = df.apply(lambda x: PaletMetadata.Enrichment._findAgeGroupValueName(x), axis=1)
+
+            return df
+
+        def _removeAgeBandNotFound(df: pd.DataFrame):
             df = df.loc[df['age_band'] != 'not found']
 
             return df
+
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+
+        def _renderAgeRange(self):
+            if self.age_band is not None:
+                ageBandWhere = []
+
+                ageBandWhere.append(', case')
+
+                for i in self.age_band.keys():
+                    a = self.age_band[i]
+                    ab = f"when age_num >= {a[0]} and age_num <= {a[1]} then '{i}'"
+                    ageBandWhere.append(ab)
+
+                ageBandWhere.append("else 'not found' end as age_band")
+
+                return ' '.join(ageBandWhere)
+
+            else:
+                return ''
 
         # --------------------------------------------------------------------------------
         #

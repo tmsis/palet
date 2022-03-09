@@ -245,6 +245,7 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def sql(self):
+        from palet.PaletMetadata import PaletMetadata
         """The SQL query that the Enrollment class uses to pull dataframes.
 
         This can be called allowing an analyst to view the SQL the Enrollment is using.
@@ -277,7 +278,7 @@ class Enrollment(Paletable):
                 {self._getByGroupWithAlias()}
                 a.de_fil_dt,
                 {self._getTimeUnitBreakdown()}
-                {self._renderAgeRange()}
+                {PaletMetadata.Enrichment._renderAgeRange(self)}
                 {self._stackChipCode()}
             from
                 taf.taf_ann_de_base as a
