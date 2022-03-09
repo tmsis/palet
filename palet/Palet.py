@@ -132,6 +132,7 @@ class Palet():
     def initialize_logger(self, now: datetime):
         """Attribute that initializes the logger within the Palet class.
         Prints a datetime so it is clear to the user when the code was executed.
+        Logging contains multiple levels: INFO, DEBUG, WARNING,ERROR and TRACE.
 
         Args:
             now: `datetime, optional`: Filter a date and time. Can be set but shouldn't. Defaults to when a log line is written.

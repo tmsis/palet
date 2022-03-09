@@ -93,6 +93,7 @@ class Eligibility(Paletable, list):
             self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
             self.isNotEnrolled = False
+            self.defined_columns = paletable.defined_columns
 
         self._user_runids = paletable._user_runids
         self.palet.logger.debug('Initializing Eligibility API')

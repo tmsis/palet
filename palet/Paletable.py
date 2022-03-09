@@ -9,6 +9,7 @@ import pandas as pd
 
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
+from palet.Enrichment import Enrichment
 
 
 class Paletable():
@@ -56,12 +57,13 @@ class Paletable():
         self.preprocesses = []
         self.postprocesses = []
         self._user_runids = runIds
+        self.defined_columns = Enrichment.getDefinedColumns(self)
 
         self.palet = Palet('201801')
 
         if runIds is not None:
             self._user_runids = self.usingRunIds(runIds)
-        self._runids = self.palet.cache_run_ids()
+        # self._runids = self.palet.cache_run_ids()
 
         self.palet.logger.debug('Initializing Paletable super class')
 
@@ -779,30 +781,8 @@ class Paletable():
 
         if (sparkDF is not None):
 
-            if PaletMetadata.Enrollment.raceEthnicity.race in sparkDF.columns:
-                sparkDF = sparkDF.withColumn(
-                    PaletMetadata.Enrollment.raceEthnicity.race,
-                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.race].cast(StringType()))
-
-            if PaletMetadata.Enrollment.raceEthnicity.raceExpanded in sparkDF.columns:
-                sparkDF = sparkDF.withColumn(
-                    PaletMetadata.Enrollment.raceEthnicity.raceExpanded,
-                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.raceExpanded].cast(StringType()))
-
-            if PaletMetadata.Enrollment.raceEthnicity.ethnicity in sparkDF.columns:
-                sparkDF = sparkDF.withColumn(
-                    PaletMetadata.Enrollment.raceEthnicity.ethnicity,
-                    sparkDF[PaletMetadata.Enrollment.raceEthnicity.ethnicity].cast(StringType()))
-
-            if PaletMetadata.Enrollment.identity.income in sparkDF.columns:
-                sparkDF = sparkDF.withColumn(
-                    PaletMetadata.Enrollment.identity.income,
-                    sparkDF[PaletMetadata.Enrollment.identity.income].cast(StringType()))
-
-            if PaletMetadata.Enrollment.identity.ageGroup in sparkDF.columns:
-                sparkDF = sparkDF.withColumn(
-                    PaletMetadata.Enrollment.identity.ageGroup,
-                    sparkDF[PaletMetadata.Enrollment.identity.ageGroup].cast(StringType()))
+            for column in self.by_group:
+                sparkDF = sparkDF.withColumn(column, sparkDF[column].cast(StringType()))
 
         df = sparkDF.toPandas()
 
@@ -815,14 +795,12 @@ class Paletable():
             # perform data enrichments & post
             if (sparkDF is not None):
                 self.palet.logger.debug('Beginning call to run post-processes')
-                for column in PaletMetadata.Enrichment.defined_columns:
+                for column in self.defined_columns:
                     if column in df.columns:
                         self.palet.logger.debug("Calling post-process " + column)
-                        col = PaletMetadata.Enrichment.defined_columns[column]
+                        col = self.defined_columns[column]
                         df = col(df)
 
-                for pp in self.postprocesses:
-                    df = pp(df)
             return df
         else:
             return print('No results')
@@ -837,8 +815,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def log(self, viewname: str, sql=''):
         """
-        This attribute enhances logging. Logging contains multiple levels: INFO, DEBUG, WARNING,
-        ERROR and TRACE.
+        This attribute allows you to print out the sql of a specific view within databricks or a database
         """
         self.palet.logger.debug('\t' + viewname)
         if sql != '':
