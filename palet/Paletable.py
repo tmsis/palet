@@ -57,7 +57,7 @@ class Paletable():
         self.preprocesses = []
         self.postprocesses = []
         self._user_runids = runIds
-        self.defined_columns = Enrichment.getDefinedColumns(self)
+        self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
         self.palet = Palet('201801')
 

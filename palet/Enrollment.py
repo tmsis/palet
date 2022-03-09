@@ -90,6 +90,7 @@ class Enrollment(Paletable):
             self.by_group = paletable.by_group
             self.derived_by_group = paletable.derived_by_group
             self.filter = paletable.filter
+            self.defined_columns = paletable.defined_columns
 
         self._user_runids = runIds
         self.palet.logger.debug('Initializing Enrollment API')
