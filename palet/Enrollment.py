@@ -46,9 +46,15 @@ class Enrollment(Paletable):
 
         Specifying run ids and switching context
 
+        or
+
+        switching context by Parameter naming
+
         >>> api = Coverage([6278, 6280], api) or
 
         >>> api = Coverage([], api)
+
+        >>> api = Coverage(paletable=api)
 
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
@@ -91,6 +97,7 @@ class Enrollment(Paletable):
             self.derived_by_group = paletable.derived_by_group
             self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
+            self._runids = paletable._runids
 
         self._user_runids = runIds
         self.palet.logger.debug('Initializing Enrollment API')

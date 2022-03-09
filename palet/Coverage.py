@@ -41,6 +41,8 @@ class Coverage(Paletable):
 
         >>> api = Coverage([], api)
 
+        >>> api = Coverage(paletable=api)
+
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
         Paletable: No input required, defaults to None.
@@ -59,6 +61,7 @@ class Coverage(Paletable):
             self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
             self.defined_columns = paletable.defined_columns
+            self._runids = paletable._runids
 
         self._user_runids = paletable._user_runids
         self.palet.logger.debug('Initializing Coverage API')

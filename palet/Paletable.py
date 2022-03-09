@@ -62,8 +62,8 @@ class Paletable():
 
         if runIds is not None:
             self._user_runids = self.usingRunIds(runIds)
-        # self._runids = self.palet.cache_run_ids()
 
+        self._runids = self.palet.cache_run_ids()
         self.palet.logger.debug('Initializing Paletable super class')
 
     # ---------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class Paletable():
     #  Determine if there are any user defined run Ids and use them instead.
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
-        if self._user_runids is not None:
+        if self._user_runids is not None and len(self._user_runids) > 0:
             return ','.join(map(str, self._user_runids))
         else:
             return ','.join(map(str, self._runids))
@@ -371,7 +371,7 @@ class Paletable():
         if ids is not None:
             self._user_runids = ids
         else:
-            self._user_runids = []
+            self._user_runids = None
 
         return
 
@@ -803,9 +803,6 @@ class Paletable():
             return df
         else:
             return print('No results')
-
-        # if 'age_band' in df.columns:
-        #     df = df.loc[df['age_band'] != 'not found']
 
     # ---------------------------------------------------------------------------------
     #

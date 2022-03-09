@@ -681,6 +681,7 @@ class PaletMetadata:
         # ---------------------------------------------------------------------------------
         def _buildAgeGroupColumn(df: pd.DataFrame):
             df['ageGroup'] = df.apply(lambda x: PaletMetadata.Enrichment._findAgeGroupValueName(x), axis=1)
+            df = df.loc[df['age_band'] != 'not found']
 
             return df
 

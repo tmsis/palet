@@ -48,9 +48,15 @@ class Eligibility(Paletable, list):
 
         Specifying run ids and switching context
 
+        or
+
+        Switching context by parameter naming
+
         >>> api = Coverage([6278, 6280], api) or
 
         >>> api = Coverage([], api)
+
+        >>> api = Coverage(paletable=api)
 
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
@@ -94,6 +100,7 @@ class Eligibility(Paletable, list):
             self.derived_by_group = paletable.derived_by_group
             self.isNotEnrolled = False
             self.defined_columns = paletable.defined_columns
+            self._runids = paletable._runids
 
         self._user_runids = paletable._user_runids
         self.palet.logger.debug('Initializing Eligibility API')
@@ -283,7 +290,7 @@ class Eligibility(Paletable, list):
 
         # compress rows from elibigility type
         if self.isNotEnrolled is True:
-            self._addPostProcess(self._buildEligibilityType)
+            self._addPostProcess(PaletMetadata.Enrichment._buildEligibilityType)
 
         return z
 
