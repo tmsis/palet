@@ -4,4 +4,4 @@ databricks --profile val fs cp ./palet/PaletMetadata.py dbfs:/FileStore/shared_u
 databricks --profile val fs cp ./palet/Eligibility.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
 databricks --profile val fs cp ./palet/Paletable.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite  
 databricks --profile val fs cp ./palet/Coverage.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
-databricks --profile val fs cp ./palet/Paletable.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
+databricks --profile val fs cp ./palet/Palet.py dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
