@@ -108,6 +108,10 @@ class Enrollment(Paletable):
         refers to beneficiaries who are enrolled at least one day in a given year. When looking at enrollment by
         month, enrollment refers to beneficiaries who are enrolled at least one day in a given month.
 
+        Breakdown - Provides the sum of all beneficiaries enrolled within the time period or periods specified. 
+
+        Cull - Provides the individual beneficiaries enrolled within the time period or periods specified.
+
         Note:
             This class affects both Medicaid & CHIP Enrollment.
         """
