@@ -9,7 +9,6 @@ import pandas as pd
 
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
-from palet.Enrichment import Enrichment
 
 
 class Paletable():
