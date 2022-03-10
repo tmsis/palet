@@ -5,8 +5,8 @@ uses the pandas library and elements of the pyspark library. Note the Paletable 
 the Enrollment module inherits from the Paletable module.
 """
 
-import pandas as pd
 from palet.Paletable import Paletable
+import pandas as pd
 
 
 class Enrollment(Paletable):
@@ -115,7 +115,7 @@ class Enrollment(Paletable):
         refers to beneficiaries who are enrolled at least one day in a given year. When looking at enrollment by
         month, enrollment refers to beneficiaries who are enrolled at least one day in a given month.
 
-        Breakdown - Provides the sum of all beneficiaries enrolled within the time period or periods specified. 
+        Breakdown - Provides the sum of all beneficiaries enrolled within the time period or periods specified.
 
         Cull - Provides the individual beneficiaries enrolled within the time period or periods specified.
 
@@ -176,6 +176,22 @@ class Enrollment(Paletable):
         }
 
     # ---------------------------------------------------------------------------------
+    # _getTimeunitBreakdown
+    # Tis function is used to dynamically generate the SQL statement by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getTimeUnitBreakdown(self):
+        return Enrollment.timeunit.breakdown[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
+    # _getByTimeunitCull
+    # Tis function is used to dynamically generate the SQL where clause by returning the
+    # selected timeunit. e.g. byMonth() or byYear()
+    # ---------------------------------------------------------------------------------
+    def _getByTimeunitCull(self):
+        return Enrollment.timeunit.cull[self.timeunit]
+
+    # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
     # to calculate the % change columns. Each Paletable class should override this
     # and create it's own logic.
@@ -220,22 +236,6 @@ class Enrollment(Paletable):
             self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
         return df
-
-    # ---------------------------------------------------------------------------------
-    # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getTimeUnitBreakdown(self):
-        return Enrollment.timeunit.breakdown[self.timeunit]
-
-    # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Enrollment.timeunit.cull[self.timeunit]
 
     # ---------------------------------------------------------------------------------
     #
@@ -297,7 +297,6 @@ class Enrollment(Paletable):
          """
 
         self._addPostProcess(self._percentChange)
-        self._addPostProcess(self._decorate)
 
         return z
 

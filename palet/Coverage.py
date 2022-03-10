@@ -54,7 +54,7 @@ class Coverage(Paletable):
     # -----------------------------------------------------------------------
     def __init__(self, runIds: list = None, paletable: Paletable = None):
         # print('Initializing Enrollment API')
-        super().__init__()
+        super().__init__(runIds)
 
         if (paletable is not None):
             self.by_group = paletable.by_group
@@ -132,57 +132,6 @@ class Coverage(Paletable):
         # self._addPostProcess(self._decorate)
 
         return z
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def fetch(self):
-        """Call this method at the end of an object when you are ready for results.
-
-        This can be leveraged with display() to quickly pivot results.
-
-        Args:
-            None: No input required
-
-        Returns:
-            Spark Datarame: Executes your query and returns a Spark Datarame.
-
-        Example:
-            Create object for enrollment by state and year
-
-            >>> api = Enrollment().byState()
-
-            Return Spark DataFrame:
-
-            >>> api.fetch
-
-            Lever display() to pivot from yearly to monthly
-
-            >>> display(api.byMonth().fetch())
-        """
-
-        from pyspark.sql import SparkSession
-
-        session = SparkSession.getActiveSession()
-        # self.palet.logger.debug('Fetching data - \n' + self.sql())
-
-        # post-processing callbacks
-        for pp in self.preprocesses:
-            pp()
-
-        # raw results
-        sparkDF = session.sql(self.sql())
-        df = sparkDF.toPandas()
-
-        # post-processing callbacks
-        for pp in self.postprocesses:
-            df = pp(df)
-
-        # df = df.drop(columns=['isfirst'])
-
-        return df
 
     # ---------------------------------------------------------------------------------
     #

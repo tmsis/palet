@@ -247,30 +247,6 @@ class Paletable():
     #
     #
     #
-    #
-    # ---------------------------------------------------------------------------------
-    def _decorate(self, df):
-        self.palet.logger.debug('Decorate')
-
-        # for submitting state
-        if PaletMetadata.Enrollment.locale.submittingState in self.by_group:
-            df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-            df = pd.merge(df, self.palet.st_name,
-                          how='inner',
-                          left_on=['USPS'],
-                          right_on=['USPS'])
-            df = pd.merge(df, self.palet.st_usps,
-                          how='inner',
-                          left_on=['USPS'],
-                          right_on=['USPS'])
-            df = df.drop(['USPS'], axis=1)
-
-        return df
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
         """Filter your query by Age Range. Most top level objects inherit this
@@ -775,6 +751,11 @@ class Paletable():
                         self.palet.logger.debug("Calling post-process " + column)
                         col = self.defined_columns[column]
                         df = col(df)
+
+                # perform data enrichments
+                self.palet.logger.debug('Beginning call to run post-processes')
+                for pp in self.postprocesses:
+                    df = pp(df)
 
             return df
         else:
