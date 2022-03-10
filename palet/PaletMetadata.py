@@ -465,7 +465,6 @@ class PaletMetadata:
 
     class Enrichment():
 
-        from palet.Palet import Palet
         import pandas as pd
 
         def __init__(self) -> None:
@@ -483,7 +482,6 @@ class PaletMetadata:
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound
-
             }
 
             return self.defined_columns

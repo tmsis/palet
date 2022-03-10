@@ -4,13 +4,12 @@ to apply specific filters. Doing so, analysts can view eligibility by state, inc
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
-
 import pandas as pd
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 
 
-class Eligibility(Paletable, list):
+class Eligibility(Paletable):
     """
     The class within the PALET library for viewing eligibility. This class is used to view eligibility for Medicaid and CHIP.
     Attributes inherited from the Paletable class can be used to apply and_filters for beneficiary age, ehtnicity, gender, state, income, etc.
@@ -91,64 +90,19 @@ class Eligibility(Paletable, list):
     # Initialize the Eligibility API
     # -----------------------------------------------------------------------
     def __init__(self, runIds: list = None, paletable: Paletable = None):
-        # print('Initializing Eligibility API')
-        super().__init__()
+        # print('Initializing Enrollment API')
+        super().__init__(runIds)
 
         if (paletable is not None):
             self.by_group = paletable.by_group
-            self.filter = paletable.filter
             self.derived_by_group = paletable.derived_by_group
-            self.isNotEnrolled = False
+            self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
             self._runids = paletable._runids
 
-        self._user_runids = paletable._user_runids
+        self.isNotEnrolled = False
+        self._user_runids = runIds
         self.palet.logger.debug('Initializing Eligibility API')
-
-    # ---------------------------------------------------------------------------------
-    #
-    #  _percentChange protected/private method that is called by each fetch() call
-    #  to calculate the % change columns. Each Paletable class should override this
-    #  and create it's own logic.
-    #
-    # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: pd.DataFrame):
-        self.palet.logger.debug('Percent Change')
-
-        df['year'] = df['de_fil_dt']
-
-        if self.timeunit == 'month':
-
-            # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_eligible', 1, False)
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
-
-            # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-
-        elif self.timeunit == 'year':
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_eligible', 1, False)
-
-        return df
 
     # ---------------------------------------------------------------------------------
     # notEnrolled
@@ -200,6 +154,50 @@ class Eligibility(Paletable, list):
         self.palet.logger.info('resetting to eligible enrolled called')
         self.isNotEnrolled = False
         return self
+
+    # ---------------------------------------------------------------------------------
+    #  _percentChange protected/private method that is called by each fetch() call
+    #  to calculate the % change columns. Each Paletable class should override this
+    #  and create it's own logic.
+    #
+    # ---------------------------------------------------------------------------------
+    def _percentChange(self, df: pd.DataFrame):
+        self.palet.logger.debug('Percent Change')
+
+        df['year'] = df['de_fil_dt']
+
+        if self.timeunit == 'month':
+
+            # Month-over-Month
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrlmt', 1, False)
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrlmt', 1, False)
+
+            # Re-sort Chronologically
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+
+        elif self.timeunit == 'year':
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrlmt', 1, False)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #
@@ -285,8 +283,7 @@ class Eligibility(Paletable, list):
                     a.elgblty_grp_cd
             """
 
-        # self._addPostProcess(self._percentChange)
-        self._addPostProcess(self._decorate)
+        self._addPostProcess(self._percentChange)
 
         # compress rows from elibigility type
         if self.isNotEnrolled is True:
