@@ -298,30 +298,7 @@ class Paletable():
 
         return self
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-
-    def _renderAgeRange(self):
-        if self.age_band is not None:
-            ageBandWhere = []
-
-            ageBandWhere.append(', case')
-
-            for i in self.age_band.keys():
-                a = self.age_band[i]
-                ab = f"when age_num >= {a[0]} and age_num <= {a[1]} then '{i}'"
-                ageBandWhere.append(ab)
-
-            ageBandWhere.append("else 'not found' end as age_band")
-
-            return ' '.join(ageBandWhere)
-
-        else:
-            return ''
-
+    
     # ----------------------------------------------------------
     #
     # _stackChipCode
