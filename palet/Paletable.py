@@ -298,7 +298,6 @@ class Paletable():
 
         return self
 
-    
     # ----------------------------------------------------------
     #
     # _stackChipCode
