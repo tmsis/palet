@@ -255,8 +255,9 @@ class Paletable():
             next by group.
 
         Args:
-            age_range: `str, optional`: Filter a single age, range such as
-            18-21, or an inclusive number such as 65+. Defaults to None.
+            age_range: `dict, optional`: Filter a single age, range such as {'Minor': [0,17]}
+            Or two or more age ranges such as {'Minor': [0,17],'Young Adult': [18,25]}
+            Defaults to pre-existing age ranges in age_grp_code
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
