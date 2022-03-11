@@ -36,7 +36,7 @@ class Palet():
         self.now = datetime.now()
         self.initialize_logger(self.now)
 
-        self.version = '1.2.20220130'
+        self.version = '1.5.20220311'
 
         self.report_month = datetime.strptime(report_month, '%Y%m')
         # self.start_month = datetime.strptime(start_month, '%Y%m')
@@ -132,7 +132,7 @@ class Palet():
     def initialize_logger(self, now: datetime):
         """Attribute that initializes the logger within the Palet class.
         Prints a datetime so it is clear to the user when the code was executed.
-        Logging contains multiple levels: INFO, DEBUG, WARNING,ERROR and TRACE.
+        Logging contains multiple levels: INFO, DEBUG, WARNING, ERROR, CRITICAL, and FATAL.
 
         Args:
             now: `datetime, optional`: Filter a date and time. Can be set but shouldn't. Defaults to when a log line is written.

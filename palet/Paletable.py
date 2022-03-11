@@ -6,7 +6,6 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
-
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -66,6 +65,14 @@ class Paletable():
         self._runids = self.palet.cache_run_ids()
         self.palet.logger.debug('Initializing Paletable super class')
 
+    # ----
+    #
+    #
+    # ----
+    def setLoggingLevel(self, level: str):
+        self.palet.logger.setLevel(level)
+        return self
+
     # ---------------------------------------------------------------------------------
     #
     # _getRunIds
@@ -124,7 +131,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def _addDerivedByGroup(self, var):
         if var not in self.derived_by_group:
-            # self.palet.logger.debug(f'Adding By Group {var}')
+            self.palet.logger.debug(f'Adding By Group {var}')
             self.derived_by_group.append(var)
 
     # ---------------------------------------------------------------------------------
@@ -331,13 +338,13 @@ class Paletable():
     def displayCurrentRunIds(self):
         """If you'd like to get a display of the current run ids set in the query then you can call this function
            or check the full sql statement by :func:sql()
-        
+
         Args:
             None
 
         Returns:
             Prints the current list of run ids to the screen.
-            
+
         """
         print("Current RunIds: " + str(self._getRunIds()))
 
@@ -729,9 +736,6 @@ class Paletable():
         self.palet.logger.debug('Fetching data - \n' + self.sql())
 
         sparkDF = session.sql(self.sql())
-
-        # if len(sparkDF.head(1)) == 0:
-        #    print('Empty DataFrame')
 
         if (sparkDF is not None):
 
