@@ -466,9 +466,15 @@ class PaletMetadata:
     class Enrichment():
 
         import pandas as pd
-        import logging
         from datetime import datetime
         from palet.Palet import Palet
+
+        @staticmethod
+        def _getPaletObj():
+            enrichment = PaletMetadata.Enrichment()
+            d = enrichment.datetime.now()
+            palet = enrichment.Palet(d.strftime("%Y") + "" + d.strftime("%m"))
+            return palet
 
         def getDefinedColumns(self):
             self.defined_columns = {
@@ -493,8 +499,8 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _mergeStateEnrollments(df: pd.DataFrame):
-
-            # PaletMetadata.Enrichment.logger.debug('Merging separate state enrollments')
+            # PaletMetadata.Enrichment.Palet.logger.info('Merging separate state enrollments')
+            palet = PaletMetadata.Enrichment._getPaletObj()
 
             timeunit = 'month'
 
@@ -502,11 +508,11 @@ class PaletMetadata:
                 timeunit = 'year'
 
             df['USPS'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-            df = PaletMetadata.Enrichment.pd.merge(df, PaletMetadata.Enrichment.Palet.st_name,
+            df = PaletMetadata.Enrichment.pd.merge(df, palet.st_name,
                                                    how='inner',
                                                    left_on=['USPS'],
                                                    right_on=['USPS'])
-            df = PaletMetadata.Enrichment.pd.merge(df, PaletMetadata.Enrichment.Palet.st_usps,
+            df = PaletMetadata.Enrichment.pd.merge(df, palet.st_usps,
                                                    how='inner',
                                                    left_on=['USPS'],
                                                    right_on=['USPS'])
@@ -537,7 +543,7 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _buildRaceEthnicityColumn(df: pd.DataFrame):
-            PaletMetadata.Enrichment.Palet.logger.debug('build our columns by looking for race value')
+            # PaletMetadata.Enrichment.Palet.logger.debug('build our columns by looking for race value')
             df['race'] = df.apply(lambda x: PaletMetadata.Enrichment._findRaceValueName(x), axis=1)
 
             return df
@@ -632,7 +638,6 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _buildEligibilityType(df: pd.DataFrame):
-            print(df)
             # self.palet.logger.debug('build our columns by looking for eligibilty codes')
             df['eligibility_category'] = df.apply(lambda x: PaletMetadata.Enrichment._findEligibiltyType(x), axis=1)
             return df

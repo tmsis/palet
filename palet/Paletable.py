@@ -60,7 +60,8 @@ class Paletable():
         self.palet = Palet('201801')
 
         if runIds is not None:
-            self._user_runids = self.usingRunIds(runIds)
+            if not issubclass(type(runIds), Paletable):
+                self._user_runids = self.usingRunIds(runIds)
 
         self._runids = self.palet.cache_run_ids()
         self.palet.logger.debug('Initializing Paletable super class')
@@ -79,7 +80,7 @@ class Paletable():
     #  Determine if there are any user defined run Ids and use them instead.
     # ---------------------------------------------------------------------------------
     def _getRunIds(self):
-        if self._user_runids is not None and len(self._user_runids) > 0:
+        if self._user_runids is not None and not issubclass(type(self._user_runids), Paletable):
             return ','.join(map(str, self._user_runids))
         else:
             return ','.join(map(str, self._runids))
@@ -480,6 +481,7 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byState to the by Group')
+        self.timeunit = 'month'
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
@@ -543,7 +545,7 @@ class Paletable():
         if type is not None:
             self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
-        return Enrollment(self)
+        return Enrollment(self._user_runids, self)
 
     # ---------------------------------------------------------------------------------
     #
