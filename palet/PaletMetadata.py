@@ -470,11 +470,6 @@ class PaletMetadata:
         from datetime import datetime
         from palet.Palet import Palet
 
-        def __init__(self) -> None:
-            self.palet = PaletMetadata.Enrichment.Palet('201801')
-            self.palet.initialize_logger(self.datetime.now())
-            self.logger = self.logging.getLogger('palet_log')
-
         def getDefinedColumns(self):
             self.defined_columns = {
                 'age_grp_flag': PaletMetadata.Enrichment._buildAgeGroupColumn,
@@ -499,7 +494,7 @@ class PaletMetadata:
         # ---------------------------------------------------------------------------------
         def _mergeStateEnrollments(df: pd.DataFrame):
 
-            PaletMetadata.Enrichment.logger.debug('Merging separate state enrollments')
+            # PaletMetadata.Enrichment.logger.debug('Merging separate state enrollments')
 
             timeunit = 'month'
 
@@ -528,7 +523,7 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _findRaceValueName(x):
-            PaletMetadata.Enrichment.Palet.logger.debug('looking up the race_ethncty_flag value from our metadata')
+            # PaletMetadata.Enrichment.Palet.logger.debug('looking up the race_ethncty_flag value from our metadata')
             # import math
             # get this row's ref value from the column by name
             y = x['race_ethncty_flag']
