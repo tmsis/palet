@@ -120,7 +120,7 @@ class Palet():
                     fil_dt
             """
 
-        return ['6379']
+        return ['6279']
 
         spark = SparkSession.getActiveSession()
         pdf = spark.sql(z).toPandas()
