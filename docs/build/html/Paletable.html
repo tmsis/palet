@@ -45,8 +45,401 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="paletable">
-<h1>Paletable<a class="headerlink" href="#paletable" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-Paletable">
+<span id="paletable"></span><h1>Paletable<a class="headerlink" href="#module-Paletable" title="Permalink to this headline">¶</a></h1>
+<p>The Paletable module contains the Paletable class and its attributes. Said attributes can be combined with top
+level objects, such as enrollment, to filter data by a variety of meterics. These metrics include age range,
+ethnicity, file data, income bracket, gender and state. Paletable also contains fetch(), the attribute used to
+return datafranes created by high level objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="Paletable.Paletable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Paletable.</span></span><span class="sig-name descname"><span class="pre">Paletable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class containing attributes that can be combined with other classes from the PALET library. These
+attributes allow users to filter and return the dataframes created by high level objects.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Paletable class is inherited from high level objects such as enrollment, as such it does not need to be imported seperately.
+Once imported, the Article class is not called. Rather its attributes are called after a high level object.</p>
+</div>
+<p class="rubric">Example</p>
+<p>Import enrollment:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">palet.Enrollment</span> <span class="kn">import</span> <span class="n">Enrollment</span>
+</pre></div>
+</div>
+<p>Create dataframe:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">byState</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Return dataframe:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.setLoggingLevel">
+<span class="sig-name descname"><span class="pre">setLoggingLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.setLoggingLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byAgeRange">
+<span class="sig-name descname"><span class="pre">byAgeRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">age_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byAgeRange" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by Age Range. Most top level objects inherit this</dt><dd><p>function such as Enrollment, Trend, etc.
+If your object is already set by a by group this will add it as the
+next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>age_range</strong> – <cite>dict, optional</cite>: Filter a single age, range such as {‘Minor’: [0,17]}</p></li>
+<li><p><strong>{'Minor'</strong> (<em>Or two</em><em> or </em><em>more age ranges such as</em>) – [0,17],’Young Adult’: [18,25]}</p></li>
+<li><p><strong>age_grp_code</strong> (<em>Defaults to pre-existing age ranges in</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.usingRunIds">
+<span class="sig-name descname"><span class="pre">usingRunIds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.usingRunIds" title="Permalink to this definition">¶</a></dt>
+<dd><p>For users who which to pass in their own Run Ids, call this method by passing
+in a list of run ids separated by comma. e.g. [6279, 6280]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ids</strong> – <cite>list, optional</cite>: Filter by specific runids by passing in a list of one or more.</p></li>
+<li><p><strong>default</strong> (<em>Defaults to an Empty List</em><em> [</em><em>] </em><em>and will clear user defined run ids when called by</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>No return values</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span><span class="o">.</span><span class="n">usingRunIds</span><span class="p">([</span><span class="mi">6279</span><span class="p">,</span> <span class="mi">6280</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.displayCurrentRunIds">
+<span class="sig-name descname"><span class="pre">displayCurrentRunIds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.displayCurrentRunIds" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>If you’d like to get a display of the current run ids set in the query then you can call this function</dt><dd><p>or check the full sql statement by :func:sql()</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prints the current list of run ids to the screen.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byRaceEthnicity">
+<span class="sig-name descname"><span class="pre">byRaceEthnicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ethnicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byRaceEthnicity" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by Race. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ethnicity</strong> – <cite>str, optional</cite>: Filter a single ethnicity. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byRaceEthnicityExpanded">
+<span class="sig-name descname"><span class="pre">byRaceEthnicityExpanded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ethnicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byRaceEthnicityExpanded" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by Expanded Race. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ethnicity</strong> – <cite>str, optional</cite>: Filter a single expanded ethnicity group. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byEthnicity">
+<span class="sig-name descname"><span class="pre">byEthnicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ethnicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byEthnicity" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ethnicity</strong> – <cite>str, optional</cite>: Filter a single expanded ethnicity group. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byGender">
+<span class="sig-name descname"><span class="pre">byGender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byGender" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by Gender. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gender</strong> – <cite>str, optional</cite>: Filter by gender. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byState">
+<span class="sig-name descname"><span class="pre">byState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_cd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byState" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_fips</strong> – <cite>str, (optional)</cite>: Filter by State using FIPS code. See also <code class="xref py py-func docutils literal notranslate"><span class="pre">State.__init__()</span></code>. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byCoverageType">
+<span class="sig-name descname"><span class="pre">byCoverageType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byCoverageType" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type</strong> – <cite>str, (optional)</cite>: Filter by coverage type using coverage code. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+<p>Note: The <a class="reference internal" href="Coverage.html#module-Coverage" title="Coverage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coverage</span></code></a> class is automatically imported when this by group is called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byEnrollmentType">
+<span class="sig-name descname"><span class="pre">byEnrollmentType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byEnrollmentType" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type</strong> – <cite>str, (optional)</cite>: Filter by coverage type using enrollment type code. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byMedicaidOnly">
+<span class="sig-name descname"><span class="pre">byMedicaidOnly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_fips</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byMedicaidOnly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter your query to only include counts and percentage changes for Medicaid. Most top level objects
+inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this
+will add it as the next by group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_fips</strong> – <cite>str, (optional)</cite>: Filter by State using FIPS code. See also <code class="xref py py-func docutils literal notranslate"><span class="pre">State.__init__()</span></code>. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byIncomeBracket">
+<span class="sig-name descname"><span class="pre">byIncomeBracket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bracket</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byIncomeBracket" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.</dt><dd><p>If your object is already set by a by group this will add it as the next by group.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bracket</strong> (<cite>str, (optional)</cite>: Filter by income. Defaults to None.) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Spark DataFrame</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Enrollment</span><span class="o">.</span><span class="n">byIncomeBracket</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Trend</span><span class="o">.</span><span class="n">byIncomeBracket</span><span class="p">(</span><span class="s1">&#39;01-03&#39;</span><span class="p">)</span>
+<span class="go">or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Trend</span><span class="o">.</span><span class="n">byIncomeBracket</span><span class="p">(</span><span class="s1">&#39;02,03,05&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byYear">
+<span class="sig-name descname"><span class="pre">byYear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byYear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year</strong> – <cite>int, (optional)</cite>: Filter by year using the year in numerical format. Defaults to None.</p></li>
+<li><p><strong>count</strong> – <cite>int, (optional)</cite>: Specify the number of years before or after the year specified. Defaults to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.byMonth">
+<span class="sig-name descname"><span class="pre">byMonth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.byMonth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>month</strong> – <cite>int, (optional)</cite>: Filter by month using the month in numerical format. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>: returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.sql">
+<span class="sig-name descname"><span class="pre">sql</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>The SQL query that the Enrollment class uses to pull dataframes.</p>
+<p>This can be called allowing an analyst to view the SQL the Enrollment is using.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – No input required.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a text string containing the SQL query run by the Enrollment class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Create object containing the SQL query:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">byState</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Return the query as text:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">byState</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.fetch">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call this method at the end of an object when you are ready for results.</p>
+<p>This can be leveraged with display() to quickly pivot results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – No input required</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Executes your query and returns a Spark Datarame.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark Datarame</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Create object for enrollment by state and year</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">byState</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Return Spark DataFrame:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span><span class="o">.</span><span class="n">fetch</span>
+</pre></div>
+</div>
+<p>Lever display() to pivot from yearly to monthly</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">byMonth</span><span class="p">()</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Paletable.Paletable.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Paletable.Paletable.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>This attribute allows you to print out the sql of a specific view within databricks or a database</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

@@ -467,7 +467,7 @@ class PaletMetadata:
 
         import pandas as pd
         from datetime import datetime
-        from palet.Palet import Palet
+        from Palet import Palet
 
         @staticmethod
         def _getPaletObj():

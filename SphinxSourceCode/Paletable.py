@@ -514,7 +514,7 @@ class Paletable():
         Note: The :class:`Coverage` class is automatically imported when this by group is called.
         """
 
-        from palet.Coverage import Coverage
+        from Coverage import Coverage
 
         self.palet.logger.info('adding byCoverageType to the by Group')
 
@@ -538,7 +538,7 @@ class Paletable():
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        from palet.Enrollment import Enrollment
+        from Enrollment import Enrollment
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
 
