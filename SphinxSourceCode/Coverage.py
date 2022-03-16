@@ -5,7 +5,7 @@ For example, when this class is utilized along wit enrollment or eligibility, on
 eligibilty counts for each different kind of coverage type.
 """
 
-from palet.Paletable import Paletable
+from Paletable import Paletable
 
 
 class Coverage(Paletable):

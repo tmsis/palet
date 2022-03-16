@@ -5,7 +5,7 @@ uses the pandas library and elements of the pyspark library. Note the Paletable 
 the Enrollment module inherits from the Paletable module.
 """
 
-from palet.Paletable import Paletable
+from Paletable import Paletable
 import pandas as pd
 
 

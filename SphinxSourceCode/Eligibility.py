@@ -5,8 +5,8 @@ uses the pandas library and elements of the pyspark library. Note the Paletable 
 the Enrollment module inherits from the Paletable module.
 """
 import pandas as pd
-from palet.PaletMetadata import PaletMetadata
-from palet.Paletable import Paletable
+from PaletMetadata import PaletMetadata
+from Paletable import Paletable
 
 
 class Eligibility(Paletable):
