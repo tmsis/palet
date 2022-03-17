@@ -76,7 +76,7 @@ class Palet():
     #
     #
     # --------------------------------------------------------------------
-    def cache_run_ids(self):
+    def cache_run_ids(self, field: str = "da_run_id"):
         from pyspark.sql import SparkSession
         """This method of the Palet class is responsible for pulling the most current valid run ids.
 
@@ -122,7 +122,7 @@ class Palet():
 
         spark = SparkSession.getActiveSession()
         pdf = spark.sql(z).toPandas()
-        return pdf['da_run_id'].tolist()
+        return pdf[field].tolist()
 
     # --------------------------------------------------------------------
     #
@@ -272,6 +272,19 @@ class Palet():
         def propertiesOf(Obj: Any):
             return print(Obj.__dict__)
 
+        @staticmethod
+        def numDaysInMonth(month: int, year: int):
+            if((month == 2) and ((year % 4 == 0) or ((year % 100 == 0) and (year % 400 == 0)))):
+                return 29
+
+            elif(month == 2):
+                return 28
+
+            elif(month in (1, 3, 5, 7, 8, 10, 12)):
+                return 31
+
+            else:
+                return 30
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
 

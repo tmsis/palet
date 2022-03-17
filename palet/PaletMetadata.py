@@ -21,6 +21,7 @@ class PaletMetadata:
 
     """
     class Enrollment:
+        import pandas as pd
         """
         The Enrollment class is a subclass of PaletMetadata. This class primaryily assigns more readable
         and concise column names to the TAF data pertaining to Medicaid and CHIP enrollment. Additionally,
@@ -39,6 +40,13 @@ class PaletMetadata:
                 '2': 'Title XXI M-CHIP',
                 '3': 'Title XXI S-CHIP'
             }
+
+        def _findFullMonthEnrollments(df: pd.DataFrame):
+            palet = PaletMetadata.Enrichment._getPaletObj()
+            month = df['month']
+            year = df['de_fil_dt']
+            if df['month'] != palet.Utils.numDaysInMonth(month, year):
+                return
 
         # ---------------------------------------------------------------------------------
         #
@@ -267,6 +275,21 @@ class PaletMetadata:
                 Oct = 'mdcd_enrlmt_days_10'
                 Nov = 'mdcd_enrlmt_days_11'
                 Dec = 'mdcd_enrlmt_days_12'
+
+                enrollment = {
+                    '01':  "mdcd_enrlmt_days_01",
+                    '02':  "mdcd_enrlmt_days_02",
+                    '03':  "mdcd_enrlmt_days_03",
+                    '04':  "mdcd_enrlmt_days_04",
+                    '05':  "mdcd_enrlmt_days_05",
+                    '06':  "mdcd_enrlmt_days_06",
+                    '07':  "mdcd_enrlmt_days_07",
+                    '08':  "mdcd_enrlmt_days_08",
+                    '09':  "mdcd_enrlmt_days_09",
+                    '10': "mdcd_enrlmt_days_10",
+                    '11': "mdcd_enrlmt_days_11",
+                    '12': "mdcd_enrlmt_days_12"
+                }
 
         # ---------------------------------------------------------------------------------
         #
@@ -749,5 +772,6 @@ class PaletMetadata:
         #
         # ----------------------------------------------------------------------------------
         def _removeIsFirst(df: pd.DataFrame):
-            df = df.drop(columns=['isfirst'])
+            print("DROP EM")
+            df = df.drop(columns=['isfirst'], axis=1)
             return df

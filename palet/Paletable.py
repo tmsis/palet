@@ -64,6 +64,7 @@ class Paletable():
                 self._user_runids = self.usingRunIds(runIds)
 
         self._runids = self.palet.cache_run_ids()
+        self._years = self.palet.cache_run_ids("fil_dt")
         self.palet.logger.debug('Initializing Paletable super class')
 
     # ----
@@ -84,6 +85,15 @@ class Paletable():
             return ','.join(map(str, self._user_runids))
         else:
             return ','.join(map(str, self._runids))
+
+    # ---------------------------------------------------------------------------------
+    #
+    # _getCorrespondingYears
+    #   Return the years associated with the runIds for full or partial month
+    #   Enrollment calculations
+    # ---------------------------------------------------------------------------------
+    def _getCorrespondingYears(self):
+        return self._years
 
     # ---------------------------------------------------------------------------------
     #
@@ -481,7 +491,8 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byState to the by Group')
-        self.timeunit = 'month'
+        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+            self.timeunit = 'month'
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
@@ -753,7 +764,12 @@ class Paletable():
                 df[column] = df[column].astype(pd.StringDtype())
                 df[column].fillna('-1', inplace=True)
 
-            # perform data enrichments & post
+            # perform data post process
+            self.palet.logger.debug('Beginning call to run post-processes')
+            for pp in self.postprocesses:
+                df = pp(df)
+
+            # perform data enrichments
             if (sparkDF is not None):
                 self.palet.logger.debug('Beginning call to run post-processes')
                 for column in self.defined_columns:
@@ -761,11 +777,6 @@ class Paletable():
                         self.palet.logger.debug("Calling post-process " + column)
                         col = self.defined_columns[column]
                         df = col(df)
-
-                # perform data enrichments
-                self.palet.logger.debug('Beginning call to run post-processes')
-                for pp in self.postprocesses:
-                    df = pp(df)
 
             return df
         else:

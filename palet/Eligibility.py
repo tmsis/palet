@@ -166,7 +166,7 @@ class Eligibility(Paletable):
 
         df['year'] = df['de_fil_dt']
 
-        if self.timeunit == 'month':
+        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
