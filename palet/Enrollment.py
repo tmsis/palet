@@ -58,6 +58,14 @@ class Enrollment(Paletable):
 
         >>> api = Coverage(paletable=api)
 
+        You may also request FULL or PARTIAL month enrollments.
+
+        >>> api = Enrollment(period='full')
+
+        or
+
+        >>> api = Enrollment(period='partial')
+
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
         Paletable: No input required, defaults to None.
@@ -316,24 +324,6 @@ class Enrollment(Paletable):
             self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
         return df
-
-    def _getEntireMonthOnlyResults(self, month: int = -1, year: int = -1):
-        keys = PaletMetadata.Enrollment.Medicaid.monthly.enrollment
-
-        if month == -1:
-            for _year_ in self._getCorrespondingYears():
-                for _month_ in keys:
-                    daysInMonth = Palet.Utils.numDaysInMonth(int(_month_), int(_year_))
-                    if daysInMonth != 29:
-                        self.filter.update({keys.get(_month_): str(daysInMonth)})
-                    else:
-                        self.filter.update(({keys.get(_month_): str(daysInMonth) + " AND " + PaletMetadata.Enrollment.fileDate + "=" + str(_year_)}))
-
-        return
-
-    def byFullMonth(self, year: int = -1, month: int = -1):
-        self.timeunit = 'full'
-        return self
 
     # ---------------------------------------------------------------------------------
     #
