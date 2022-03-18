@@ -4,8 +4,6 @@ to apply specific filters. Doing so, analysts can view enrollment by state, inco
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
-
-from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 import pandas as pd

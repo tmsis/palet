@@ -510,6 +510,7 @@ class PaletMetadata:
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
+                'mc_plan_type_cd': PaletMetadata.Enrichment._buildValueColumn,
                 'isfirst': PaletMetadata.Enrichment._removeIsFirst
             }
 
@@ -741,6 +742,34 @@ class PaletMetadata:
 
             else:
                 return ''
+
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _findValueName(self, x):
+            # get this row's ref value from the column by name
+            y = x[PaletMetadata.Coverage.mc_plan_type_cd]
+            # if the value is NaN, default to unknown
+            if y is None or y == 'null':
+                return 'unknown'
+            else:
+                # lookup label with value
+                field = PaletMetadata.Coverage.coverage_type
+                return field.get(y)
+
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _buildValueColumn(self, df: pd.DataFrame):
+            newColumn = "coverage_type"
+            df[newColumn] = df.apply(lambda x: self._findValueName(x), axis=1)
+
+            return df
 
         # --------------------------------------------------------------------------------
         #

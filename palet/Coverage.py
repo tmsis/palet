@@ -127,9 +127,7 @@ class Coverage(Paletable):
         #  TODO: {self._getByGroupWithAlias()}
 
         # compress rows from coverage if it is in the by group
-        self._addPostProcess(self._buildValueColumn)
-        # self._addPostProcess(self._percentChange)
-        # self._addPostProcess(self._decorate)
+        self._addPostProcess(self._percentChange)
 
         return z
 
