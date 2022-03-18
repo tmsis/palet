@@ -176,12 +176,14 @@ class Eligibility(Paletable):
                 df['isfirst'] = 0
 
             self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrlmt', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrlmt', 1, False)
 
             # Year-over-Year
             df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
             df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
 
             self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrlmt', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrlmt', 1, False)
 
             # Re-sort Chronologically
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -196,6 +198,7 @@ class Eligibility(Paletable):
                 df['isfirst'] = 0
 
             self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrlmt', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrlmt', 1, False)
 
         return df
 

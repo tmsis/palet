@@ -772,6 +772,5 @@ class PaletMetadata:
         #
         # ----------------------------------------------------------------------------------
         def _removeIsFirst(df: pd.DataFrame):
-            print("DROP EM")
             df = df.drop(columns=['isfirst'], axis=1)
             return df
