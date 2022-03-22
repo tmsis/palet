@@ -6,6 +6,7 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
+from palet.CoverageType import CoverageType
 from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
@@ -160,10 +161,12 @@ class Paletable():
                 if isinstance(column, str):
                     z += column + new_line_comma
 
-                # if str(type(column)) == "<class 'palet.EnrollmentType.EnrollmentType'>":
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-
                     for j in EnrollmentType.cols:
+                        z += j + new_line_comma
+
+                if str(column) == "<class 'palet.CoverageType.CoverageType'>":
+                    for j in CoverageType.cols:
                         z += j + new_line_comma
 
             return f"{z}"
@@ -538,7 +541,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, type=None):
+    def byCoverageTypeObject(self, type=None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -558,6 +561,35 @@ class Paletable():
         self._addByGroup(PaletMetadata.Coverage.type)
 
         return Coverage(self._user_runids, self)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byCoverageType(self, type=None):
+        """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args:
+            type:`str, (optional)`: Filter by coverage type using coverage code. Defaults to None.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note: The :class:`Coverage` class is automatically imported when this by group is called.
+        """
+
+        from palet.Enrollment import Enrollment
+        from palet.CoverageType import CoverageType
+
+        self.palet.logger.info('adding CoverageType to the by Group')
+        self.derived_by_group.append(CoverageType)
+
+        # if type is not None:
+        #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+
+        return Enrollment(self._user_runids, self)
 
     # ---------------------------------------------------------------------------------
     #

@@ -4,6 +4,7 @@ to apply specific filters. Doing so, analysts can view enrollment by state, inco
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
+from palet.CoverageType import CoverageType
 from palet.EnrollmentType import EnrollmentType
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
@@ -320,6 +321,9 @@ class Enrollment(Paletable):
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
                     return EnrollmentType.alias + ','
 
+                elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
+                    return CoverageType.alias + ','
+
         return ''
 
     # ---------------------------------------------------------------------------------
@@ -347,6 +351,23 @@ class Enrollment(Paletable):
                         'a.' + EnrollmentType.cols[10] + ',',
                         'a.' + EnrollmentType.cols[11] + ',',
                         EnrollmentType.alias + ',',
+                        )
+
+                elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
+                    return breakdown.format(
+                        'a.' + CoverageType.cols[0] + ',',
+                        'a.' + CoverageType.cols[1] + ',',
+                        'a.' + CoverageType.cols[2] + ',',
+                        'a.' + CoverageType.cols[3] + ',',
+                        'a.' + CoverageType.cols[4] + ',',
+                        'a.' + CoverageType.cols[5] + ',',
+                        'a.' + CoverageType.cols[6] + ',',
+                        'a.' + CoverageType.cols[7] + ',',
+                        'a.' + CoverageType.cols[8] + ',',
+                        'a.' + CoverageType.cols[9] + ',',
+                        'a.' + CoverageType.cols[10] + ',',
+                        'a.' + CoverageType.cols[11] + ',',
+                        CoverageType.alias + ',',
                         )
 
         return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '')
@@ -440,6 +461,7 @@ class Enrollment(Paletable):
         super().sql()
 
         # create or replace temporary view enrollment_by_month as
+        # taf.data_anltcs_taf_ade_base_vw as a
         z = f"""
             select
                 counter,
@@ -455,7 +477,8 @@ class Enrollment(Paletable):
                     {self._getTimeUnitBreakdown()}
                     {PaletMetadata.Enrichment._renderAgeRange(self)}
                 from
-                    taf.data_anltcs_taf_ade_base_vw as a
+
+                    taf.taf_ann_de_base as a
                 where
                     a.da_run_id in ( {self._getRunIds()} ) and
                     {self._getByTimeunitCull()} AND
