@@ -6,6 +6,7 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
+from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -62,9 +63,9 @@ class Paletable():
         if runIds is not None:
             if not issubclass(type(runIds), Paletable):
                 self._user_runids = self.usingRunIds(runIds)
-
-        self._runids = self.palet.cache_run_ids()
-        self._years = self.palet.cache_run_ids("fil_dt")
+        else:
+            self._runids = self.palet.cache_run_ids()
+            self._years = self.palet.cache_run_ids("fil_dt")
         self.palet.logger.debug('Initializing Paletable super class')
 
     # ----
@@ -150,13 +151,21 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-
     def _getDerivedByGroup(self):
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.derived_by_group)) > 0:
             for column in self.derived_by_group:
-                z += column + new_line_comma
+
+                if isinstance(column, str):
+                    z += column + new_line_comma
+
+                # if str(type(column)) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+
+                    for j in EnrollmentType.cols:
+                        z += j + new_line_comma
+
             return f"{z}"
         else:
             return ''
@@ -174,6 +183,23 @@ class Paletable():
         if (len(self.by_group)) > 0:
             for column in self.by_group:
                 z += "a." + column + new_line_comma
+            return f"{z}"
+        else:
+            return ''
+
+    # ---------------------------------------------------------------------------------
+    #
+    #   getByGroup: This function allows our byGroup
+    #       properly for the dynamic sql generation
+    #
+    # ---------------------------------------------------------------------------------
+    def _getByGroup(self):
+        self.palet.logger.debug('Forming SQL by Groups')
+        z = ""
+        new_line_comma = '\n\t\t\t   ,'
+        if (len(self.by_group)) > 0:
+            for column in self.by_group:
+                z += column + new_line_comma
             return f"{z}"
         else:
             return ''
@@ -531,7 +557,7 @@ class Paletable():
 
         self._addByGroup(PaletMetadata.Coverage.type)
 
-        return Coverage(self)
+        return Coverage(self._user_runids, self)
 
     # ---------------------------------------------------------------------------------
     #
@@ -550,11 +576,15 @@ class Paletable():
         """
 
         from palet.Enrollment import Enrollment
-        self.palet.logger.info('adding byEnrollmentType to the by Group')
-        self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
+        from palet.EnrollmentType import EnrollmentType
 
-        if type is not None:
-            self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+        self.palet.logger.info('adding byEnrollmentType to the by Group')
+        # self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
+        # self.derived_by_group.extend(PaletMetadata.Enrollment.derived_enrollment_field)
+        self.derived_by_group.append(EnrollmentType)
+
+        # if type is not None:
+        #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
         return Enrollment(self._user_runids, self)
 
@@ -678,6 +708,52 @@ class Paletable():
         self.timeunitvalue = month
 
         return self
+
+    # ---------------------------------------------------------------------------------
+    # _percentChange protected/private method that is called by each fetch() call
+    # to calculate the % change columns. Each Paletable class should override this
+    # and create it's own logic.
+    # ---------------------------------------------------------------------------------
+    def _percentChange(self, df: pd.DataFrame):
+        self.palet.logger.debug('Percent Change')
+
+        df['year'] = df['de_fil_dt']
+
+        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+
+            # Month-over-Month
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
+            # Re-sort Chronologically
+            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+
+        elif self.timeunit == 'year':
+
+            # Year-over-Year
+            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            if (len(self.by_group)) > 0:
+                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df['isfirst'] = 0
+
+            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
+            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
+
+        return df
 
     # ---------------------------------------------------------------------------------
     #

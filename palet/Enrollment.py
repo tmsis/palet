@@ -4,6 +4,7 @@ to apply specific filters. Doing so, analysts can view enrollment by state, inco
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
+from palet.EnrollmentType import EnrollmentType
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 import pandas as pd
@@ -134,114 +135,158 @@ class Enrollment(Paletable):
 
         breakdown = {
             'year': """
+                'In Year' as counter,
                 sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
                 sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment""",
-            'month': """
+
+            'month': f"""
+                'In Month' as counter,
                 stack(12,
-                    1, sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
+                     1, { {0} }
+                       sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end),
-                    2, sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
+                     2, { {1} }
+                       sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end),
-                    3, sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
+                     3, { {2} }
+                       sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end),
-                    4, sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
+                     4, { {3} }
+                       sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end),
-                    5, sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
+                     5, { {4} }
+                       sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end),
-                    6, sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
+                     6, { {5} }
+                       sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end),
-                    7, sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
+                     7, { {6} }
+                       sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end),
-                    8, sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
+                     8, { {7} }
+                       sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end),
-                    9, sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
+                     9, { {8} }
+                       sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end),
-                    10,sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
+                    10, { {9} }
+                       sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end),
-                    11,sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
+                    11, { {10} }
+                       sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end),
-                    12,sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
+                    12, { {11} }
+                       sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end)
-                ) as (month, mdcd_enrollment, chip_enrollment)""",
-            'full': """
+                ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
+
+            'full': f"""
+                'Full Month' as counter,
                 stack(12,
-                    1, sum(case when a.mdcd_enrlmt_days_01 = 31 then 1 else 0 end) ,
+                     1, { {0} }
+                       sum(case when a.mdcd_enrlmt_days_01 = 31 then 1 else 0 end) ,
                        sum(case when a.chip_enrlmt_days_01 = 31 then 1 else 0 end) ,
-                    2, sum(case
-                            when a.mdcd_enrlmt_days_02 == 29 then 1
-                            when (a.mdcd_enrlmt_days_02 == 28
+                     2, { {1} }
+                       sum(case
+                            when a.mdcd_enrlmt_days_02 = 29 then 1
+                            when (a.mdcd_enrlmt_days_02 = 28
                                 and ((a.de_fil_dt % 4 != 0) or ((a.de_fil_dt % 100 != 0)
                                 and (a.de_fil_dt % 400 != 0)))) then 1
                             else 0 end),
                        sum(case
-                            when a.chip_enrlmt_days_02 == 29 then 1
-                            when (a.chip_enrlmt_days_02 == 28
+                            when a.chip_enrlmt_days_02 = 29 then 1
+                            when (a.chip_enrlmt_days_02 = 28
                                 and ((a.de_fil_dt % 4 != 0) or ((a.de_fil_dt % 100 != 0)
                                 and (a.de_fil_dt % 400 != 0)))) then 1
                             else 0 end),
-                    3, sum(case when a.mdcd_enrlmt_days_03 = 31 then 1 else 0 end),
+                     3, { {2} }
+                       sum(case when a.mdcd_enrlmt_days_03 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_03 = 31 then 1 else 0 end),
-                    4, sum(case when a.mdcd_enrlmt_days_04 = 30 then 1 else 0 end),
+                     4, { {3} }
+                       sum(case when a.mdcd_enrlmt_days_04 = 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_04 = 30 then 1 else 0 end),
-                    5, sum(case when a.mdcd_enrlmt_days_05 = 31 then 1 else 0 end),
+                     5, { {4} }
+                       sum(case when a.mdcd_enrlmt_days_05 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_05 = 31 then 1 else 0 end),
-                    6, sum(case when a.mdcd_enrlmt_days_06 = 30 then 1 else 0 end),
+                     6, { {5} }
+                       sum(case when a.mdcd_enrlmt_days_06 = 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_06 = 30 then 1 else 0 end),
-                    7, sum(case when a.mdcd_enrlmt_days_07 = 31 then 1 else 0 end),
+                     7, { {6} }
+                       sum(case when a.mdcd_enrlmt_days_07 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_07 = 31 then 1 else 0 end),
-                    8, sum(case when a.mdcd_enrlmt_days_08 = 31 then 1 else 0 end),
+                     8, { {7} }
+                       sum(case when a.mdcd_enrlmt_days_08 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_08 = 31 then 1 else 0 end),
-                    9, sum(case when a.mdcd_enrlmt_days_09 = 30 then 1 else 0 end),
+                     9, { {8} }
+                       sum(case when a.mdcd_enrlmt_days_09 = 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_09 = 30 then 1 else 0 end),
-                    10,sum(case when a.mdcd_enrlmt_days_10 = 31 then 1 else 0 end),
+                    10, { {9} }
+                       sum(case when a.mdcd_enrlmt_days_10 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_10 = 31 then 1 else 0 end),
-                    11,sum(case when a.mdcd_enrlmt_days_11 = 30 then 1 else 0 end),
+                    11, { {10} }
+                       sum(case when a.mdcd_enrlmt_days_11 = 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_11 = 30 then 1 else 0 end),
-                    12,sum(case when a.mdcd_enrlmt_days_12 = 31 then 1 else 0 end),
+                    12, { {11} }
+                       sum(case when a.mdcd_enrlmt_days_12 = 31 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_12 = 31 then 1 else 0 end)
-                    ) as (month, mdcd_entire_month, chip_entire_month)""",
-            'partial': """
+                    ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
+
+            'partial': f"""
+                'Partial Month' as counter,
                 stack(12,
-                    1, sum(case when a.mdcd_enrlmt_days_01 between 1 and 30 then 1 else 0 end) ,
+                     1, { {0} }
+                       sum(case when a.mdcd_enrlmt_days_01 between 1 and 30 then 1 else 0 end) ,
                        sum(case when a.chip_enrlmt_days_01 between 1 and 30 then 1 else 0 end) ,
-                    2, sum(case
+                     2, { {1} }
+                       sum(case
                             when a.mdcd_enrlmt_days_02 between 1 and 27 then 1
-                            when (a.mdcd_enrlmt_days_02 == 28
-                                and ((a.de_fil_dt % 4 == 0) or ((a.de_fil_dt % 100 == 0)
-                                and (a.de_fil_dt % 400 == 0)))) then 1
+                            when (a.mdcd_enrlmt_days_02 = 28
+                                and ((a.de_fil_dt % 4 = 0) or ((a.de_fil_dt % 100 = 0)
+                                and (a.de_fil_dt % 400 = 0)))) then 1
                             else 0 end),
                        sum(case
                             when a.chip_enrlmt_days_02 between 1 and 27 then 1
-                            when (a.chip_enrlmt_days_02 == 28
-                                and ((a.de_fil_dt % 4 == 0) or ((a.de_fil_dt % 100 == 0)
-                                and (a.de_fil_dt % 400 == 0)))) then 1
+                            when (a.chip_enrlmt_days_02 = 28
+                                and ((a.de_fil_dt % 4 = 0) or ((a.de_fil_dt % 100== 0)
+                                and (a.de_fil_dt % 400 = 0)))) then 1
                             else 0 end),
-                    3, sum(case when a.mdcd_enrlmt_days_03 between 1 and 30 then 1 else 0 end),
+                     3, { {2} }
+                       sum(case when a.mdcd_enrlmt_days_03 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_03 between 1 and 30 then 1 else 0 end),
-                    4, sum(case when a.mdcd_enrlmt_days_04 between 1 and 29 then 1 else 0 end),
+                     4, { {3} }
+                       sum(case when a.mdcd_enrlmt_days_04 between 1 and 29 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_04 between 1 and 29 then 1 else 0 end),
-                    5, sum(case when a.mdcd_enrlmt_days_05 between 1 and 30 then 1 else 0 end),
+                     5, { {4} }
+                       sum(case when a.mdcd_enrlmt_days_05 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_05 between 1 and 30 then 1 else 0 end),
-                    6, sum(case when a.mdcd_enrlmt_days_06 between 1 and 29 then 1 else 0 end),
+                     6, { {5} }
+                       sum(case when a.mdcd_enrlmt_days_06 between 1 and 29 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_06 between 1 and 29 then 1 else 0 end),
-                    7, sum(case when a.mdcd_enrlmt_days_07 between 1 and 30 then 1 else 0 end),
+                     7, { {6} }
+                       sum(case when a.mdcd_enrlmt_days_07 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_07 between 1 and 30 then 1 else 0 end),
-                    8, sum(case when a.mdcd_enrlmt_days_08 between 1 and 30 then 1 else 0 end),
+                     8, { {7} }
+                       sum(case when a.mdcd_enrlmt_days_08 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_08 between 1 and 30 then 1 else 0 end),
-                    9, sum(case when a.mdcd_enrlmt_days_09 between 1 and 29 then 1 else 0 end),
+                     9, { {8} }
+                       sum(case when a.mdcd_enrlmt_days_09 between 1 and 29 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_09 between 1 and 29 then 1 else 0 end),
-                    10,sum(case when a.mdcd_enrlmt_days_10 between 1 and 30 then 1 else 0 end),
+                    10, { {9} }
+                       sum(case when a.mdcd_enrlmt_days_10 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_10 between 1 and 30 then 1 else 0 end),
-                    11,sum(case when a.mdcd_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
+                    11, { {10} }
+                       sum(case when a.mdcd_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
-                    12,sum(case when a.mdcd_enrlmt_days_12 between 1 and 30 then 1 else 0 end),
+                    12, { {11} }
+                       sum(case when a.mdcd_enrlmt_days_12 between 1 and 30 then 1 else 0 end),
                        sum(case when a.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)
-                    ) as (month, mdcd_partial_month, chip_partial_month)"""
+                    ) as (month, { {12} } mdcd_enrollment, chip_enrollment)"""
         }
 
         cull = {
             'year': """(
                 (a.mdcd_enrlmt_days_yr > 0) or (a.chip_enrlmt_days_yr > 0))""",
+
             'month': """(
                 (a.mdcd_enrlmt_days_01 > 0) or (a.chip_enrlmt_days_01 > 0) or
                 (a.mdcd_enrlmt_days_02 > 0) or (a.chip_enrlmt_days_02 > 0) or
@@ -256,22 +301,59 @@ class Enrollment(Paletable):
                 (a.mdcd_enrlmt_days_11 > 0) or (a.chip_enrlmt_days_11 > 0) or
                 (a.mdcd_enrlmt_days_12 > 0) or (a.chip_enrlmt_days_12 > 0)
             )""",
+
             'full': "1=1",
+
             'partial': '1=1'
 
         }
 
     # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getDerivedSelections(self):
+
+        if (len(self.derived_by_group)) > 0:
+            for column in self.derived_by_group:
+                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+                    return EnrollmentType.alias + ','
+
+        return ''
+
+    # ---------------------------------------------------------------------------------
     # _getTimeunitBreakdown
-    # Tis function is used to dynamically generate the SQL statement by returning the
+    # This function is used to dynamically generate the SQL statement by returning the
     # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
     def _getTimeUnitBreakdown(self):
-        return Enrollment.timeunit.breakdown[self.timeunit]
+        breakdown = Enrollment.timeunit.breakdown[self.timeunit]
+
+        if (len(self.derived_by_group)) > 0:
+            for column in self.derived_by_group:
+                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+                    return breakdown.format(
+                        'a.' + EnrollmentType.cols[0] + ',',
+                        'a.' + EnrollmentType.cols[1] + ',',
+                        'a.' + EnrollmentType.cols[2] + ',',
+                        'a.' + EnrollmentType.cols[3] + ',',
+                        'a.' + EnrollmentType.cols[4] + ',',
+                        'a.' + EnrollmentType.cols[5] + ',',
+                        'a.' + EnrollmentType.cols[6] + ',',
+                        'a.' + EnrollmentType.cols[7] + ',',
+                        'a.' + EnrollmentType.cols[8] + ',',
+                        'a.' + EnrollmentType.cols[9] + ',',
+                        'a.' + EnrollmentType.cols[10] + ',',
+                        'a.' + EnrollmentType.cols[11] + ',',
+                        EnrollmentType.alias + ',',
+                        )
+
+        return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '')
 
     # ---------------------------------------------------------------------------------
     # _getByTimeunitCull
-    # Tis function is used to dynamically generate the SQL where clause by returning the
+    # This function is used to dynamically generate the SQL where clause by returning the
     # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self):
@@ -285,7 +367,7 @@ class Enrollment(Paletable):
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
-        df['year'] = df['de_fil_dt']
+        # df['year'] = df['de_fil_dt']
 
         if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
 
@@ -360,25 +442,42 @@ class Enrollment(Paletable):
         # create or replace temporary view enrollment_by_month as
         z = f"""
             select
-                {self._getByGroupWithAlias()}
-                a.de_fil_dt,
-                {self._getTimeUnitBreakdown()}
-                {PaletMetadata.Enrichment._renderAgeRange(self)}
-                {self._stackChipCode()}
-            from
-                taf.taf_ann_de_base as a
-            where
-                a.da_run_id in ( {self._getRunIds()} ) and
-                {self._getByTimeunitCull()} AND
-                {self._defineWhereClause()}
+                counter,
+                {self._getByGroup()}
+                {self._getDerivedSelections()}
+                de_fil_dt as year,
+                sum(mdcd_enrollment) as mdcd_enrollment,
+                sum(chip_enrollment) as chip_enrollment
+            from (
+                select
+                    {self._getByGroupWithAlias()}
+                    a.de_fil_dt,
+                    {self._getTimeUnitBreakdown()}
+                    {PaletMetadata.Enrichment._renderAgeRange(self)}
+                from
+                    taf.data_anltcs_taf_ade_base_vw as a
+                where
+                    a.da_run_id in ( {self._getRunIds()} ) and
+                    {self._getByTimeunitCull()} AND
+                    {self._defineWhereClause()}
+                group by
+                    {self._getByGroupWithAlias()}
+                    {self._getDerivedByGroup()}
+                    a.de_fil_dt
+                order by
+                    {self._getByGroupWithAlias()}
+                    {self._getDerivedByGroup()}
+                    a.de_fil_dt
+            )
             group by
-                {self._getByGroupWithAlias()}
-                {self._getDerivedByGroup()}
-                a.de_fil_dt
+                counter,
+                {self._getByGroup()}
+                {self._getDerivedSelections()}
+                de_fil_dt
             order by
-                {self._getByGroupWithAlias()}
-                {self._getDerivedByGroup()}
-                a.de_fil_dt
+                {self._getByGroup()}
+                {self._getDerivedSelections()}
+                de_fil_dt
          """
 
         self._addPostProcess(self._percentChange)
