@@ -63,7 +63,7 @@ class Coverage(Paletable):
             self.defined_columns = paletable.defined_columns
             self._runids = paletable._runids
 
-        self._user_runids = paletable._user_runids
+        self._user_runids = runIds
         self.palet.logger.debug('Initializing Coverage API')
 
     # ---------------------------------------------------------------------------------
