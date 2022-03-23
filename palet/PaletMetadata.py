@@ -517,7 +517,7 @@ class PaletMetadata:
                 'SUBMTG_STATE_CD': PaletMetadata.Enrichment._mergeStateEnrollments,
                 'race_ethncty_exp_flag': PaletMetadata.Enrichment._buildRaceEthnicityExpColumn,
                 'ethncty_cd': PaletMetadata.Enrichment._buildEthnicityColumn,
-                'enrl_type_flag': PaletMetadata.Enrichment._buildEnrollmentType,
+                'enrollment_type': PaletMetadata.Enrichment._buildEnrollmentType,
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
@@ -649,7 +649,7 @@ class PaletMetadata:
 
         def _buildEnrollmentType(df: pd.DataFrame):
             # self.palet.logger.debug('build our columns by looking for enrollmentType')
-            df['enrollment_type'] = df.apply(lambda x: PaletMetadata.Enrichment._findEnrollmentType(x), axis=1)
+            df['enrollment_type_label'] = df.apply(lambda x: PaletMetadata.Enrichment._findEnrollmentType(x), axis=1)
 
             return df
 
