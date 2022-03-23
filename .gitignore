@@ -9,8 +9,7 @@ palet.code-workspace
 **/*.pyc
 misc/DDL/**
 misc/**
-palet/__pycache__/Palet.cpython-39.pyc
-palet/__pycache__/Article.cpython-39.pyc
+palet/__pycache__/**
 .gitignore
 junk/test.py
 junk/test.py
@@ -799,4 +798,5 @@ notes/chr-chronic-condition-algorithms.pdf
 notes/notes.txt
 notes/PALET Epic Burn.xlsx
 notes/Screenshot 2022-03-08 142043.png
-palet/__pycache__/Palet.cpython-39.pyc
+test/TestEnrollment.py
+deploy-val-std.bat
