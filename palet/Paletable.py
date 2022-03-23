@@ -56,6 +56,9 @@ class Paletable():
 
         self.preprocesses = []
         self.postprocesses = []
+
+        self.having_constraints = []
+
         self._user_runids = runIds
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
@@ -740,6 +743,38 @@ class Paletable():
         self.timeunitvalue = month
 
         return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _selectTimeunit(self):
+
+        if self.timeunit == 'year':
+            return "de_fil_dt as year,"
+        elif self.timeunit in ('month', 'full', 'partial'):
+            return """
+                de_fil_dt as year,
+                month,
+                """
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _groupTimeunit(self):
+
+        if self.timeunit == 'year':
+            return "de_fil_dt"
+        elif self.timeunit in ('month', 'full', 'partial'):
+            return """
+                de_fil_dt,
+                month
+                """
 
     # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call

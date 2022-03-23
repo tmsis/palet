@@ -5,6 +5,7 @@ uses the pandas library and elements of the pyspark library. Note the Paletable 
 the Enrollment module inherits from the Paletable module.
 """
 from palet.CoverageType import CoverageType
+from palet.Diagnoses import Diagnoses
 from palet.EnrollmentType import EnrollmentType
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
@@ -433,6 +434,32 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
+    def having(self, constraint: Diagnoses):
+        if constraint not in self.having_constraints:
+            # self.palet.logger.debug('')
+            self.having_constraints.append(constraint)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def apply_constraints(self):
+        contraints = ''
+        for i in self.having_constraints:
+            contraints += str(i)
+
+        return contraints
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def sql(self):
         """The SQL query that the Enrollment class uses to pull dataframes.
 
@@ -467,7 +494,7 @@ class Enrollment(Paletable):
                 counter,
                 {self._getByGroup()}
                 {self._getDerivedSelections()}
-                de_fil_dt as year,
+                {self._selectTimeunit()}
                 sum(mdcd_enrollment) as mdcd_enrollment,
                 sum(chip_enrollment) as chip_enrollment
             from (
@@ -477,8 +504,8 @@ class Enrollment(Paletable):
                     {self._getTimeUnitBreakdown()}
                     {PaletMetadata.Enrichment._renderAgeRange(self)}
                 from
-
                     taf.taf_ann_de_base as a
+                    { self.apply_constraints() }
                 where
                     a.da_run_id in ( {self._getRunIds()} ) and
                     {self._getByTimeunitCull()} AND
@@ -496,11 +523,11 @@ class Enrollment(Paletable):
                 counter,
                 {self._getByGroup()}
                 {self._getDerivedSelections()}
-                de_fil_dt
+                {self._groupTimeunit()}
             order by
                 {self._getByGroup()}
                 {self._getDerivedSelections()}
-                de_fil_dt
+                {self._groupTimeunit()}
          """
 
         self._addPostProcess(self._percentChange)
