@@ -521,7 +521,7 @@ class PaletMetadata:
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
-                'mc_plan_type_cd': PaletMetadata.Enrichment._buildValueColumn,
+                'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
                 'isfirst': PaletMetadata.Enrichment._removeIsFirst
             }
 
@@ -759,16 +759,10 @@ class PaletMetadata:
         #
         #
         # ---------------------------------------------------------------------------------
-        def _findValueName(self, x):
-            # get this row's ref value from the column by name
-            y = x[PaletMetadata.Coverage.mc_plan_type_cd]
-            # if the value is NaN, default to unknown
-            if y is None or y == 'null':
-                return 'unknown'
-            else:
-                # lookup label with value
-                field = PaletMetadata.Coverage.coverage_type
-                return field.get(y)
+        def _findValueName(x):
+            y = x['coverage_type']
+
+            return PaletMetadata.Coverage.coverage_type.get(y)
 
         # ---------------------------------------------------------------------------------
         #
@@ -776,11 +770,12 @@ class PaletMetadata:
         #
         #
         # ---------------------------------------------------------------------------------
-        def _buildValueColumn(self, df: pd.DataFrame):
-            newColumn = "coverage_type"
-            df[newColumn] = df.apply(lambda x: self._findValueName(x), axis=1)
+        def _buildValueColumn(df: pd.DataFrame):
+
+            df['coverage_type_label'] = df.apply(lambda x:PaletMetadata.Enrichment._findValueName(x), axis=1)
 
             return df
+
 
         # --------------------------------------------------------------------------------
         #
