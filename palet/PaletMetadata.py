@@ -47,9 +47,11 @@ class PaletMetadata:
                        'chip_cd_12']
 
         chip_cd = {
-                '1': 'Title XIX Medicaid',
-                '2': 'Title XXI M-CHIP',
-                '3': 'Title XXI S-CHIP'
+                '0': 'Not Eligible',
+                '1': 'Eligible for Medicaid',
+                '2': 'Eligible for Medicaid & Medicaid Expansion CHIP',
+                '3': 'Eligible for Seperate Title XXI CHIP',
+                '4': 'Eligible for Medicaid & Seperate CHIP'
             }
 
         def _findFullMonthEnrollments(df: pd.DataFrame):
