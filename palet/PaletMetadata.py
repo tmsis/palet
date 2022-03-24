@@ -47,6 +47,7 @@ class PaletMetadata:
                        'chip_cd_12']
 
         chip_cd = {
+                'null': 'Unknown',
                 '0': 'Not Eligible',
                 '1': 'Eligible for Medicaid',
                 '2': 'Eligible for Medicaid & Medicaid Expansion CHIP',
@@ -474,6 +475,7 @@ class PaletMetadata:
         mc_plan_type_cd = 'coverage_type'
         type = 'coverage_type'
         coverage_type = {
+            'null': 'Unknown',
             '01': "Comprehensive Managed Care Organization",
             '02': "Traditional PCCM Provider arrangement",
             '03': "Enhanced PCCM Provider arrangement",
