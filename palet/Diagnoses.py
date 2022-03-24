@@ -29,7 +29,7 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     @staticmethod
-    def doWhere(service_category: ServiceCategory, diagnoses: list):
+    def _doWhere(service_category: ServiceCategory, diagnoses: list):
         tuples = []
         delim = "','"
         for i in Diagnoses.inpatient:
@@ -53,7 +53,7 @@ class Diagnoses:
                 where
                     da_run_id in (6939, 6938, 6937, 6936, 6935, 6934, 6933, 6932, 6931, 6930, 6929, 6928, 6927)
                     and (
-                        { Diagnoses.doWhere(service_category, diagnoses) }
+                        { Diagnoses._doWhere(service_category, diagnoses) }
                     )
             ) as j on a.submtg_state_cd = j.submtg_state_cd and a.msis_ident_num = j.msis_ident_num
         """

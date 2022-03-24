@@ -439,6 +439,8 @@ class Enrollment(Paletable):
             # self.palet.logger.debug('')
             self.having_constraints.append(constraint)
 
+        return self
+
     # ---------------------------------------------------------------------------------
     #
     #

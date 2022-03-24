@@ -54,6 +54,8 @@ class Paletable():
         self.age_band = None
         self.derived_by_group = []
 
+        self._runids = []
+
         self.preprocesses = []
         self.postprocesses = []
 

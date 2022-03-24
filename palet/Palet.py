@@ -120,9 +120,11 @@ class Palet():
                     fil_dt
             """
 
-        spark = SparkSession.getActiveSession()
-        pdf = spark.sql(z).toPandas()
-        return pdf[field].tolist()
+        return [5149,6279,6280] 
+        
+        # spark = SparkSession.getActiveSession()
+        # pdf = spark.sql(z).toPandas()
+        # return pdf[field].tolist()
 
     # --------------------------------------------------------------------
     #

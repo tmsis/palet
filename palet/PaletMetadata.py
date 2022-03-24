@@ -32,7 +32,7 @@ class PaletMetadata:
         fileDate = 'DE_FIL_DT'
         type = 'chip_cd_01'
         derived_enrollment_field = 'enrollment_type'
-        
+
         chip_cd_mon = ['chip_cd_01',
                        'chip_cd_02',
                        'chip_cd_03',
@@ -47,9 +47,11 @@ class PaletMetadata:
                        'chip_cd_12']
 
         chip_cd = {
-                '1': 'Title XIX Medicaid',
-                '2': 'Title XXI M-CHIP',
-                '3': 'Title XXI S-CHIP'
+                '0': 'Not Eligible',
+                '1': 'Eligible for Medicaid',
+                '2': 'Eligible for Medicaid & Medicaid Expansion CHIP',
+                '3': 'Eligible for Seperate Title XXI CHIP',
+                '4': 'Eligible for Medicaid & Seperate CHIP'
             }
 
         def _findFullMonthEnrollments(df: pd.DataFrame):
@@ -517,11 +519,11 @@ class PaletMetadata:
                 'SUBMTG_STATE_CD': PaletMetadata.Enrichment._mergeStateEnrollments,
                 'race_ethncty_exp_flag': PaletMetadata.Enrichment._buildRaceEthnicityExpColumn,
                 'ethncty_cd': PaletMetadata.Enrichment._buildEthnicityColumn,
-                'enrl_type_flag': PaletMetadata.Enrichment._buildEnrollmentType,
+                'enrollment_type': PaletMetadata.Enrichment._buildEnrollmentType,
                 'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
-                'mc_plan_type_cd': PaletMetadata.Enrichment._buildValueColumn,
+                'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
                 'isfirst': PaletMetadata.Enrichment._removeIsFirst
             }
 
@@ -649,7 +651,7 @@ class PaletMetadata:
 
         def _buildEnrollmentType(df: pd.DataFrame):
             # self.palet.logger.debug('build our columns by looking for enrollmentType')
-            df['enrollment_type'] = df.apply(lambda x: PaletMetadata.Enrichment._findEnrollmentType(x), axis=1)
+            df['enrollment_type_label'] = df.apply(lambda x: PaletMetadata.Enrichment._findEnrollmentType(x), axis=1)
 
             return df
 
@@ -759,16 +761,10 @@ class PaletMetadata:
         #
         #
         # ---------------------------------------------------------------------------------
-        def _findValueName(self, x):
-            # get this row's ref value from the column by name
-            y = x[PaletMetadata.Coverage.mc_plan_type_cd]
-            # if the value is NaN, default to unknown
-            if y is None or y == 'null':
-                return 'unknown'
-            else:
-                # lookup label with value
-                field = PaletMetadata.Coverage.coverage_type
-                return field.get(y)
+        def _findValueName(x):
+            y = x['coverage_type']
+
+            return PaletMetadata.Coverage.coverage_type.get(y)
 
         # ---------------------------------------------------------------------------------
         #
@@ -776,9 +772,9 @@ class PaletMetadata:
         #
         #
         # ---------------------------------------------------------------------------------
-        def _buildValueColumn(self, df: pd.DataFrame):
-            newColumn = "coverage_type"
-            df[newColumn] = df.apply(lambda x: self._findValueName(x), axis=1)
+        def _buildValueColumn(df: pd.DataFrame):
+
+            df['coverage_type_label'] = df.apply(lambda x:PaletMetadata.Enrichment._findValueName(x), axis=1)
 
             return df
 
