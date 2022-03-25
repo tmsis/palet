@@ -1,4 +1,6 @@
 """
+Please note this module is no longer relevant to PALET. It has been consolidated to the by group :meth:`~Paletable.Paletable.byCoverageType` in :class:`Paletable`.
+
 The Coverage module contains the Coverage class. This class is called when an analyst uses the .byCoverageType()
 by group. It expands the query being run by the existing object so that filters are applied for various kinds fo coverage.
 For example, when this class is utilized along wit enrollment or eligibility, one can view the enrollment counts or
