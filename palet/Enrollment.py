@@ -53,11 +53,11 @@ class Enrollment(Paletable):
 
         switching context by Parameter naming
 
-        >>> api = Coverage([6278, 6280], api) or
+        >>> api = Eligibility([6278, 6280], api) or
 
-        >>> api = Coverage([], api)
+        >>> api = Eligibility([], api)
 
-        >>> api = Coverage(paletable=api)
+        >>> api = Eligibility(paletable=api)
 
         You may also request FULL or PARTIAL month enrollments.
 

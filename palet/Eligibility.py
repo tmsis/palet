@@ -43,7 +43,7 @@ class Eligibility(Paletable):
 
         User defined run ids:
 
-        >>> api = Enrollment([6278, 6280])
+        >>> api = Eligibility([6278, 6280])
 
         Specifying run ids and switching context
 
@@ -51,11 +51,11 @@ class Eligibility(Paletable):
 
         Switching context by parameter naming
 
-        >>> api = Coverage([6278, 6280], api) or
+        >>> api = Enrollment([6278, 6280], api) or
 
-        >>> api = Coverage([], api)
+        >>> api = Enrollment([], api)
 
-        >>> api = Coverage(paletable=api)
+        >>> api = Enrollment(paletable=api)
 
     Args:
         list: List of defined run ids you wish to use. Not required, defaults to list of latest run ids.
