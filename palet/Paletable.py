@@ -59,6 +59,7 @@ class Paletable():
         self.preprocesses = []
         self.postprocesses = []
 
+        self.markers = {}
         self.having_constraints = []
 
         self._user_runids = runIds

@@ -8,8 +8,6 @@ from palet.ServiceCategory import ServiceCategory
 
 class Diagnoses:
 
-    alias = 'diagnosis_cd'
-
     inpatient = ['dgns_1_cd',
                  'dgns_2_cd',
                  'dgns_3_cd',
@@ -22,6 +20,8 @@ class Diagnoses:
                  'dgns_10_cd',
                  'dgns_11_cd',
                  'dgns_12_cd']
+
+    alias = 'j'
 
     # -------------------------------------------------------
     #
@@ -44,10 +44,11 @@ class Diagnoses:
     @staticmethod
     def where(service_category: ServiceCategory, diagnoses: list):
         return f"""
-            inner join(
+            (
                 select distinct
                     submtg_state_cd,
-                    msis_ident_num
+                    msis_ident_num,
+                    1 as indicator
                 from
                     taf.data_anltcs_taf_iph_vw
                 where
@@ -55,5 +56,7 @@ class Diagnoses:
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
-            ) as j on a.submtg_state_cd = j.submtg_state_cd and a.msis_ident_num = j.msis_ident_num
+            ) as {Diagnoses.alias}
+                on a.submtg_state_cd = {Diagnoses.alias}.submtg_state_cd and
+                   a.msis_ident_num = {Diagnoses.alias}.msis_ident_num
         """

@@ -430,7 +430,89 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def mark(self, condition: Diagnoses, marker: str):
+
+        self.markers[marker] = condition
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _apply_markers(self):
+        markers = ''
+        for i in self.markers.values():
+            markers += 'left join ' + str(i)
+
+        return markers
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _select_markers(self):
+        indicators = []
+        for key, val in self.markers.items():
+            indicators.append(f"j.indicator as {key},")
+
+        return '\n'.join(indicators)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _select_indicators(self):
+        indicators = []
+        for key, val in self.markers.items():
+            indicators.append(f"coalesce({key}, 0) as {key},")
+
+        return '\n'.join(indicators)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _groupby_indicators(self):
+        groupby = []
+        for key, val in self.markers.items():
+            groupby.append(f"{key},")
+
+        return '\n'.join(groupby)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _groupby_markers(self):
+        groupby = []
+        for key, val in self.markers.items():
+            groupby.append(",j.indicator")
+
+        return '\n'.join(groupby)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
     #
     #
     # ---------------------------------------------------------------------------------
@@ -444,14 +526,14 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
     #
     #
     # ---------------------------------------------------------------------------------
-    def apply_constraints(self):
+    def _apply_constraints(self):
         contraints = ''
         for i in self.having_constraints:
-            contraints += str(i)
+            contraints += 'inner join ' + str(i)
 
         return contraints
 
@@ -497,37 +579,45 @@ class Enrollment(Paletable):
                 {self._getByGroup()}
                 {self._getDerivedSelections()}
                 {self._selectTimeunit()}
+                {self._select_indicators()}
                 sum(mdcd_enrollment) as mdcd_enrollment,
                 sum(chip_enrollment) as chip_enrollment
             from (
                 select
                     {self._getByGroupWithAlias()}
                     a.de_fil_dt,
+                    {self._select_markers()}
                     {self._getTimeUnitBreakdown()}
                     {PaletMetadata.Enrichment._renderAgeRange(self)}
+
                 from
                     taf.taf_ann_de_base as a
-                    { self.apply_constraints() }
+                    { self._apply_constraints() }
+                    { self._apply_markers() }
                 where
                     a.da_run_id in ( {self._getRunIds()} ) and
-                    {self._getByTimeunitCull()} AND
+                    {self._getByTimeunitCull()} and
                     {self._defineWhereClause()}
                 group by
                     {self._getByGroupWithAlias()}
                     {self._getDerivedByGroup()}
                     a.de_fil_dt
+                    {self._groupby_markers()}
                 order by
                     {self._getByGroupWithAlias()}
                     {self._getDerivedByGroup()}
                     a.de_fil_dt
+                    {self._groupby_markers()}
             )
             group by
                 counter,
                 {self._getByGroup()}
+                {self._groupby_indicators()}
                 {self._getDerivedSelections()}
                 {self._groupTimeunit()}
             order by
                 {self._getByGroup()}
+                {self._groupby_indicators()}
                 {self._getDerivedSelections()}
                 {self._groupTimeunit()}
          """
