@@ -13,7 +13,7 @@ from palet.ServiceCategory import ServiceCategory
 class Diagnoses:
     """
     The Diagnoses class creates an alias called inpatient that transposes the 12 dgns_cd columns allowing :meth:`Enrollment.Enrollment.having` to filter
-    by various coverage types. It also plays a role in the backend method for decorating the chronic conidition column the user specifies.
+    by various diagnosis types. It also plays a role in the backend method for decorating the chronic conidition column the user specifies.
 
     """
 
@@ -84,7 +84,7 @@ class Diagnoses:
             >>> display(df.fetch())
 
         """
-        
+
         return f"""
             (
                 select distinct
