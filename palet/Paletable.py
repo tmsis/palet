@@ -380,7 +380,7 @@ class Paletable():
         else:
             self._user_runids = None
 
-        return
+        return self
 
     def displayCurrentRunIds(self):
         """If you'd like to get a display of the current run ids set in the query then you can call this function
