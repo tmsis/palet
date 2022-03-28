@@ -776,7 +776,7 @@ class PaletMetadata:
         # ---------------------------------------------------------------------------------
         def _buildValueColumn(df: pd.DataFrame):
 
-            df['coverage_type_label'] = df.apply(lambda x:PaletMetadata.Enrichment._findValueName(x), axis=1)
+            df['coverage_type_label'] = df.apply(lambda x: PaletMetadata.Enrichment._findValueName(x), axis=1)
 
             return df
 

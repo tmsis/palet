@@ -1,5 +1,6 @@
 """
-Please note this module is no longer relevant to PALET. It has been consolidated to the by group :meth:`~Paletable.Paletable.byCoverageType` in :class:`Paletable`.
+Please note this module is no longer relevant to PALET. It has been consolidated to the by group
+:meth:`~Paletable.Paletable.byCoverageType` in :class:`Paletable`.
 
 The Coverage module contains the Coverage class. This class is called when an analyst uses the .byCoverageType()
 by group. It expands the query being run by the existing object so that filters are applied for various kinds fo coverage.
@@ -17,8 +18,7 @@ class Coverage(Paletable):
     eligibility.
 
     Note:
-        The Coverage class does not need to be specifically imported from its respective module. The Coverage class is imported by
-        the :meth:`~Paletable.Paletable.byCoverageType` method in :class:`Paletable` when it is called.
+        DEPRECATED: See Paletable.byCoverageType :meth:`~Paletable.Paletable.byCoverageType` method in :class:`Paletable` when it is called.
 
     Examples:
         Create an object for Enrollment by month:

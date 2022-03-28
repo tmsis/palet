@@ -1,5 +1,6 @@
 """
-The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions. This module only contains the :class:`Diagnoses` class and the :meth:`Diagnoses.Diagnoses.where` static method.
+The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions.
+This module only contains the :class:`Diagnoses` class and the :meth:`Diagnoses.Diagnoses.where` static method.
 """
 
 # -------------------------------------------------------
@@ -53,8 +54,8 @@ class Diagnoses:
     @staticmethod
     def where(service_category: ServiceCategory, diagnoses: list):
         """
-        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. This is where the user assigns
-        a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified. 
+        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
+        This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
 
         Args:
             service_category: `attribute`: Specify an attribute from the :class:`ServiceCategory` such as ServiceCategory.inpaitent
@@ -69,14 +70,15 @@ class Diagnoses:
         Example:
             Create a list of diagnoses codes:
 
-            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220', 'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
 
             Create an Enrollment Object:
 
             >>> api = Enrollment.ByMonth()
 
             Use the :meth:`~Enrollment.Enrollment.having` function with where() as a parameter to filter by chronic condition
-           
+
             >>> df = api.having(Diagnoses.where(ServiceCategory.inpatient, AFib))
 
             Return DataFrame
