@@ -99,7 +99,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "full"):
+    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "year"):
         # print('Initializing Enrollment API')
         super().__init__(runIds)
 
