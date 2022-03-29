@@ -602,7 +602,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, type=None):
+    def byEnrollmentType(self):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -617,8 +617,6 @@ class Paletable():
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
-        # self.derived_by_group.extend(PaletMetadata.Enrollment.chip_cd_mon)
-        # self.derived_by_group.extend(PaletMetadata.Enrollment.derived_enrollment_field)
         self.derived_by_group.append(EnrollmentType)
 
         # if type is not None:
