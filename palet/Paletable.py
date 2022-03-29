@@ -7,6 +7,7 @@ return datafranes created by high level objects.
 
 import pandas as pd
 from palet.CoverageType import CoverageType
+from palet.Enrollment import Enrollment
 from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
@@ -602,7 +603,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, type=None):
+    def byEnrollmentType(self):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -613,7 +614,6 @@ class Paletable():
             Spark DataFrame: :class:`Paletable`: returns the updated object
         """
 
-        from palet.Enrollment import Enrollment
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')

@@ -136,10 +136,48 @@ class Enrollment(Paletable):
         """
 
         breakdown = {
-            'year': """
+            'year': f"""
                 'In Year' as counter,
-                sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
-                sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment""",
+                sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment_yr,
+                sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment_yr,
+                stack(12,
+                     1, { {0} }
+                       sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end),
+                     2, { {1} }
+                       sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end),
+                     3, { {2} }
+                       sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end),
+                     4, { {3} }
+                       sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end),
+                     5, { {4} }
+                       sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end),
+                     6, { {5} }
+                       sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end),
+                     7, { {6} }
+                       sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end),
+                     8, { {7} }
+                       sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end),
+                     9, { {8} }
+                       sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end),
+                    10, { {9} }
+                       sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end),
+                    11, { {10} }
+                       sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end),
+                    12, { {11} }
+                       sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
+                       sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end)
+                ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
 
             'month': f"""
                 'In Month' as counter,
@@ -317,6 +355,7 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _getDerivedSelections(self):
 
+        #if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_group)) > 0:
             for column in self.derived_by_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
