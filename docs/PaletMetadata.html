@@ -1,0 +1,1425 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PaletMetadata &#8212; PALET Wiki Test 1.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ServiceCategory" href="ServiceCategory.html" />
+    <link rel="prev" title="Paletable" href="Paletable.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ServiceCategory.html" title="ServiceCategory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Paletable.html" title="Paletable"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PaletMetadata</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="paletmetadata">
+<h1>PaletMetadata<a class="headerlink" href="#paletmetadata" title="Permalink to this headline">¶</a></h1>
+<p>The PaletMetadata module is composed of the PaletMetadata Class and its respective subclasses. The subclassess correspond
+to high level objects like Enrollment &amp; Eligibility. These classes work to make TAF data more easily readable. Column names
+within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what
+contructed code values correspond to.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PaletMetadata.</span></span><span class="sig-name descname"><span class="pre">PaletMetadata</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>In addition to the readability aspect discussed above, the PaletMetadata class is essential to converting
+data within the TAF files to the outputs returned by the API. This most often applies to assigning names to
+structered code or implementing column names that are more concise and easily understandable.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is a best practice to import this class of the PALET library whenever running a high level
+object in the API.</p>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">palet.PaletMetadata</span> <span class="kn">import</span> <span class="n">PaletMetadata</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Enrollment</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">pd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'pandas'</span> <span class="pre">from</span> <span class="pre">'C:\\Projects\\palet\\.venv\\lib\\site-packages\\pandas\\__init__.py'&gt;</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fileDate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DE_FIL_DT'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_cd_01'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">derived_enrollment_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'enrollment_type'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chip_cd_mon</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_cd_01',</span> <span class="pre">'chip_cd_02',</span> <span class="pre">'chip_cd_03',</span> <span class="pre">'chip_cd_04',</span> <span class="pre">'chip_cd_05',</span> <span class="pre">'chip_cd_06',</span> <span class="pre">'chip_cd_07',</span> <span class="pre">'chip_cd_08',</span> <span class="pre">'chip_cd_09',</span> <span class="pre">'chip_cd_10',</span> <span class="pre">'chip_cd_11',</span> <span class="pre">'chip_cd_12']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chip_cd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'0':</span> <span class="pre">'Not</span> <span class="pre">Eligible',</span> <span class="pre">'1':</span> <span class="pre">'Eligible</span> <span class="pre">for</span> <span class="pre">Medicaid',</span> <span class="pre">'2':</span> <span class="pre">'Eligible</span> <span class="pre">for</span> <span class="pre">Medicaid</span> <span class="pre">&amp;</span> <span class="pre">Medicaid</span> <span class="pre">Expansion</span> <span class="pre">CHIP',</span> <span class="pre">'3':</span> <span class="pre">'Eligible</span> <span class="pre">for</span> <span class="pre">Seperate</span> <span class="pre">Title</span> <span class="pre">XXI</span> <span class="pre">CHIP',</span> <span class="pre">'4':</span> <span class="pre">'Eligible</span> <span class="pre">for</span> <span class="pre">Medicaid</span> <span class="pre">&amp;</span> <span class="pre">Seperate</span> <span class="pre">CHIP',</span> <span class="pre">'null':</span> <span class="pre">'Unknown'}</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identity</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Identity class is a subclass within Enrollment. This subclass assigns column names to
+beneficiary demographic data such as name, date of birth, SSN, etc.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mediciadId</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'msis_ident_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssn</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssn_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssnIndicator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssn_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssnPending</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssn_vrfctn_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">medicareId</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcr_bene_id'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">singleEnrollment</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sngl_enrlmt_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">firstName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_1st_name'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lastName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_last_name'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">middleName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_mdl_initl_name'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dob</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'birth_dt'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dod</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'death_dt'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">age</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'age_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ageGroup</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'age_grp_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">age_band</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'age_band'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">died</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dcsd_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">gender</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gndr_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">maritalStatus</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mrtl_stus_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">income</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'incm_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">vet</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vet_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">incm_cd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'01':</span> <span class="pre">'1-100%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'02':</span> <span class="pre">'101-133%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'03':</span> <span class="pre">'134-150%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'04':</span> <span class="pre">'151-200%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'05':</span> <span class="pre">'201-255%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'06':</span> <span class="pre">'256-300%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'07':</span> <span class="pre">'301-400%</span> <span class="pre">of</span> <span class="pre">FPL',</span> <span class="pre">'08':</span> <span class="pre">'&gt;400%</span> <span class="pre">of</span> <span class="pre">FPL'}</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">age_grp_flag</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'1':</span> <span class="pre">'&lt;1',</span> <span class="pre">'10':</span> <span class="pre">'85-125',</span> <span class="pre">'2':</span> <span class="pre">'1-5',</span> <span class="pre">'3':</span> <span class="pre">'6-14',</span> <span class="pre">'4':</span> <span class="pre">'15-18',</span> <span class="pre">'5':</span> <span class="pre">'19-20',</span> <span class="pre">'6':</span> <span class="pre">'21-44',</span> <span class="pre">'7':</span> <span class="pre">'45-64',</span> <span class="pre">'8':</span> <span class="pre">'65-74',</span> <span class="pre">'9':</span> <span class="pre">'75-84'}</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">locale</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The locale class is a subclass within Enrollment. This subclass assigns column names to
+beneficiary geographic data such as submitting state, city, mailing address, etc.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">submittingState</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SUBMTG_STATE_CD'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">address</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['elgbl_line_1_adr_home',</span> <span class="pre">'elgbl_line_2_adr_home',</span> <span class="pre">'elgbl_line_3_adr_home']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">city</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_city_name_home'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">zip</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_zip_cd_home'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">county</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_cnty_cd_home'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_state_cd_home'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">phone</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_phne_num_home'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reg_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mailAddress</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['elgbl_line_1_adr_mail',</span> <span class="pre">'elgbl_line_2_adr_mail',</span> <span class="pre">'elgbl_line_3_adr_mail']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mailCity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_city_name_mail'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mailZip</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_zip_cd_mail'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mailCounty</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_cnty_cd_mail'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mailState</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_state_cd_mail'</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raceEthnicity</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The raceEthnicity class is a subclass within Enrollment. This subclass assigns column names to
+beneficiary race and ethnicity data such as race, ethnicity, Native American certification, etc.
+This subclass also contains dictionaries explaining the values that correspond to the structed code
+in the following columns: race_ethncty_flag, race_ethncty_exp_flag, ethncty_cd, and crtfd_amrcn_indn_alskn_ntv_ind.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">certifiedAmericanIndian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crtfd_amrcn_indn_alskn_ntv_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ethnicity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ethncty_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">nativeHawaiian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ntv_hi_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">guamanian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'guam_chamorro_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">samoan</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'samoan_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">otherPacificIslander</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'othr_pac_islndr_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unknownPacificIslander</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unk_pac_islndr_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">asian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'asn_indn_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chinese</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chinese_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">filipino</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'filipino_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">japanese</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'japanese_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">korean</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'korean_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">vietmanese</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vietnamese_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">otherAsian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'othr_asn_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unknownAsian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unk_asn_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">white</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'wht_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">black</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'black_afrcn_amrcn_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">native</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aian_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">race</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'race_ethncty_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">raceExpanded</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'race_ethncty_exp_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">hispanic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hspnc_ethncty_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timestampAdd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('rec_add_ts',)</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timestampUpdate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rec_updt_ts'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">race_ethncty_flag</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'1':</span> <span class="pre">'white',</span> <span class="pre">'2':</span> <span class="pre">'black',</span> <span class="pre">'3':</span> <span class="pre">'asian',</span> <span class="pre">'4':</span> <span class="pre">'americanIndian',</span> <span class="pre">'5':</span> <span class="pre">'islander',</span> <span class="pre">'6':</span> <span class="pre">'mixed',</span> <span class="pre">'7':</span> <span class="pre">'hispanic'}</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">race_ethncty_exp_flag</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'1':</span> <span class="pre">'white',</span> <span class="pre">'10':</span> <span class="pre">'otherAsian',</span> <span class="pre">'11':</span> <span class="pre">'unknownAsian',</span> <span class="pre">'12':</span> <span class="pre">'multiAsian',</span> <span class="pre">'13':</span> <span class="pre">'hawaiian',</span> <span class="pre">'14':</span> <span class="pre">'guamChamarro',</span> <span class="pre">'15':</span> <span class="pre">'samoan',</span> <span class="pre">'16':</span> <span class="pre">'otherIslander',</span> <span class="pre">'17':</span> <span class="pre">'unkownIslander',</span> <span class="pre">'18':</span> <span class="pre">'multiIslander',</span> <span class="pre">'19':</span> <span class="pre">'multiRacial',</span> <span class="pre">'2':</span> <span class="pre">'black',</span> <span class="pre">'20':</span> <span class="pre">'hispanic',</span> <span class="pre">'3':</span> <span class="pre">'americanIndian',</span> <span class="pre">'4':</span> <span class="pre">'indian',</span> <span class="pre">'5':</span> <span class="pre">'chinese',</span> <span class="pre">'6':</span> <span class="pre">'filipino',</span> <span class="pre">'7':</span> <span class="pre">'japanese',</span> <span class="pre">'8':</span> <span class="pre">'korean',</span> <span class="pre">'9':</span> <span class="pre">'vietnamese'}</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ethncty_cd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'0':</span> <span class="pre">'notHispanic',</span> <span class="pre">'1':</span> <span class="pre">'mexican',</span> <span class="pre">'2':</span> <span class="pre">'puertoRican',</span> <span class="pre">'3':</span> <span class="pre">'cuban',</span> <span class="pre">'4':</span> <span class="pre">'otherHispanic',</span> <span class="pre">'5':</span> <span class="pre">'unkownHispanic',</span> <span class="pre">'6':</span> <span class="pre">'unspecified'}</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">crtfd_amrcn_indn_alskn_ntv_ind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'0':</span> <span class="pre">'notAmericanIndian',</span> <span class="pre">'1':</span> <span class="pre">'americanIndian',</span> <span class="pre">'2':</span> <span class="pre">'certifiedAmericanIndian'}</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CHIP</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The CHIP class is a subclass within Enrollment. This subclass assigns time periods to
+CHIP enrollment data such as yearly, quarterly, and biannually.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">yearly</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_yr'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_enrlmt_days_01',</span> <span class="pre">'chip_enrlmt_days_02',</span> <span class="pre">'chip_enrlmt_days_03']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_enrlmt_days_04',</span> <span class="pre">'chip_enrlmt_days_05',</span> <span class="pre">'chip_enrlmt_days_06']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_enrlmt_days_07',</span> <span class="pre">'chip_enrlmt_days_08',</span> <span class="pre">'chip_enrlmt_days_09']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_enrlmt_days_10',</span> <span class="pre">'chip_enrlmt_days_11',</span> <span class="pre">'chip_enrlmt_days_12']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">half1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['chip_enrlmt_days_01',</span> <span class="pre">'chip_enrlmt_days_02',</span> <span class="pre">'chip_enrlmt_days_03'],</span> <span class="pre">['chip_enrlmt_days_04',</span> <span class="pre">'chip_enrlmt_days_05',</span> <span class="pre">'chip_enrlmt_days_06']]</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">half2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['chip_enrlmt_days_07',</span> <span class="pre">'chip_enrlmt_days_08',</span> <span class="pre">'chip_enrlmt_days_09'],</span> <span class="pre">['chip_enrlmt_days_10',</span> <span class="pre">'chip_enrlmt_days_11',</span> <span class="pre">'chip_enrlmt_days_12']]</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monthly</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Monthly class is a subclass within CHIP. This subclass assigns months to
+CHIP enrollment data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jan</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_01'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Feb</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_02'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Mar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_03'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Apr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_04'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">May</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_05'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jun</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_06'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jul</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_07'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Aug</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_08'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Sep</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_09'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Oct</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_10'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Nov</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_11'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Dec</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrlmt_days_12'</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Medicaid</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Medicaid class is a subclass within Enrollment. This subclass assigns time periods to
+CHIP enrollment data such as yearly, quarterly, and biannually.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">yearly</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_yr'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mdcd_enrlmt_days_01',</span> <span class="pre">'mdcd_enrlmt_days_02',</span> <span class="pre">'mdcd_enrlmt_days_03']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mdcd_enrlmt_days_04',</span> <span class="pre">'mdcd_enrlmt_days_05',</span> <span class="pre">'mdcd_enrlmt_days_06']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mdcd_enrlmt_days_07',</span> <span class="pre">'mdcd_enrlmt_days_08',</span> <span class="pre">'mdcd_enrlmt_days_09']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">quarter4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mdcd_enrlmt_days_10',</span> <span class="pre">'mdcd_enrlmt_days_11',</span> <span class="pre">'mdcd_enrlmt_days_12']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">half1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['mdcd_enrlmt_days_01',</span> <span class="pre">'mdcd_enrlmt_days_02',</span> <span class="pre">'mdcd_enrlmt_days_03'],</span> <span class="pre">['mdcd_enrlmt_days_04',</span> <span class="pre">'mdcd_enrlmt_days_05',</span> <span class="pre">'mdcd_enrlmt_days_06']]</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">half2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[['mdcd_enrlmt_days_07',</span> <span class="pre">'mdcd_enrlmt_days_08',</span> <span class="pre">'mdcd_enrlmt_days_09'],</span> <span class="pre">['mdcd_enrlmt_days_10',</span> <span class="pre">'mdcd_enrlmt_days_11',</span> <span class="pre">'mdcd_enrlmt_days_12']]</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monthly</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Monthly class is a subclass within Medicaid. This subclass assigns months to
+Medicaid enrollment data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jan</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_01'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Feb</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_02'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Mar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_03'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Apr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_04'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">May</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_05'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jun</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_06'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Jul</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_07'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Aug</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_08'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Sep</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_09'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Oct</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_10'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Nov</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_11'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Dec</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_enrlmt_days_12'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">enrollment</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'01':</span> <span class="pre">'mdcd_enrlmt_days_01',</span> <span class="pre">'02':</span> <span class="pre">'mdcd_enrlmt_days_02',</span> <span class="pre">'03':</span> <span class="pre">'mdcd_enrlmt_days_03',</span> <span class="pre">'04':</span> <span class="pre">'mdcd_enrlmt_days_04',</span> <span class="pre">'05':</span> <span class="pre">'mdcd_enrlmt_days_05',</span> <span class="pre">'06':</span> <span class="pre">'mdcd_enrlmt_days_06',</span> <span class="pre">'07':</span> <span class="pre">'mdcd_enrlmt_days_07',</span> <span class="pre">'08':</span> <span class="pre">'mdcd_enrlmt_days_08',</span> <span class="pre">'09':</span> <span class="pre">'mdcd_enrlmt_days_09',</span> <span class="pre">'10':</span> <span class="pre">'mdcd_enrlmt_days_10',</span> <span class="pre">'11':</span> <span class="pre">'mdcd_enrlmt_days_11',</span> <span class="pre">'12':</span> <span class="pre">'mdcd_enrlmt_days_12'}</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">claimNumber</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcr_hicn_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">caseNumber</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'msis_case_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">citizenship</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['ctznshp_ind',</span> <span class="pre">'ctznshp_vrfctn_ind']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">immigrationStatus</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['imgrtn_stus_cd',</span> <span class="pre">'imgrtn_vrfctn_ind',</span> <span class="pre">'imgrtn_stus_5_yr_bar_end_dt']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">language</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['othr_lang_home_cd',</span> <span class="pre">'prmry_lang_flag',</span> <span class="pre">'prmry_lang_englsh_prfcncy_cd']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">householdSize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hsehld_size_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">pregnant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['prgnt_ind',</span> <span class="pre">'prgncy_flag']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">careLevel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'care_lvl_stus_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">deaf</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'deaf_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">blind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blnd_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">difficultyConcentrating</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dfclty_conc_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">difficultyWalking</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dfclty_wlkg_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">difficultyBathing</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dfclty_drsng_bathg_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">difficultyErrands</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dfclty_errands_aln_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">disabilityOther</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'othr_dsbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">enrollmentType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'enrl_type_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibleDaysThisMonth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'days_elig_in_mo_cnt'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibleThisMonth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_entir_mo_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibleLastDayThisMonth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgbl_last_day_of_mo_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chip</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">scope</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rstrctd_bnfts_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssdi</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssdi_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssi</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssi_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssiStateCode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssi_state_splmt_stus_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ssiStatus</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ssi_stus_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">birthToConception</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'birth_cncptn_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">temporaryAssistance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tanf_cash_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">healthMdeicalHome</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hh_pgm_prtcpnt_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">healthProvider</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hh_prvdr_num'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">healthEntity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hh_ent_name'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">malignantHyperthermia</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mh_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">substanceAbuse</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sa_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">asthma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'asthma_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">diabetes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dbts_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">heartDisease</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hrt_dis_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">overweight</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ovrwt_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">hiv</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hiv_aids_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">otherChronicConidition</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'othr_hh_chrnc_cond_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lockInProvider</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['lckin_prvdr_num1',</span> <span class="pre">'lckin_prvdr_num2',</span> <span class="pre">'lckin_prvdr_num3']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lockInProviderType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['lckin_prvdr_type_cd1',</span> <span class="pre">'lckin_prvdr_type_cd2',</span> <span class="pre">'lckin_prvdr_type_cd3']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lockIn</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lckin_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">longTermProvider</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['ltss_prvdr_num1',</span> <span class="pre">'ltss_prvdr_num2',</span> <span class="pre">'ltss_prvdr_num3']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">longTermCareLevel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['ltss_lvl_care_cd1',</span> <span class="pre">'ltss_lvl_care_cd2',</span> <span class="pre">'ltss_lvl_care_cd3']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">livesWithFamily</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_lvs_wth_fmly_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">qualifiedInstituion</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_qlfyd_instn_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">qualifiedResidence</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_qlfyd_rsdnc_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">participationEndedReason</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_prtcptn_endd_rsn_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reinstitutionalizedReasonCode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_rinstlzd_rsn_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">moneyFollowsPerson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mfp_prtcpnt_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cfc</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cmnty_1st_chs_spo_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">thirdPartyLiabilityInsurance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tpl_insrnc_cvrg_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">thirdPartyLiabilityOther</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tpl_othr_cvrg_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">enrollmentIntervals</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'medicaid_enrollment_intervals'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">CHIPIntervals</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'chip_enrollment_intervals'</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Eligibility</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Eiligibility class is a subclass of PaletMetadata. This class primaryily assigns more readable
+and concise column names to the TAF data pertaining to Medicaid and CHIP eligibility.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incomplete, work in progress.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fileDate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DE_FIL_DT'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibiltyGroup</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgblty_grp_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">primaryEligibilityGroup</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'prmry_elgblty_grp_ind'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibiltyGroupCategory</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgblty_grp_ctgry_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">maintenanceAssistanceStatus</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mas_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibilityBasis</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elgblty_mdcd_basis_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">masEligibilityBasis</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'masboe_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">stateEligibility</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'state_spec_elgblty_fctr_txt'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dualEligibilityCode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dual_elgbl_cd'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dualEligibility</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dual_elgbl_flag'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">notEnrolled</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mdcd_not_enrolled'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">eligibility_cd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'01':</span> <span class="pre">'Parents</span> <span class="pre">&amp;</span> <span class="pre">Other</span> <span class="pre">Caretaker</span> <span class="pre">Relatives',</span> <span class="pre">'02':</span> <span class="pre">'Transitional</span> <span class="pre">Medical</span> <span class="pre">Assistance',</span> <span class="pre">'03':</span> <span class="pre">'Extended</span> <span class="pre">Medicaid</span> <span class="pre">due</span> <span class="pre">to</span> <span class="pre">Earnings',</span> <span class="pre">'04':</span> <span class="pre">'Extended</span> <span class="pre">Medicaid</span> <span class="pre">due</span> <span class="pre">to</span> <span class="pre">Spousal</span> <span class="pre">Support</span> <span class="pre">Collections',</span> <span class="pre">'05':</span> <span class="pre">'Pregnant</span> <span class="pre">Women',</span> <span class="pre">'06':</span> <span class="pre">'Deemed</span> <span class="pre">Newborns',</span> <span class="pre">'07':</span> <span class="pre">'Infants</span> <span class="pre">&amp;</span> <span class="pre">Children</span> <span class="pre">under</span> <span class="pre">Age</span> <span class="pre">19',</span> <span class="pre">'08':</span> <span class="pre">'Children</span> <span class="pre">w/</span> <span class="pre">Title</span> <span class="pre">IV-E</span> <span class="pre">Adoption</span> <span class="pre">Asst,</span> <span class="pre">Foster</span> <span class="pre">or</span> <span class="pre">Guardianship</span> <span class="pre">Care',</span> <span class="pre">'09':</span> <span class="pre">'Former</span> <span class="pre">Foster</span> <span class="pre">Care</span> <span class="pre">Children',</span> <span class="pre">'11':</span> <span class="pre">'Indvl</span> <span class="pre">Receiving</span> <span class="pre">SSI',</span> <span class="pre">'12':</span> <span class="pre">'Aged,</span> <span class="pre">Blind</span> <span class="pre">&amp;</span> <span class="pre">Disabled</span> <span class="pre">Indvl</span> <span class="pre">in</span> <span class="pre">209(b)</span> <span class="pre">States',</span> <span class="pre">'13':</span> <span class="pre">'Indvl</span> <span class="pre">Receiving</span> <span class="pre">M&amp;atory</span> <span class="pre">State</span> <span class="pre">Supplements',</span> <span class="pre">'14':</span> <span class="pre">'Indvl</span> <span class="pre">Who</span> <span class="pre">Are</span> <span class="pre">Essential</span> <span class="pre">Spouses',</span> <span class="pre">'15':</span> <span class="pre">'Institutionalized</span> <span class="pre">Indvl</span> <span class="pre">Continuously</span> <span class="pre">Eligible</span> <span class="pre">Since</span> <span class="pre">1973',</span> <span class="pre">'16':</span> <span class="pre">'Blind</span> <span class="pre">or</span> <span class="pre">Disabled</span> <span class="pre">Indvl</span> <span class="pre">Eligible</span> <span class="pre">1973',</span> <span class="pre">'17':</span> <span class="pre">'Indvl</span> <span class="pre">Who</span> <span class="pre">Lost</span> <span class="pre">Eligibility</span> <span class="pre">for</span> <span class="pre">SSI/SSP</span> <span class="pre">Due</span> <span class="pre">to</span> <span class="pre">Incr.</span> <span class="pre">OASDI</span> <span class="pre">Benefits</span> <span class="pre">in</span> <span class="pre">1972',</span> <span class="pre">'18':</span> <span class="pre">'Indvl</span> <span class="pre">Who</span> <span class="pre">Would</span> <span class="pre">be</span> <span class="pre">Eligible</span> <span class="pre">SSI/SSP</span> <span class="pre">but</span> <span class="pre">for</span> <span class="pre">OASDI</span> <span class="pre">COLA</span> <span class="pre">incr.</span> <span class="pre">since</span> <span class="pre">April,</span> <span class="pre">1977',</span> <span class="pre">'19':</span> <span class="pre">'Disabled</span> <span class="pre">Widows</span> <span class="pre">&amp;</span> <span class="pre">Widowers</span> <span class="pre">Ineligible</span> <span class="pre">for</span> <span class="pre">SSI</span> <span class="pre">due</span> <span class="pre">to</span> <span class="pre">Increase</span> <span class="pre">in</span> <span class="pre">OASDI',</span> <span class="pre">'20':</span> <span class="pre">'Disabled</span> <span class="pre">Widows</span> <span class="pre">&amp;</span> <span class="pre">Widowers</span> <span class="pre">Ineligible</span> <span class="pre">for</span> <span class="pre">SSI</span> <span class="pre">due</span> <span class="pre">to</span> <span class="pre">Early</span> <span class="pre">Rcpt</span> <span class="pre">of</span> <span class="pre">Social</span> <span class="pre">Security',</span> <span class="pre">'21':</span> <span class="pre">'Working</span> <span class="pre">Disabled</span> <span class="pre">under</span> <span class="pre">1619(b)',</span> <span class="pre">'22':</span> <span class="pre">'Disabled</span> <span class="pre">Adult</span> <span class="pre">Children',</span> <span class="pre">'23':</span> <span class="pre">'Qualified</span> <span class="pre">Medicare</span> <span class="pre">Beneficiaries',</span> <span class="pre">'24':</span> <span class="pre">'Qualified</span> <span class="pre">Disabled</span> <span class="pre">&amp;</span> <span class="pre">Working</span> <span class="pre">Indvl',</span> <span class="pre">'25':</span> <span class="pre">'Specified</span> <span class="pre">Low</span> <span class="pre">Income</span> <span class="pre">Medicare</span> <span class="pre">Beneficiaries',</span> <span class="pre">'26':</span> <span class="pre">'Qualifying</span> <span class="pre">Indvl',</span> <span class="pre">'27':</span> <span class="pre">'Optional</span> <span class="pre">Coverage</span> <span class="pre">of</span> <span class="pre">Parents</span> <span class="pre">&amp;</span> <span class="pre">Other</span> <span class="pre">Caretaker</span> <span class="pre">Relatives',</span> <span class="pre">'28':</span> <span class="pre">'Reasonable</span> <span class="pre">Classifications</span> <span class="pre">of</span> <span class="pre">Indvl</span> <span class="pre">under</span> <span class="pre">Age</span> <span class="pre">21',</span> <span class="pre">'29':</span> <span class="pre">'Children</span> <span class="pre">w/</span> <span class="pre">Non-IV-E</span> <span class="pre">Adoption</span> <span class="pre">Assistance',</span> <span class="pre">'30':</span> <span class="pre">'Independent</span> <span class="pre">Foster</span> <span class="pre">Care</span> <span class="pre">Adolescents',</span> <span class="pre">'31':</span> <span class="pre">'Optional</span> <span class="pre">Targeted</span> <span class="pre">Low</span> <span class="pre">Income</span> <span class="pre">Children',</span> <span class="pre">'32':</span> <span class="pre">'Indvl</span> <span class="pre">Electing</span> <span class="pre">COBRA</span> <span class="pre">Continuation</span> <span class="pre">Coverage',</span> <span class="pre">'33':</span> <span class="pre">'Indvl</span> <span class="pre">above</span> <span class="pre">133%</span> <span class="pre">FPL</span> <span class="pre">under</span> <span class="pre">Age</span> <span class="pre">65',</span> <span class="pre">'34':</span> <span class="pre">'Certain</span> <span class="pre">Indvl</span> <span class="pre">Needing</span> <span class="pre">Treatment</span> <span class="pre">for</span> <span class="pre">Breast</span> <span class="pre">or</span> <span class="pre">Cervical</span> <span class="pre">Cancer',</span> <span class="pre">'35':</span> <span class="pre">'Indvl</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">Family</span> <span class="pre">Planning</span> <span class="pre">Services',</span> <span class="pre">'36':</span> <span class="pre">'Indvl</span> <span class="pre">w/</span> <span class="pre">Tuberculosis',</span> <span class="pre">'37':</span> <span class="pre">'Aged,</span> <span class="pre">Blind</span> <span class="pre">or</span> <span class="pre">Dsbld</span> <span class="pre">Indiv.</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">but</span> <span class="pre">Not</span> <span class="pre">Receiving</span> <span class="pre">Cash</span> <span class="pre">Asst',</span> <span class="pre">'38':</span> <span class="pre">'Indvl</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">Cash</span> <span class="pre">Assistance</span> <span class="pre">except</span> <span class="pre">for</span> <span class="pre">Institutionalization',</span> <span class="pre">'39':</span> <span class="pre">'Indvl</span> <span class="pre">Receiving</span> <span class="pre">Home</span> <span class="pre">&amp;</span> <span class="pre">Community</span> <span class="pre">Based</span> <span class="pre">Services</span> <span class="pre">under</span> <span class="pre">Institutional</span> <span class="pre">Rules',</span> <span class="pre">'40':</span> <span class="pre">'Optional</span> <span class="pre">State</span> <span class="pre">Suppl</span> <span class="pre">Recipients</span> <span class="pre">-</span> <span class="pre">1634</span> <span class="pre">States,</span> <span class="pre">&amp;</span> <span class="pre">SSI</span> <span class="pre">Criteria</span> <span class="pre">States</span> <span class="pre">w/</span> <span class="pre">1616</span> <span class="pre">Agremts',</span> <span class="pre">'41':</span> <span class="pre">'Optional</span> <span class="pre">State</span> <span class="pre">Suppl</span> <span class="pre">Recipients</span> <span class="pre">-</span> <span class="pre">209(b)</span> <span class="pre">States,</span> <span class="pre">&amp;</span> <span class="pre">SSI</span> <span class="pre">Criteria</span> <span class="pre">States</span> <span class="pre">w/out</span> <span class="pre">1616</span> <span class="pre">Agreements',</span> <span class="pre">'42':</span> <span class="pre">'Institutionalized</span> <span class="pre">Indvl</span> <span class="pre">Eligible</span> <span class="pre">under</span> <span class="pre">a</span> <span class="pre">Special</span> <span class="pre">Income</span> <span class="pre">Level',</span> <span class="pre">'43':</span> <span class="pre">'Indvl</span> <span class="pre">participating</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">PACE</span> <span class="pre">Program</span> <span class="pre">under</span> <span class="pre">Institutional</span> <span class="pre">Rules',</span> <span class="pre">'44':</span> <span class="pre">'Indvl</span> <span class="pre">Receiving</span> <span class="pre">Hospice</span> <span class="pre">Care',</span> <span class="pre">'45':</span> <span class="pre">'Qualified</span> <span class="pre">Disabled</span> <span class="pre">Children</span> <span class="pre">under</span> <span class="pre">Age</span> <span class="pre">19',</span> <span class="pre">'46':</span> <span class="pre">'Poverty</span> <span class="pre">Level</span> <span class="pre">Aged</span> <span class="pre">or</span> <span class="pre">Disabled',</span> <span class="pre">'47':</span> <span class="pre">'Work</span> <span class="pre">Incentives</span> <span class="pre">Eligibility</span> <span class="pre">Group',</span> <span class="pre">'48':</span> <span class="pre">'Ticket</span> <span class="pre">to</span> <span class="pre">Work</span> <span class="pre">Basic</span> <span class="pre">Group',</span> <span class="pre">'49':</span> <span class="pre">'Ticket</span> <span class="pre">to</span> <span class="pre">Work</span> <span class="pre">Medical</span> <span class="pre">Improvements</span> <span class="pre">Group',</span> <span class="pre">'50':</span> <span class="pre">'Family</span> <span class="pre">Opportunity</span> <span class="pre">Act</span> <span class="pre">Children</span> <span class="pre">w/</span> <span class="pre">Disabilities',</span> <span class="pre">'51':</span> <span class="pre">'Indvl</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">Home</span> <span class="pre">&amp;</span> <span class="pre">Community-Based</span> <span class="pre">Services',</span> <span class="pre">'52':</span> <span class="pre">'Indvl</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">Home</span> <span class="pre">&amp;</span> <span class="pre">Community-Based</span> <span class="pre">Services</span> <span class="pre">-</span> <span class="pre">Special</span> <span class="pre">Income</span> <span class="pre">Level',</span> <span class="pre">'53':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Pregnant</span> <span class="pre">Women',</span> <span class="pre">'54':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Children</span> <span class="pre">under</span> <span class="pre">Age</span> <span class="pre">18',</span> <span class="pre">'55':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Children</span> <span class="pre">Age</span> <span class="pre">18</span> <span class="pre">Through</span> <span class="pre">20',</span> <span class="pre">'56':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Parents</span> <span class="pre">&amp;</span> <span class="pre">Other</span> <span class="pre">Caretakers',</span> <span class="pre">'59':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Aged,</span> <span class="pre">Blind</span> <span class="pre">or</span> <span class="pre">Disabled',</span> <span class="pre">'60':</span> <span class="pre">'Medically</span> <span class="pre">Needy</span> <span class="pre">Blind</span> <span class="pre">or</span> <span class="pre">Disabled</span> <span class="pre">Indvl</span> <span class="pre">Eligible</span> <span class="pre">1973',</span> <span class="pre">'61':</span> <span class="pre">'Targeted</span> <span class="pre">Low-Income</span> <span class="pre">Children',</span> <span class="pre">'62':</span> <span class="pre">'Deemed</span> <span class="pre">Newborn',</span> <span class="pre">'63':</span> <span class="pre">'Children</span> <span class="pre">Ineligible</span> <span class="pre">for</span> <span class="pre">Medicaid</span> <span class="pre">Due</span> <span class="pre">to</span> <span class="pre">Loss</span> <span class="pre">of</span> <span class="pre">Income</span> <span class="pre">Disregards',</span> <span class="pre">'64':</span> <span class="pre">'Coverage</span> <span class="pre">from</span> <span class="pre">Conception</span> <span class="pre">to</span> <span class="pre">Birth',</span> <span class="pre">'65':</span> <span class="pre">'Children</span> <span class="pre">w/</span> <span class="pre">Access</span> <span class="pre">to</span> <span class="pre">Public</span> <span class="pre">Employee</span> <span class="pre">Coverage',</span> <span class="pre">'66':</span> <span class="pre">'Children</span> <span class="pre">Eligible</span> <span class="pre">for</span> <span class="pre">Dental</span> <span class="pre">Only</span> <span class="pre">Supplemental</span> <span class="pre">Coverage',</span> <span class="pre">'67':</span> <span class="pre">'Targeted</span> <span class="pre">Low-Income</span> <span class="pre">Pregnant</span> <span class="pre">Women',</span> <span class="pre">'68':</span> <span class="pre">'Pregnant</span> <span class="pre">Women</span> <span class="pre">w/</span> <span class="pre">Access</span> <span class="pre">to</span> <span class="pre">Public</span> <span class="pre">Employee</span> <span class="pre">Coverage',</span> <span class="pre">'69':</span> <span class="pre">'Indvl</span> <span class="pre">w/</span> <span class="pre">Mental</span> <span class="pre">Health</span> <span class="pre">Conditions</span> <span class="pre">(expansion</span> <span class="pre">group)',</span> <span class="pre">'70':</span> <span class="pre">'Family</span> <span class="pre">Planning</span> <span class="pre">Participants</span> <span class="pre">(expansion</span> <span class="pre">group)',</span> <span class="pre">'71':</span> <span class="pre">'Other</span> <span class="pre">expansion</span> <span class="pre">group',</span> <span class="pre">'72':</span> <span class="pre">'Adult</span> <span class="pre">Group</span> <span class="pre">-</span> <span class="pre">Indvl</span> <span class="pre">&lt;=</span> <span class="pre">133%</span> <span class="pre">FPL</span> <span class="pre">Age</span> <span class="pre">19</span> <span class="pre">-</span> <span class="pre">64,</span> <span class="pre">newly</span> <span class="pre">elgbl</span> <span class="pre">for</span> <span class="pre">all</span> <span class="pre">states',</span> <span class="pre">'73':</span> <span class="pre">'Adult</span> <span class="pre">Group</span> <span class="pre">-</span> <span class="pre">Indvl</span> <span class="pre">&lt;=</span> <span class="pre">133%</span> <span class="pre">FPL</span> <span class="pre">Age</span> <span class="pre">19</span> <span class="pre">-</span> <span class="pre">64,</span> <span class="pre">not</span> <span class="pre">newly</span> <span class="pre">elgbl</span> <span class="pre">for</span> <span class="pre">non</span> <span class="pre">1905z(3)</span> <span class="pre">states',</span> <span class="pre">'74':</span> <span class="pre">'Adult</span> <span class="pre">Group</span> <span class="pre">-</span> <span class="pre">Indvl</span> <span class="pre">&lt;=</span> <span class="pre">133%</span> <span class="pre">FPL</span> <span class="pre">Age</span> <span class="pre">19</span> <span class="pre">-</span> <span class="pre">64,</span> <span class="pre">not</span> <span class="pre">newly</span> <span class="pre">elgbl</span> <span class="pre">parent/caretaker-relative(s)</span> <span class="pre">in</span> <span class="pre">1905z(3)</span> <span class="pre">states',</span> <span class="pre">'75':</span> <span class="pre">'Adult</span> <span class="pre">Group</span> <span class="pre">-</span> <span class="pre">Indvl</span> <span class="pre">&lt;=</span> <span class="pre">133%</span> <span class="pre">FPL</span> <span class="pre">Age</span> <span class="pre">19</span> <span class="pre">-</span> <span class="pre">64,</span> <span class="pre">not</span> <span class="pre">newly</span> <span class="pre">elgbl</span> <span class="pre">non-parent/caretaker-relative(s)</span> <span class="pre">in</span> <span class="pre">1905z(3)</span> <span class="pre">states',</span> <span class="pre">'76':</span> <span class="pre">'Uninsured</span> <span class="pre">Individual</span> <span class="pre">eligible</span> <span class="pre">for</span> <span class="pre">COVID-19</span> <span class="pre">testing'}</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Coverage</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Coverage class is a subclass of PaletMetadata. This class primaryily assigns more readable
+and concise column names to the TAF data pertaining to Medicaid and CHIP coverage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incomplete, work in progress.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fileDate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DE_FIL_DT'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mc_plan_type_cd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coverage_type'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coverage_type'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">coverage_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'01':</span> <span class="pre">'Comprehensive</span> <span class="pre">Managed</span> <span class="pre">Care</span> <span class="pre">Organization',</span> <span class="pre">'02':</span> <span class="pre">'Traditional</span> <span class="pre">PCCM</span> <span class="pre">Provider</span> <span class="pre">arrangement',</span> <span class="pre">'03':</span> <span class="pre">'Enhanced</span> <span class="pre">PCCM</span> <span class="pre">Provider</span> <span class="pre">arrangement',</span> <span class="pre">'04':</span> <span class="pre">'Health</span> <span class="pre">Insuring</span> <span class="pre">Organization</span> <span class="pre">(HIO)',</span> <span class="pre">'05':</span> <span class="pre">'Medical-Only</span> <span class="pre">PIHP',</span> <span class="pre">'06':</span> <span class="pre">'Medical-Only</span> <span class="pre">PAHP',</span> <span class="pre">'07':</span> <span class="pre">'Long-Term</span> <span class="pre">Services</span> <span class="pre">&amp;</span> <span class="pre">Supports</span> <span class="pre">(LTSS)</span> <span class="pre">PIHP',</span> <span class="pre">'08':</span> <span class="pre">'Mental</span> <span class="pre">Health</span> <span class="pre">(MH)</span> <span class="pre">PIHP',</span> <span class="pre">'09':</span> <span class="pre">'Mental</span> <span class="pre">Health</span> <span class="pre">(MH)</span> <span class="pre">PAHP',</span> <span class="pre">'10':</span> <span class="pre">'(SUD)</span> <span class="pre">PIHP',</span> <span class="pre">'11':</span> <span class="pre">'Substance</span> <span class="pre">Use</span> <span class="pre">Disorders</span> <span class="pre">(SUD)</span> <span class="pre">PAHP',</span> <span class="pre">'12':</span> <span class="pre">'Mental</span> <span class="pre">Health</span> <span class="pre">(MH)</span> <span class="pre">and</span> <span class="pre">(SUD)</span> <span class="pre">PIHP',</span> <span class="pre">'13':</span> <span class="pre">'Mental</span> <span class="pre">Health</span> <span class="pre">(MH)</span> <span class="pre">and</span> <span class="pre">(SUD)</span> <span class="pre">PAHP',</span> <span class="pre">'14':</span> <span class="pre">'Dental</span> <span class="pre">PAHP',</span> <span class="pre">'15':</span> <span class="pre">'Transportation</span> <span class="pre">PAHP',</span> <span class="pre">'16':</span> <span class="pre">'Disease</span> <span class="pre">Management</span> <span class="pre">PAHP',</span> <span class="pre">'17':</span> <span class="pre">'Prog</span> <span class="pre">All-Inclusive</span> <span class="pre">Care</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">Elderly</span> <span class="pre">(PACE)',</span> <span class="pre">'18':</span> <span class="pre">'Pharmacy</span> <span class="pre">PAHP',</span> <span class="pre">'19':</span> <span class="pre">'LT</span> <span class="pre">Services</span> <span class="pre">&amp;</span> <span class="pre">Supports</span> <span class="pre">(LTSS)</span> <span class="pre">and</span> <span class="pre">(MH)</span> <span class="pre">PIHP',</span> <span class="pre">'20':</span> <span class="pre">'Other',</span> <span class="pre">'60':</span> <span class="pre">'Accountable</span> <span class="pre">Care</span> <span class="pre">Organization',</span> <span class="pre">'70':</span> <span class="pre">'Health/Medical</span> <span class="pre">Home</span> <span class="pre">(retired</span> <span class="pre">value)',</span> <span class="pre">'80':</span> <span class="pre">'Integrated</span> <span class="pre">Care</span> <span class="pre">for</span> <span class="pre">Dual</span> <span class="pre">Eligibles',</span> <span class="pre">'null':</span> <span class="pre">'Unknown'}</span></em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Enrichment</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">pd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'pandas'</span> <span class="pre">from</span> <span class="pre">'C:\\Projects\\palet\\.venv\\lib\\site-packages\\pandas\\__init__.py'&gt;</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">hour</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">minute</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">microsecond</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">tzinfo</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></p>
+<p>The year, month and day arguments are required. tzinfo may be None, or an
+instance of a tzinfo subclass. The remaining arguments may be ints.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">astimezone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>tz -&gt; convert to local time in new timezone tz</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>date, time -&gt; datetime with same date and time fields</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ctime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return ctime() style string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return date object with same year, month and day.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dst</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return self.tzinfo.dst(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fold</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fromisoformat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>string -&gt; datetime from datetime.isoformat() output</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fromtimestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>timestamp[, tz] -&gt; tz’s local time from POSIX timestamp.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">hour</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">isoformat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>[sep] -&gt; string in ISO 8601 format, YYYY-MM-DDT[HH[:MM[:SS[.mmm[uuu]]]]][+HH:MM].
+sep is used to separate the year from the time, and defaults to ‘T’.
+The optional argument timespec specifies the number of additional terms
+of the time to include. Valid options are ‘auto’, ‘hours’, ‘minutes’,
+‘seconds’, ‘milliseconds’ and ‘microseconds’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">datetime.datetime(9999,</span> <span class="pre">12,</span> <span class="pre">31,</span> <span class="pre">23,</span> <span class="pre">59,</span> <span class="pre">59,</span> <span class="pre">999999)</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">microsecond</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">min</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">datetime.datetime(1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">0)</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">minute</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">now</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Returns new datetime object representing current time local to tz.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>tz</dt><dd><p>Timezone object.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If no tz is specified, uses local timezone.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return datetime with new specified fields.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">datetime.timedelta(microseconds=1)</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">second</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">strptime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>string, format -&gt; new datetime parsed from a string (like time.strptime()).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return time object with same time but with tzinfo=None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return POSIX timestamp as float.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timetuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return time tuple, compatible with time.localtime().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timetz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return time object with same time and tzinfo.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tzinfo</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tzname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return self.tzinfo.tzname(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">utcfromtimestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Construct a naive UTC datetime from a POSIX timestamp.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">utcnow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return a new datetime representing UTC day and time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">utcoffset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return self.tzinfo.utcoffset(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">utctimetuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return UTC time tuple, compatible with time.localtime().</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Palet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The class responsible initialization, logging and utilities.
+This class is critical to utilizing the PALET library. It initializes the API, logs data, and provides access to the Utils subclass.</p>
+<p class="rubric">Example</p>
+<p>from palet.Palet import Palet</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class is inherited from the Paletable, which is inherited from all high level objecsts. As such this class does not need to be
+manually imported.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">PERFORMANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Utils</span></span></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Sub-class within the Palet class containing utilities.
+The Utils subclass features static methods that can be used by CMS analysts.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Static method to compress a string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> – <cite>str</cite>: The string a user wishes to compress</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A compressed string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createDateRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Static method for creating a data range when viewing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>year</strong> – <cite>str</cite>: The year an analyst wants to view data for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Data from the all 12 months of the specified year.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numDaysInMonth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propertiesOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Static method allowing the analyst to return the sql functions being run by the palet library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sql</strong> – <cite>str</cite>: The SQL function an analyst is utilizing when logging.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prints the SQL query an analyst is using for logging purposes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cache_run_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'da_run_id'</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">initialize_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">now</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Attribute that initializes the logger within the Palet class.
+Prints a datetime so it is clear to the user when the code was executed.
+Logging contains multiple levels: INFO, DEBUG, WARNING, ERROR, CRITICAL, and FATAL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>now</strong> – <cite>datetime, optional</cite>: Filter a date and time. Can be set but shouldn’t. Defaults to when a log line is written.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prints a datetime to show when the code was executed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_metadata_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Attribute for loading in Pickle metadata files sourced from Excel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> – <cite>str</cite>: The name of the pkl file without the extension</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PDF file with the metadata from the specified pkl file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>To be Determined.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">getDefinedColumns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Paletable.html"
+                        title="previous chapter">Paletable</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ServiceCategory.html"
+                        title="next chapter">ServiceCategory</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/PaletMetadata.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ServiceCategory.html" title="ServiceCategory"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Paletable.html" title="Paletable"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PaletMetadata</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, ch.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>
