@@ -73,17 +73,21 @@ class Diagnoses:
             >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
                         'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
 
-            Create an Enrollment Object:
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
 
-            >>> api = Enrollment.ByMonth()
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
 
-            Use the :meth:`~Enrollment.Enrollment.having` function with where() as a parameter to filter by chronic condition
+            Return DataFrame:
 
-            >>> df = api.having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+            >>> display(api.fetch())
 
-            Return DataFrame
+            Use the mark function to add a column specifying the chronic condition which the user is filtering by:
 
-            >>> display(df.fetch())
+            >>> api = Enrollment([6280]).byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
 
         """
 
