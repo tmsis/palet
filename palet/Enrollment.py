@@ -131,6 +131,15 @@ class Enrollment(Paletable):
 
         Cull - Provides the individual beneficiaries enrolled within the time period or periods specified.
 
+        Available Time Units:
+            In Year (year) - Beneficiaries enrolled at least one day in a given year
+
+            In Month (month) - Beneficiaries enrolled at least one day in a given month
+
+            Full Month (full) - Beneficiaries enrolled in n days of a given month, where n is the total number of days in said month
+
+            Partial Month (partial) - Beneficiaries enrolled in 1 to n-1 days of a given month, where n is the total number of days in said month
+
         Note:
             This class affects both Medicaid & CHIP Enrollment.
         """
@@ -473,6 +482,43 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def mark(self, condition: Diagnoses, marker: str):
+        """
+        The mark function appends a condition column to a dataframe that was filtered using the :meth:`~Enrollment.Enrollment.having` function. Additionally,        
+        it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+
+        Note:
+            The mark function should only be utilized once the analyst has filtered their Enrollment object with :meth:`~Enrollment.Enrollment.having`.
+
+        Args:
+            condition: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
+            marker: `str`: The lable to be populated in the condition column.
+
+        Returns:
+            DataFrame: Returns the updated object filtered by the specified chronic condition with a condition column
+
+        Example:
+            Create a list of diagnoses codes:
+
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Use the mark function to add a column specifying the chronic condition which the user is filtering by:
+
+            >>> api = Enrollment([6280]).byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
+
+        """
 
         self.markers[marker] = condition
         return self
@@ -555,6 +601,39 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def having(self, constraint: Diagnoses):
+        """
+        The having function, allows user to filter Enrollment objects by chronic conidition diagnoses. The :meth:`~Diagnoses.Diagnoses.where` from :class:`Diagnoses`.
+        Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+
+        Args:
+            constraint: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
+
+        Returns:
+            DataFrame: Returns the updated object filtered by the specified chronic condition.
+
+        Example:
+            Create a list of diagnoses codes:
+
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+
+            Create an Enrollment object & use the having function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Use the :meth:`~Enrollment.Enrollment.mark` function to add a column specifying the chronic condition which the user is filtering by:
+
+            >>> api = Enrollment([6280]).byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
+            
+        """
         if constraint not in self.having_constraints:
             # self.palet.logger.debug('')
             self.having_constraints.append(constraint)
