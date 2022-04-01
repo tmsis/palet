@@ -1,0 +1,239 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Palet &#8212; PALET Wiki Test 1.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Paletable" href="Paletable.html" />
+    <link rel="prev" title="EnrollmentType" href="EnrollmentType.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Paletable.html" title="Paletable"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="EnrollmentType.html" title="EnrollmentType"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Palet</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Palet">
+<span id="palet"></span><h1>Palet<a class="headerlink" href="#module-Palet" title="Permalink to this headline">¶</a></h1>
+<p>The flagship class the Palet lirbary is built around. This class provides the frame work for other classes in the library.
+The Palet module contains the Palet class, the Utils subclass (short for utilities), and attributes for initialization, loading
+metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from
+the Paletable module inherit from Palet as well.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="Palet.Palet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Palet.</span></span><span class="sig-name descname"><span class="pre">Palet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The class responsible initialization, logging and utilities.
+This class is critical to utilizing the PALET library. It initializes the API, logs data, and provides access to the Utils subclass.</p>
+<p class="rubric">Example</p>
+<p>from palet.Palet import Palet</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class is inherited from the Paletable, which is inherited from all high level objecsts. As such this class does not need to be
+manually imported.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Palet.Palet.PERFORMANCE">
+<span class="sig-name descname"><span class="pre">PERFORMANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#Palet.Palet.PERFORMANCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.cache_run_ids">
+<span class="sig-name descname"><span class="pre">cache_run_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'da_run_id'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.cache_run_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.initialize_logger">
+<span class="sig-name descname"><span class="pre">initialize_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">now</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.initialize_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attribute that initializes the logger within the Palet class.
+Prints a datetime so it is clear to the user when the code was executed.
+Logging contains multiple levels: INFO, DEBUG, WARNING, ERROR, CRITICAL, and FATAL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>now</strong> – <cite>datetime, optional</cite>: Filter a date and time. Can be set but shouldn’t. Defaults to when a log line is written.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prints a datetime to show when the code was executed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.load_metadata_file">
+<span class="sig-name descname"><span class="pre">load_metadata_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.load_metadata_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attribute for loading in Pickle metadata files sourced from Excel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> – <cite>str</cite>: The name of the pkl file without the extension</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PDF file with the metadata from the specified pkl file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>To be Determined.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Palet.Palet.Utils">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Utils</span></span><a class="headerlink" href="#Palet.Palet.Utils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Sub-class within the Palet class containing utilities.
+The Utils subclass features static methods that can be used by CMS analysts.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.compress">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.compress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method to compress a string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> – <cite>str</cite>: The string a user wishes to compress</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A compressed string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.show">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method allowing the analyst to return the sql functions being run by the palet library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sql</strong> – <cite>str</cite>: The SQL function an analyst is utilizing when logging.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prints the SQL query an analyst is using for logging purposes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.createDateRange">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createDateRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.createDateRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method for creating a data range when viewing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>year</strong> – <cite>str</cite>: The year an analyst wants to view data for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Data from the all 12 months of the specified year.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.propertiesOf">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propertiesOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.propertiesOf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.numDaysInMonth">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numDaysInMonth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.numDaysInMonth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="EnrollmentType.html"
+                        title="previous chapter">EnrollmentType</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Paletable.html"
+                        title="next chapter">Paletable</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Palet.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Paletable.html" title="Paletable"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="EnrollmentType.html" title="EnrollmentType"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Palet</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, ch.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>
