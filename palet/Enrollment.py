@@ -140,8 +140,32 @@ class Enrollment(Paletable):
 
             Partial Month (partial) - Beneficiaries enrolled in 1 to n-1 days of a given month, where n is the total number of days in said month
 
+        Example:
+            Specifying the time unit using .timeunit:
+
+            >>> api = Enrollment()
+
+            >>> api.timeunit = 'year'
+
+            >>> api.timeunit = 'month'
+
+            >>> api.timeunit = 'full'
+
+            >>> api.timeunit = 'partial'
+
+            Specifying the time unit using Enrollment()'s parameters:
+
+            >>> api = Enrollment('year')
+
+            >>> api = Enrollment('month')
+
+            >>> api = Enrollment('partial')
+
+            >>> api = Enrollment('full')
+
         Note:
             This class affects both Medicaid & CHIP Enrollment.
+            
         """
 
         breakdown = {
