@@ -131,15 +131,86 @@ class Enrollment(Paletable):
 
         Cull - Provides the individual beneficiaries enrolled within the time period or periods specified.
 
+        Available Time Units:
+            In Year (year) - Beneficiaries enrolled at least one day in a given year
+
+            In Month (month) - Beneficiaries enrolled at least one day in a given month
+
+            Full Month (full) - Beneficiaries enrolled in n days of a given month, where n is the total number of days in said month
+
+            Partial Month (partial) - Beneficiaries enrolled in 1 to n-1 days of a given month, where n is the total number of days in said month
+
+        Example:
+            Specifying the time unit using .timeunit:
+
+            >>> api = Enrollment()
+
+            >>> api.timeunit = 'year'
+
+            >>> api.timeunit = 'month'
+
+            >>> api.timeunit = 'full'
+
+            >>> api.timeunit = 'partial'
+
+            Specifying the time unit using Enrollment()'s parameters:
+
+            >>> api = Enrollment('year')
+
+            >>> api = Enrollment('month')
+
+            >>> api = Enrollment('partial')
+
+            >>> api = Enrollment('full')
+
         Note:
             This class affects both Medicaid & CHIP Enrollment.
+            
         """
 
         breakdown = {
-            'year': """
+            'year': f"""
                 'In Year' as counter,
-                sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
-                sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment""",
+                sum(case when a.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment_yr,
+                sum(case when a.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment_yr,
+                stack(12,
+                        1, { {0} }
+                        sum(case when a.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_01 > 0 then 1 else 0 end),
+                        2, { {1} }
+                        sum(case when a.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_02 > 0 then 1 else 0 end),
+                        3, { {2} }
+                        sum(case when a.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_03 > 0 then 1 else 0 end),
+                        4, { {3} }
+                        sum(case when a.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_04 > 0 then 1 else 0 end),
+                        5, { {4} }
+                        sum(case when a.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_05 > 0 then 1 else 0 end),
+                        6, { {5} }
+                        sum(case when a.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_06 > 0 then 1 else 0 end),
+                        7, { {6} }
+                        sum(case when a.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_07 > 0 then 1 else 0 end),
+                        8, { {7} }
+                        sum(case when a.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_08 > 0 then 1 else 0 end),
+                        9, { {8} }
+                        sum(case when a.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_09 > 0 then 1 else 0 end),
+                    10, { {9} }
+                        sum(case when a.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_10 > 0 then 1 else 0 end),
+                    11, { {10} }
+                        sum(case when a.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_11 > 0 then 1 else 0 end),
+                    12, { {11} }
+                        sum(case when a.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
+                        sum(case when a.chip_enrlmt_days_12 > 0 then 1 else 0 end)
+                ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
 
             'month': f"""
                 'In Month' as counter,
@@ -430,11 +501,163 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def mark(self, condition: Diagnoses, marker: str):
+        """
+        The mark function appends a condition column to a dataframe that was filtered using the :meth:`~Enrollment.Enrollment.having` function. Additionally,        
+        it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+
+        Note:
+            The mark function should only be utilized once the analyst has filtered their Enrollment object with :meth:`~Enrollment.Enrollment.having`.
+
+        Args:
+            condition: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
+            marker: `str`: The lable to be populated in the condition column.
+
+        Returns:
+            DataFrame: Returns the updated object filtered by the specified chronic condition with a condition column
+
+        Example:
+            Create a list of diagnoses codes:
+
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Use the mark function to add a column specifying the chronic condition which the user is filtering by:
+
+            >>> api = Enrollment().byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
+
+        """
+
+        self.markers[marker] = condition
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _apply_markers(self):
+        markers = ''
+        for i in self.markers.values():
+            markers += 'left join ' + str(i)
+
+        return markers
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _select_markers(self):
+        indicators = []
+        for key, val in self.markers.items():
+            indicators.append(f"j.indicator as {key},")
+
+        return '\n'.join(indicators)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _select_indicators(self):
+        indicators = []
+        for key, val in self.markers.items():
+            indicators.append(f"coalesce({key}, 0) as {key},")
+
+        return '\n'.join(indicators)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _groupby_indicators(self):
+        groupby = []
+        for key, val in self.markers.items():
+            groupby.append(f"{key},")
+
+        return '\n'.join(groupby)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _groupby_markers(self):
+        groupby = []
+        for key, val in self.markers.items():
+            groupby.append(",j.indicator")
+
+        return '\n'.join(groupby)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
     #
     #
     # ---------------------------------------------------------------------------------
     def having(self, constraint: Diagnoses):
+        """
+        The having function, allows user to filter Enrollment objects by chronic conidition diagnoses. The :meth:`~Diagnoses.Diagnoses.where` from :class:`Diagnoses`.
+        Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+
+        Args:
+            constraint: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
+
+        Returns:
+            DataFrame: Returns the updated object filtered by the specified chronic condition.
+
+        Example:
+            Create a list of diagnoses codes:
+
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+
+            Create an Enrollment object & use the having function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Use the :meth:`~Enrollment.Enrollment.mark` function to add a column specifying the chronic condition which the user is filtering by:
+
+            >>> api = Enrollment().byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
+            
+        """
         if constraint not in self.having_constraints:
             # self.palet.logger.debug('')
             self.having_constraints.append(constraint)
@@ -444,14 +667,14 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #  SQL Alchemy for Enrollment series by year or year/month for Medicaid and CHIP
+    #
     #
     #
     # ---------------------------------------------------------------------------------
-    def apply_constraints(self):
+    def _apply_constraints(self):
         contraints = ''
         for i in self.having_constraints:
-            contraints += str(i)
+            contraints += 'inner join ' + str(i)
 
         return contraints
 
@@ -497,37 +720,45 @@ class Enrollment(Paletable):
                 {self._getByGroup()}
                 {self._getDerivedSelections()}
                 {self._selectTimeunit()}
+                {self._select_indicators()}
                 sum(mdcd_enrollment) as mdcd_enrollment,
                 sum(chip_enrollment) as chip_enrollment
             from (
                 select
                     {self._getByGroupWithAlias()}
                     a.de_fil_dt,
+                    {self._select_markers()}
                     {self._getTimeUnitBreakdown()}
                     {PaletMetadata.Enrichment._renderAgeRange(self)}
+
                 from
                     taf.taf_ann_de_base as a
-                    { self.apply_constraints() }
+                    { self._apply_constraints() }
+                    { self._apply_markers() }
                 where
                     a.da_run_id in ( {self._getRunIds()} ) and
-                    {self._getByTimeunitCull()} AND
+                    {self._getByTimeunitCull()} and
                     {self._defineWhereClause()}
                 group by
                     {self._getByGroupWithAlias()}
                     {self._getDerivedByGroup()}
                     a.de_fil_dt
+                    {self._groupby_markers()}
                 order by
                     {self._getByGroupWithAlias()}
                     {self._getDerivedByGroup()}
                     a.de_fil_dt
+                    {self._groupby_markers()}
             )
             group by
                 counter,
                 {self._getByGroup()}
+                {self._groupby_indicators()}
                 {self._getDerivedSelections()}
                 {self._groupTimeunit()}
             order by
                 {self._getByGroup()}
+                {self._groupby_indicators()}
                 {self._getDerivedSelections()}
                 {self._groupTimeunit()}
          """

@@ -302,18 +302,40 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def byAgeRange(self, age_range=None):
-        """Filter your query by Age Range. Most top level objects inherit this
-            function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the
-            next by group.
+        """Filter your query by Age Range. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            age_range: `dict, optional`: Filter a single age, range such as {'Minor': [0,17]}
-            Or two or more age ranges such as {'Minor': [0,17],'Young Adult': [18,25]}
-            Defaults to pre-existing age ranges in age_grp_code
+            age_range: `dict, optional`: Filter a single age, range such as {'Minor': [0,17]} or two or more age ranges such as {'Minor': [0,17],'Young Adult': [18,25]}
+            default: `none`: Defaults to pre-existing age ranges in age_grp_code
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note:
+            The lowest possible age within TAF data is 0 while the highest is 125. 
+
+        Example:
+            Start with an enrollment object:
+
+            >>> api = Enrollment()
+
+            Default Option, returns DataFrame filtered by the age ranges defined in age_grp_cd:
+
+            >>> df = api.byAgeRange()
+
+            Return DataFrame:
+
+            >>> display(df.fetch())
+
+            User defined option, analyst enters a dictionary of labels with minimum and maximum ages:
+
+            >>> df = api.byAgeRange({'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]})
+
+            Return DataFrame:
+
+            >>> display(df.fetch())
+
         """
 
         self.palet.logger.info('adding byAgeRange to by Group')
@@ -366,13 +388,32 @@ class Paletable():
 
         Args:
             ids: `list, optional`: Filter by specific runids by passing in a list of one or more.
-            Defaults to an Empty List [] and will clear user defined run ids when called by default
+            default: `none`: Defaults to an Empty List [] and will clear user defined run ids when called by default
 
         Returns:
             No return values
 
         Example:
+            Start with a Paletable object:
+
+            >>> api = Enrollment()
+
+            Specify run ids:
+            
             >>> api.usingRunIds([6279, 6280])
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Alternatively enter the list of run ids as a parameter of the Paletable object:
+
+            >>> api = Enrollment([6279, 6280])
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
         """
         self.palet.logger.debug("using RunIds: " + str(ids))
         if ids is not None:
@@ -384,13 +425,34 @@ class Paletable():
 
     def displayCurrentRunIds(self):
         """If you'd like to get a display of the current run ids set in the query then you can call this function
-           or check the full sql statement by :func:sql()
+        or check the full sql statement by :meth:`sql`.
 
         Args:
             None
 
         Returns:
             Prints the current list of run ids to the screen.
+
+        Example:
+            Create a Paletable object:
+
+            >>> api = Eligibility()
+
+            Return a list of the default run ids:
+
+            >>> api.displayCurrentRunIds()
+
+            Manually specify a list of run ids:
+
+            >>> api.usingRunIds([6279, 6280])
+
+            Return a list of the user defined run ids:
+
+            >>> api.displayCurrentRunIds()
+
+            Alternatively print the backend sql query and check the run ids there:
+
+            >>> print(api.sql())
 
         """
         print("Current RunIds: " + str(self._getRunIds()))
@@ -419,13 +481,36 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byRaceEthnicity(self, ethnicity=None):
         """Filter your query by Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        If your object is already set by a by group this will add it as the next by group. The values in the race column
+        correspond to the to the codes and races from race_ethncty_flag in TAF. See race_ethncty_flag in PaletMetadata.
 
         Args:
-            ethnicity: `str, optional`: Filter a single ethnicity. Defaults to None.
+            ethnicity: `str, optional`: Filter a single race by entering the corresponding code from race_ethncty_flag
+            default: `none`: Filter by all races in race_ethncty_flag 
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note:
+            The codes and corresponding races of race_ethncty_flag can be found in PaletMetadata.
+
+        Example:
+            Start with a Paletable object and use the default option to filter query by race and ethnicity:
+
+            >>> api = Enrollment().byRaceEthnicity()
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Focus in on one race, in this example Asian beneficiaries:
+
+            >>> api = Enrollment().byRaceEthnicity('3')
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         self.palet.logger.info('adding byRaceEthnicity to by Group')
@@ -442,14 +527,37 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def byRaceEthnicityExpanded(self, ethnicity=None):
-        """Filter your query by Expanded Race. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        """Filter your query by Race Ethnicity Expanded. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group. The values in the raceExpanded column
+        correspond to the to the codes and races from race_ethncty_exp_flag in TAF. See race_ethncty_exp_flag in PaletMetadata.
 
         Args:
-            ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
+            ethnicity: `str, optional`: Filter a single race by entering the corresponding code from race_ethncty_exp_flag
+            default: `none`: Filter by all races in race_ethncty_exp_flag 
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note:
+            The codes and corresponding races of race_ethncty_exp_flag can be found in PaletMetadata.
+
+        Example:
+            Start with a Paletable object and use the default option to filter query by race and ethnicity:
+
+            >>> api = Enrollment().byRaceEthnicityExpanded()
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Focus in on one race, in this example Native American beneficiaries:
+
+            >>> api = Enrollment().byRaceEthnicityExpanded('3')
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         self.palet.logger.info('adding byRaceEthnicityExpanded to by Group')
@@ -467,13 +575,36 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byEthnicity(self, ethnicity=None):
         """Filter your query by Ethnicity. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        If your object is already set by a by group this will add it as the next by group. The values in the ethnicity column
+        correspond to the to the codes and races from ethncty_cd in TAF. See ethncty_cd in PaletMetadata.
 
         Args:
-            ethnicity: `str, optional`: Filter a single expanded ethnicity group. Defaults to None.
+            ethnicity: `str, optional`: Filter a single ethnicity by entering the corresponding code from ethncty_cd
+            default: `none`: Filter by all ethnicities in ethncty_cd 
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Note:
+            The codes and corresponding races of race_ethncty_flag can be found in PaletMetadata.
+
+        Example:
+            Start with a Paletable object and use the default option to filter query by ethnicity:
+
+            >>> api = Enrollment().byEthnicity()
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Focus in on one race, in this example Cuban beneficiaries:
+
+            >>> api = Enrollment().byEthnicity('3')
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         self.palet.logger.info('adding byEthnicity to by Group')
@@ -491,13 +622,37 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byGender(self, gender=None):
         """Filter your query by Gender. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        If your object is already set by a by group this will add it as the next by group. This by group is filtering
+        using the gndr_cd column in the TAF data. 
 
         Args:
-            gender: `str, optional`: Filter by gender. Defaults to None.
+            gender: `str, optional`: Filter by a single gender using the corresponding code from gndr_cd
+            default: `none`: Defaults to filtering by all three options: -1 (null), F (female), M (male).
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create a Paletable object:
+
+            >>> api = Eligibility()
+
+            Use byGender() to filter the DataFrame by gender: 
+
+            >>> df = api.byGender().fetch()
+
+            Return the DataFrame:
+
+            >>> display(df)
+
+            Pivot to focus only on male beneficiaries:
+
+            >>> df = api.byGender('M').fetch()
+
+            Return the DataFrame:
+
+            >>> display(df)
+
         """
 
         self.palet.logger.info('adding byGender to by Group')
@@ -519,10 +674,29 @@ class Paletable():
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+            state_fips:`str, (optional)`: Filter by a single State using FIPS code.
+            default: `none`: Filter the Paletable object by all states and territories.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create a Paletable object for enrollment filtered by state:
+
+            >>> api = Enrollment().byState()
+
+            Return the object as DataFrame:
+
+            >>> display(api.fetch())
+
+            Focus in one state, for this example Alabama:
+
+            api = Enrollment().byState('01')
+
+            Return the object as DataFrame:
+
+            >>> display(api.fetch())
+            
         """
 
         self.palet.logger.info('adding byState to the by Group')
@@ -548,8 +722,11 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def byCoverageTypeObject(self, type=None):
-        """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        """DEPRECATED Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group.
+
+        Note:
+            This function inherits from the deprecated :class:`Coverage` class and is no longer supported. Please see :meth:`byCoverageType`.
 
         Args:
             type:`str, (optional)`: Filter by coverage type using coverage code. Defaults to None.
@@ -557,7 +734,6 @@ class Paletable():
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
 
-        Note: The :class:`Coverage` class is automatically imported when this by group is called.
         """
 
         from palet.Coverage import Coverage
@@ -575,15 +751,28 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byCoverageType(self, type=None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+            If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
+            correspond to coverage_type in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by coverage type using coverage code. Defaults to None.
+            type:`str, (optional)`: Filter by an individual coverage type using coverage code. 
+            default: `none`: Filter by all available coverage types.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
 
-        Note: The :class:`Coverage` class is automatically imported when this by group is called.
+        Note:
+            The :class:`CoverageType` class is automatically imported when this by group is called.
+
+        Example:
+            Create Paletable object:
+
+            >>> api = Enrollment().byCoverageType()
+
+            Return Paletable object as a DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         from palet.Enrollment import Enrollment
@@ -604,13 +793,25 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byEnrollmentType(self):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
-            If your object is already set by a by group this will add it as the next by group.
+        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
+        correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by coverage type using enrollment type code. Defaults to None.
+            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            default: `none`: Filter by all available enrollment types
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create Paletable object:
+
+            >>> api = Enrollment().byEnrollmentType()
+
+            Return Paletable object as a DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         from palet.Enrollment import Enrollment
@@ -635,10 +836,21 @@ class Paletable():
         will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. See also :func:`State.__init__`. Defaults to None.
+            state_fips:`str, (optional)`: Filter by State using FIPS code. 
+            default: `none`: Change counts to focus only on Medicaid.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create Paletable object:
+
+            >>> api = Enrollment().byMedicaidOnly()
+
+            Return Paletable object as a DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         self.palet.logger.info('adding byMedicaidOnly to the by Group')
@@ -672,7 +884,8 @@ class Paletable():
 
         Args
         ----
-            bracket:`str, (optional)`: Filter by income. Defaults to None.
+            bracket:`str, (optional)`: Filter by incm_cd, can be individual, range, or multiple. See examples below.
+            default: `none`: Filter data by all possible incm_cd's.
 
         Returns
         -------
@@ -707,9 +920,32 @@ class Paletable():
         Args:
             year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
             count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1.
+            default: `none`: Filter object by all states and territories available.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create Paletable object filtering by all available years:
+
+            >>> api = Enrollment().byYear()
+
+            Return object as a DataFrame:
+
+            >>> display(api.fetch())
+
+            Create Paletable object filtering by 2019 and 2020:
+
+            >>> api = Enrollment().byYear(2019, 1)
+
+            Or alternatively:
+
+            >>> api = api = Enrollment().byYear(2020, -1)
+
+            Return object as a DataFrame:
+
+            >>> display(api.fetch())
+
         """
 
         self.palet.logger.info('adding byYear to the by Group')
@@ -733,10 +969,25 @@ class Paletable():
         """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
-            month:`int, (optional)`: Filter by month using the month in numerical format. Defaults to None.
+            month:`int, (optional)`: Filter by a specific month using the month in numerical format.
+            default: `none`: Filter object by all available months.
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create Paletable object filtering by all available months:
+
+            >>> api = Enrollment().byMonth()
+
+            Return object as a DataFrame:
+
+            >>> display(api.fetch())
+
+            Create Paletable object focusing only on the month of December in the given time period:
+
+            >>> api = Enrollment().byMonth(12)
+
         """
 
         self.palet.logger.info('adding byMonth to the by Group')
