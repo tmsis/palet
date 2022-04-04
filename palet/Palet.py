@@ -68,6 +68,7 @@ class Palet:
 
         # SQL Alias cache
         cls._alphabet = []
+        cls._cache_aliases_ = []
         for letter in range(97, 123):
             cls._alphabet.append(chr(letter))
         cls._last_used = None
@@ -218,7 +219,7 @@ class Palet:
         self.logger.setLevel(logging.INFO)
 
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        ch.setLevel(logging.DEBUG)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)
@@ -267,13 +268,22 @@ class Palet:
         """
         print(self.sql[v])
 
-    def getNextSQLAlias(self):
+    def reserveSQLAlias(self):
         self._count += 1
         print("Alias count: " + str(self._count))
-        if self._count % 2 == 0:
-            return self._alphabet[self._count]
-        else:
-            return self._alphabet[self._count - 1]
+        _next_alias_ = self._alphabet[self._count]
+        self.logger.debug("Next alias: " + str(_next_alias_))
+        self._cache_aliases_.append(_next_alias_)
+        self.logger.debug("Current alias cache: " + str(self._cache_aliases_))
+        return _next_alias_
+
+    def getCachedSQLAliases(self):
+        _shallow_copy = self._cache_aliases_.copy()
+        _shallow_copy.reverse()
+        return _shallow_copy
+
+    def clearAliasCache(self):
+        self._cache_aliases_ = []
 
     # ---------------------------------------------------------------------------------
     #

@@ -111,10 +111,11 @@ class Enrollment(Paletable):
             self.defined_columns = paletable.defined_columns
             self._runids = paletable._runids
 
-        palet = Palet.getInstance()
-        self._alias = palet.getNextSQLAlias()
+        self.palet = Palet.getInstance()
         self.timeunit = period
         self._user_runids = runIds
+        self._marker_cache = []
+        self._groupby_cache = []
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -168,7 +169,7 @@ class Enrollment(Paletable):
 
         Note:
             This class affects both Medicaid & CHIP Enrollment.
-            
+
         """
 
         breakdown = {
@@ -413,35 +414,35 @@ class Enrollment(Paletable):
             for column in self.derived_by_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
                     return breakdown.format(
-                        'a.' + EnrollmentType.cols[0] + ',',
-                        'a.' + EnrollmentType.cols[1] + ',',
-                        'a.' + EnrollmentType.cols[2] + ',',
-                        'a.' + EnrollmentType.cols[3] + ',',
-                        'a.' + EnrollmentType.cols[4] + ',',
-                        'a.' + EnrollmentType.cols[5] + ',',
-                        'a.' + EnrollmentType.cols[6] + ',',
-                        'a.' + EnrollmentType.cols[7] + ',',
-                        'a.' + EnrollmentType.cols[8] + ',',
-                        'a.' + EnrollmentType.cols[9] + ',',
-                        'a.' + EnrollmentType.cols[10] + ',',
-                        'a.' + EnrollmentType.cols[11] + ',',
+                        'aa.' + EnrollmentType.cols[0] + ',',
+                        'aa.' + EnrollmentType.cols[1] + ',',
+                        'aa.' + EnrollmentType.cols[2] + ',',
+                        'aa.' + EnrollmentType.cols[3] + ',',
+                        'aa.' + EnrollmentType.cols[4] + ',',
+                        'aa.' + EnrollmentType.cols[5] + ',',
+                        'aa.' + EnrollmentType.cols[6] + ',',
+                        'aa.' + EnrollmentType.cols[7] + ',',
+                        'aa.' + EnrollmentType.cols[8] + ',',
+                        'aa.' + EnrollmentType.cols[9] + ',',
+                        'aa.' + EnrollmentType.cols[10] + ',',
+                        'aa.' + EnrollmentType.cols[11] + ',',
                         EnrollmentType.alias + ',',
                         )
 
                 elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
                     return breakdown.format(
-                        'a.' + CoverageType.cols[0] + ',',
-                        'a.' + CoverageType.cols[1] + ',',
-                        'a.' + CoverageType.cols[2] + ',',
-                        'a.' + CoverageType.cols[3] + ',',
-                        'a.' + CoverageType.cols[4] + ',',
-                        'a.' + CoverageType.cols[5] + ',',
-                        'a.' + CoverageType.cols[6] + ',',
-                        'a.' + CoverageType.cols[7] + ',',
-                        'a.' + CoverageType.cols[8] + ',',
-                        'a.' + CoverageType.cols[9] + ',',
-                        'a.' + CoverageType.cols[10] + ',',
-                        'a.' + CoverageType.cols[11] + ',',
+                        'aa.' + CoverageType.cols[0] + ',',
+                        'aa.' + CoverageType.cols[1] + ',',
+                        'aa.' + CoverageType.cols[2] + ',',
+                        'aa.' + CoverageType.cols[3] + ',',
+                        'aa.' + CoverageType.cols[4] + ',',
+                        'aa.' + CoverageType.cols[5] + ',',
+                        'aa.' + CoverageType.cols[6] + ',',
+                        'aa.' + CoverageType.cols[7] + ',',
+                        'aa.' + CoverageType.cols[8] + ',',
+                        'aa.' + CoverageType.cols[9] + ',',
+                        'aa.' + CoverageType.cols[10] + ',',
+                        'aa.' + CoverageType.cols[11] + ',',
                         CoverageType.alias + ',',
                         )
 
@@ -535,8 +536,9 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _select_markers(self):
         indicators = []
-        alias = self._alias
+        _marker_cache = self.palet.getCachedSQLAliases()
         for key, val in self.markers.items():
+            alias = _marker_cache.pop()
             indicators.append(f"{alias}.indicator as {key},")
 
         return '\n'.join(indicators)
@@ -578,8 +580,9 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _groupby_markers(self):
         groupby = []
-        alias = self._alias
+        _groupby_cache = self.palet.getCachedSQLAliases()
         for key, val in self.markers.items():
+            alias = _groupby_cache.pop()
             groupby.append(f",{alias}.indicator")
 
         return '\n'.join(groupby)
@@ -593,8 +596,10 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def having(self, constraint: Diagnoses):
         """
-        The having function, allows user to filter Enrollment objects by chronic conidition diagnoses. The :meth:`~Diagnoses.Diagnoses.where` from :class:`Diagnoses`.
-        Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+        The having function, allows user to filter Enrollment objects by chronic conidition diagnoses.
+        The :meth:`~Diagnoses.Diagnoses.where` from :class:`Diagnoses`.
+        Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes
+        they wish to filter by.
 
         Args:
             constraint: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
@@ -623,7 +628,7 @@ class Enrollment(Paletable):
             Return the more readable version of the DataFrame:
 
             >>> display(api.fetch())
-            
+
         """
         if constraint not in self.having_constraints:
             # self.palet.logger.debug('')

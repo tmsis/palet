@@ -74,7 +74,8 @@ class Diagnoses:
             >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
                         'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
 
-            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter
+            to filter by chronic condition:
 
             >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
 
@@ -92,7 +93,7 @@ class Diagnoses:
 
         """
         palet = Palet.getInstance()
-        alias = palet.getNextSQLAlias()
+        alias = palet.reserveSQLAlias()
 
         return f"""
             (

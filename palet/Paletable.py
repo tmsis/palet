@@ -306,14 +306,15 @@ class Paletable():
         If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            age_range: `dict, optional`: Filter a single age, range such as {'Minor': [0,17]} or two or more age ranges such as {'Minor': [0,17],'Young Adult': [18,25]}
+            age_range: `dict, optional`: Filter a single age, range such as {'Minor': [0,17]} or
+            two or more age ranges such as {'Minor': [0,17],'Young Adult': [18,25]}
             default: `none`: Defaults to pre-existing age ranges in age_grp_code
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
 
         Note:
-            The lowest possible age within TAF data is 0 while the highest is 125. 
+            The lowest possible age within TAF data is 0 while the highest is 125.
 
         Example:
             Start with an enrollment object:
@@ -399,7 +400,7 @@ class Paletable():
             >>> api = Enrollment()
 
             Specify run ids:
-            
+
             >>> api.usingRunIds([6279, 6280])
 
             Return DataFrame:
@@ -486,7 +487,7 @@ class Paletable():
 
         Args:
             ethnicity: `str, optional`: Filter a single race by entering the corresponding code from race_ethncty_flag
-            default: `none`: Filter by all races in race_ethncty_flag 
+            default: `none`: Filter by all races in race_ethncty_flag
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -533,7 +534,7 @@ class Paletable():
 
         Args:
             ethnicity: `str, optional`: Filter a single race by entering the corresponding code from race_ethncty_exp_flag
-            default: `none`: Filter by all races in race_ethncty_exp_flag 
+            default: `none`: Filter by all races in race_ethncty_exp_flag
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -580,7 +581,7 @@ class Paletable():
 
         Args:
             ethnicity: `str, optional`: Filter a single ethnicity by entering the corresponding code from ethncty_cd
-            default: `none`: Filter by all ethnicities in ethncty_cd 
+            default: `none`: Filter by all ethnicities in ethncty_cd
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -623,7 +624,7 @@ class Paletable():
     def byGender(self, gender=None):
         """Filter your query by Gender. Most top level objects inherit this function such as Enrollment, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. This by group is filtering
-        using the gndr_cd column in the TAF data. 
+        using the gndr_cd column in the TAF data.
 
         Args:
             gender: `str, optional`: Filter by a single gender using the corresponding code from gndr_cd
@@ -637,7 +638,7 @@ class Paletable():
 
             >>> api = Eligibility()
 
-            Use byGender() to filter the DataFrame by gender: 
+            Use byGender() to filter the DataFrame by gender:
 
             >>> df = api.byGender().fetch()
 
@@ -696,7 +697,7 @@ class Paletable():
             Return the object as DataFrame:
 
             >>> display(api.fetch())
-            
+
         """
 
         self.palet.logger.info('adding byState to the by Group')
@@ -755,7 +756,7 @@ class Paletable():
             correspond to coverage_type in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual coverage type using coverage code. 
+            type:`str, (optional)`: Filter by an individual coverage type using coverage code.
             default: `none`: Filter by all available coverage types.
 
         Returns:
@@ -836,7 +837,7 @@ class Paletable():
         will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code. 
+            state_fips:`str, (optional)`: Filter by State using FIPS code.
             default: `none`: Change counts to focus only on Medicaid.
 
         Returns:
@@ -1145,6 +1146,7 @@ class Paletable():
         self.palet.logger.debug('Fetching data - \n' + self.sql())
 
         sparkDF = session.sql(self.sql())
+        self.palet.clearAliasCache()
 
         if (sparkDF is not None):
 
