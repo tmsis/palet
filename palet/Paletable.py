@@ -65,7 +65,7 @@ class Paletable():
         self._user_runids = runIds
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
-        self.palet = Palet('201801')
+        self.palet = Palet.getInstance()
 
         if runIds is not None:
             if not issubclass(type(runIds), Paletable):
@@ -191,7 +191,7 @@ class Paletable():
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
             for column in self.by_group:
-                z += "a." + column + new_line_comma
+                z += "aa." + column + new_line_comma
             return f"{z}"
         else:
             return ''
@@ -245,7 +245,7 @@ class Paletable():
                 if str(values).find(" ") > -1:
                     splitRange = self._checkForMultiVarFilter(values)
                     for value in splitRange:
-                        clause = ("a." + key, value)
+                        clause = ("aa." + key, value)
                         where.append(' ((= '.join(clause))
 
                 # Check for multiples with , separator
@@ -255,15 +255,15 @@ class Paletable():
                         # check for age ranges here with the - separator
                         if str(values).find("-") > -1:
                             splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "a." + key + " between " + splitRange[0] + " and " + splitRange[1]
+                            range_stmt = "aa." + key + " between " + splitRange[0] + " and " + splitRange[1]
                         # check for greater than; i.e. x+ equals >= x
                         elif str(values).find("+") > -1:
-                            range_stmt = "a." + key + " >= " + values.strip("+")
+                            range_stmt = "aa." + key + " >= " + values.strip("+")
                         # take the x+ and strip out the +
                         where.append(range_stmt)
 
                 else:  # else parse the single value
-                    clause = ("a." + key, self.filter[key])
+                    clause = ("aa." + key, self.filter[key])
                     where.append(' = '.join(clause))
 
             return f"{' and '.join(where)}"
@@ -339,18 +339,18 @@ class Paletable():
         select = ""
         if PaletMetadata.Enrollment.type in self.derived_by_group:
             select = """,stack(12,
-                            1,  a.chip_cd_01,
-                            2,  a.chip_cd_02,
-                            3,  a.chip_cd_03,
-                            4,  a.chip_cd_04,
-                            5,  a.chip_cd_05,
-                            6,  a.chip_cd_06,
-                            7,  a.chip_cd_07,
-                            8,  a.chip_cd_08,
-                            9,  a.chip_cd_09,
-                            10, a.chip_cd_10,
-                            11, a.chip_cd_11,
-                            12, a.chip_cd_12
+                            1,  aa.chip_cd_01,
+                            2,  aa.chip_cd_02,
+                            3,  aa.chip_cd_03,
+                            4,  aa.chip_cd_04,
+                            5,  aa.chip_cd_05,
+                            6,  aa.chip_cd_06,
+                            7,  aa.chip_cd_07,
+                            8,  aa.chip_cd_08,
+                            9,  aa.chip_cd_09,
+                            10, aa.chip_cd_10,
+                            11, aa.chip_cd_11,
+                            12, aa.chip_cd_12
                             ) as (month, enrollment_type)
                         """
         return select

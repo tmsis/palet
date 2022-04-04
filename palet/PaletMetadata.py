@@ -510,8 +510,7 @@ class PaletMetadata:
         @staticmethod
         def _getPaletObj():
             enrichment = PaletMetadata.Enrichment()
-            d = enrichment.datetime.now()
-            palet = enrichment.Palet(d.strftime("%Y") + "" + d.strftime("%m"))
+            palet = enrichment.Palet.getInstance()
             return palet
 
         def getDefinedColumns(self):
@@ -557,7 +556,7 @@ class PaletMetadata:
                                                    right_on=['USPS'])
             df = df.drop(['USPS'], axis=1)
 
-            df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
+            df.groupby(by=['STABBREV', timeunit]).sum().reset_index()
 
             return df
 

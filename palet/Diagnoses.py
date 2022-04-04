@@ -8,6 +8,7 @@ This module only contains the :class:`Diagnoses` class and the :meth:`Diagnoses.
 #
 #
 # -------------------------------------------------------
+from palet.Palet import Palet
 from palet.ServiceCategory import ServiceCategory
 
 
@@ -86,6 +87,8 @@ class Diagnoses:
             >>> display(df.fetch())
 
         """
+        palet = Palet.getInstance()
+        alias = palet.getNextSQLAlias()
 
         return f"""
             (
@@ -100,7 +103,7 @@ class Diagnoses:
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
-            ) as {Diagnoses.alias}
-                on a.submtg_state_cd = {Diagnoses.alias}.submtg_state_cd and
-                   a.msis_ident_num = {Diagnoses.alias}.msis_ident_num
+            ) as {alias}
+                on aa.submtg_state_cd = {alias}.submtg_state_cd and
+                   aa.msis_ident_num = {alias}.msis_ident_num
         """

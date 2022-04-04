@@ -11,7 +11,7 @@ import logging
 from typing import Any
 
 
-class Palet():
+class Palet:
     """The class responsible initialization, logging and utilities.
     This class is critical to utilizing the PALET library. It initializes the API, logs data, and provides access to the Utils subclass.
 
@@ -22,54 +22,120 @@ class Palet():
         This class is inherited from the Paletable, which is inherited from all high level objecsts. As such this class does not need to be
         manually imported.
     """
-
+    __instance = None
     PERFORMANCE = 15
 
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def __init__(self, report_month: str, start_month: str = None, end_month: str = None, run_id: str = None):
+    def __new__(cls):
         from datetime import datetime
-        self.now = datetime.now()
-        self.initialize_logger(self.now)
+        cls.__instance = super().__new__(cls)
+        cls.now = datetime.now()
+        cls.initialize_logger(cls, cls.now)
 
-        self.version = '1.5.20220311'
+        cls.version = '1.7.20220404'
 
-        self.report_month = datetime.strptime(report_month, '%Y%m')
-        # self.start_month = datetime.strptime(start_month, '%Y%m')
-        # self.end_month = datetime.strptime(end_month, '%Y%m')
+        # cls.report_month = datetime.strptime(report_month, '%Y%m')
+        # cls.start_month = datetime.strptime(start_month, '%Y%m')
+        # cls.end_month = datetime.strptime(end_month, '%Y%m')
 
         # static metadata dataframes
-        self.apdxc = self.load_metadata_file('apdxc')
-        self.countystate_lookup = self.load_metadata_file('countystate_lookup')
-        self.fmg = self.load_metadata_file('fmg')
-        self.missVar = self.load_metadata_file('missVar')
-        self.prgncy = self.load_metadata_file('prgncy')
-        self.prgncy['Code'] = self.prgncy['Code'].str.strip()
-        self.prgncy['Code'] = self.prgncy['Code'].str.upper()
-        self.prgncy['Type'] = self.prgncy['Type'].str.strip()
-        self.prgncy['Type'] = self.prgncy['Type'].str.upper()
-        self.prvtxnmy = self.load_metadata_file('prvtxnmy')
-        self.sauths = self.load_metadata_file('sauths')
-        self.schip = self.load_metadata_file('schip')
-        self.splans = self.load_metadata_file('splans')
-        self.st_fips = self.load_metadata_file('st_fips')
-        self.st_name = self.load_metadata_file('st_name')
-        self.st_usps = self.load_metadata_file('st_usps')
-        self.st2_name = self.load_metadata_file('st2_name')
-        self.stabr = self.load_metadata_file('stabr')
-        self.stc_cd = self.load_metadata_file('stc_cd')
-        self.stc_cd['z_tos'] = self.stc_cd['TypeOfService'].map('{:03d}'.format)
+        cls.apdxc = cls.load_metadata_file(cls, 'apdxc')
+        cls.countystate_lookup = cls.load_metadata_file(cls, 'countystate_lookup')
+        cls.fmg = cls.load_metadata_file(cls, 'fmg')
+        cls.missVar = cls.load_metadata_file(cls, 'missVar')
+        cls.prgncy = cls.load_metadata_file(cls, 'prgncy')
+        cls.prgncy['Code'] = cls.prgncy['Code'].str.strip()
+        cls.prgncy['Code'] = cls.prgncy['Code'].str.upper()
+        cls.prgncy['Type'] = cls.prgncy['Type'].str.strip()
+        cls.prgncy['Type'] = cls.prgncy['Type'].str.upper()
+        cls.prvtxnmy = cls.load_metadata_file(cls, 'prvtxnmy')
+        cls.sauths = cls.load_metadata_file(cls, 'sauths')
+        cls.schip = cls.load_metadata_file(cls, 'schip')
+        cls.splans = cls.load_metadata_file(cls, 'splans')
+        cls.st_fips = cls.load_metadata_file(cls, 'st_fips')
+        cls.st_name = cls.load_metadata_file(cls, 'st_name')
+        cls.st_usps = cls.load_metadata_file(cls, 'st_usps')
+        cls.st2_name = cls.load_metadata_file(cls, 'st2_name')
+        cls.stabr = cls.load_metadata_file(cls, 'stabr')
+        cls.stc_cd = cls.load_metadata_file(cls, 'stc_cd')
+        cls.stc_cd['z_tos'] = cls.stc_cd['TypeOfService'].map('{:03d}'.format)
 
-        # self.logger = None
-        self.logfile = None
+        # cls.logger = None
+        cls.logfile = None
 
-        self.sql = {}
+        cls.sql = {}
 
-        self.actual_time = self.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
+        cls.actual_time = cls.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
+
+        # SQL Alias cache
+        cls._alphabet = []
+        for letter in range(97, 123):
+            cls._alphabet.append(chr(letter))
+        cls._last_used = None
+        cls._count = -1
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    # def __init__(self, report_month: str, start_month: str = None, end_month: str = None, run_id: str = None):
+        # from datetime import datetime
+        # self.now = datetime.now()
+        # self.initialize_logger(self.now)
+
+        # self.version = '1.5.20220311'
+
+        # self.report_month = datetime.strptime(report_month, '%Y%m')
+        # # self.start_month = datetime.strptime(start_month, '%Y%m')
+        # # self.end_month = datetime.strptime(end_month, '%Y%m')
+
+        # # static metadata dataframes
+        # self.apdxc = self.load_metadata_file('apdxc')
+        # self.countystate_lookup = self.load_metadata_file('countystate_lookup')
+        # self.fmg = self.load_metadata_file('fmg')
+        # self.missVar = self.load_metadata_file('missVar')
+        # self.prgncy = self.load_metadata_file('prgncy')
+        # self.prgncy['Code'] = self.prgncy['Code'].str.strip()
+        # self.prgncy['Code'] = self.prgncy['Code'].str.upper()
+        # self.prgncy['Type'] = self.prgncy['Type'].str.strip()
+        # self.prgncy['Type'] = self.prgncy['Type'].str.upper()
+        # self.prvtxnmy = self.load_metadata_file('prvtxnmy')
+        # self.sauths = self.load_metadata_file('sauths')
+        # self.schip = self.load_metadata_file('schip')
+        # self.splans = self.load_metadata_file('splans')
+        # self.st_fips = self.load_metadata_file('st_fips')
+        # self.st_name = self.load_metadata_file('st_name')
+        # self.st_usps = self.load_metadata_file('st_usps')
+        # self.st2_name = self.load_metadata_file('st2_name')
+        # self.stabr = self.load_metadata_file('stabr')
+        # self.stc_cd = self.load_metadata_file('stc_cd')
+        # self.stc_cd['z_tos'] = self.stc_cd['TypeOfService'].map('{:03d}'.format)
+
+        # # self.logger = None
+        # self.logfile = None
+
+        # self.sql = {}
+
+        # self.actual_time = self.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
+        # pass
+
+    # Palet Singleton
+    @staticmethod
+    def getInstance():
+        """ Static access method. """
+        if Palet.__instance is None:
+            Palet()
+            __newPalet = Palet.getInstance()
+            __newPalet.logger.debug("return Palet instance " + str(__newPalet))
+        return Palet.__instance
+
+    def __init__(self):
+        """ Virtual private constructor. """
+        if Palet.__instance is not None:
+            raise Exception("This class is a singleton! Use getInstance()")
+        else:
+            Palet.__instance = self
 
     # --------------------------------------------------------------------
     #
@@ -120,11 +186,9 @@ class Palet():
                     fil_dt
             """
 
-        return [5149,6279,6280] 
-        
-        # spark = SparkSession.getActiveSession()
-        # pdf = spark.sql(z).toPandas()
-        # return pdf[field].tolist()
+        spark = SparkSession.getActiveSession()
+        pdf = spark.sql(z).toPandas()
+        return pdf[field].tolist()
 
     # --------------------------------------------------------------------
     #
@@ -202,6 +266,14 @@ class Palet():
         To be Determined.
         """
         print(self.sql[v])
+
+    def getNextSQLAlias(self):
+        self._count += 1
+        print("Alias count: " + str(self._count))
+        if self._count % 2 == 0:
+            return self._alphabet[self._count]
+        else:
+            return self._alphabet[self._count - 1]
 
     # ---------------------------------------------------------------------------------
     #
@@ -287,6 +359,18 @@ class Palet():
 
             else:
                 return 30
+
+        @staticmethod
+        def serialize(alias_list: dict):
+            import pickle
+            pickle.dump(alias_list, 'alias.pkl', 'wb')
+
+        @staticmethod
+        def deserialize(filename: str = 'alias.pkl'):
+            import pickle
+            aliases: dict = pickle.load(filename, 'rb')
+            return aliases
+
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
 
