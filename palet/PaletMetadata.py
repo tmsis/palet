@@ -557,7 +557,7 @@ class PaletMetadata:
                                                    right_on=['USPS'])
             df = df.drop(['USPS'], axis=1)
 
-            df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
+            df.groupby(by=['STABBREV', timeunit]).sum().reset_index()
 
             return df
 
