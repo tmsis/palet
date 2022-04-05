@@ -605,7 +605,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def byEnrollmentType(self):
         from palet.Enrollment import Enrollment
-        
+
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
