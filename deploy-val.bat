@@ -6,7 +6,6 @@ setlocal
 set ver=%1
 set svr=%2S
 if not defined ver goto :usage
-#if not defined svr goto :usage
 if defined ver goto :proceed
 :usage
 echo off

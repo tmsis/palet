@@ -5,10 +5,7 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
-import datetime
 import pandas as pd
-from palet.CoverageType import CoverageType
-from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -164,6 +161,9 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def _getDerivedByGroup(self):
+        from palet.EnrollmentType import EnrollmentType
+        from palet.CoverageType import CoverageType
+
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.derived_by_group)) > 0:
@@ -798,6 +798,8 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def byEnrollmentType(self):
+        from palet.Enrollment import Enrollment
+
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -820,7 +822,6 @@ class Paletable():
 
         """
 
-        from palet.Enrollment import Enrollment
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')

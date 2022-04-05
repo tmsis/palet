@@ -4,9 +4,7 @@ to apply specific filters. Doing so, analysts can view enrollment by state, inco
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
-from palet.CoverageType import CoverageType
 from palet.Diagnoses import Diagnoses
-from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
@@ -100,7 +98,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "full"):
+    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "year"):
         # print('Initializing Enrollment API')
         super().__init__(runIds)
 
@@ -391,7 +389,10 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def _getDerivedSelections(self):
+        from palet.EnrollmentType import EnrollmentType
+        from palet.CoverageType import CoverageType
 
+        # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_group)) > 0:
             for column in self.derived_by_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
@@ -408,6 +409,9 @@ class Enrollment(Paletable):
     # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
     def _getTimeUnitBreakdown(self):
+        from palet.EnrollmentType import EnrollmentType
+        from palet.CoverageType import CoverageType
+
         breakdown = Enrollment.timeunit.breakdown[self.timeunit]
 
         if (len(self.derived_by_group)) > 0:
