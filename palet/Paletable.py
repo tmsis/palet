@@ -5,6 +5,7 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
+import datetime
 import pandas as pd
 from palet.CoverageType import CoverageType
 from palet.EnrollmentType import EnrollmentType
@@ -64,6 +65,10 @@ class Paletable():
 
         self._user_runids = runIds
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
+
+        # self.report_month = datetime.strptime(report_month, '%Y%m')
+        # self.start_month = datetime.strptime(start_month, '%Y%m')
+        # self.end_month = datetime.strptime(end_month, '%Y%m')
 
         self.palet = Palet.getInstance()
 

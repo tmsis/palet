@@ -33,10 +33,6 @@ class Palet:
 
         cls.version = '1.7.20220404'
 
-        # cls.report_month = datetime.strptime(report_month, '%Y%m')
-        # cls.start_month = datetime.strptime(start_month, '%Y%m')
-        # cls.end_month = datetime.strptime(end_month, '%Y%m')
-
         # static metadata dataframes
         cls.apdxc = cls.load_metadata_file(cls, 'apdxc')
         cls.countystate_lookup = cls.load_metadata_file(cls, 'countystate_lookup')
@@ -73,53 +69,6 @@ class Palet:
             cls._alphabet.append(chr(letter))
         cls._last_used = None
         cls._count = -1
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    # def __init__(self, report_month: str, start_month: str = None, end_month: str = None, run_id: str = None):
-        # from datetime import datetime
-        # self.now = datetime.now()
-        # self.initialize_logger(self.now)
-
-        # self.version = '1.5.20220311'
-
-        # self.report_month = datetime.strptime(report_month, '%Y%m')
-        # # self.start_month = datetime.strptime(start_month, '%Y%m')
-        # # self.end_month = datetime.strptime(end_month, '%Y%m')
-
-        # # static metadata dataframes
-        # self.apdxc = self.load_metadata_file('apdxc')
-        # self.countystate_lookup = self.load_metadata_file('countystate_lookup')
-        # self.fmg = self.load_metadata_file('fmg')
-        # self.missVar = self.load_metadata_file('missVar')
-        # self.prgncy = self.load_metadata_file('prgncy')
-        # self.prgncy['Code'] = self.prgncy['Code'].str.strip()
-        # self.prgncy['Code'] = self.prgncy['Code'].str.upper()
-        # self.prgncy['Type'] = self.prgncy['Type'].str.strip()
-        # self.prgncy['Type'] = self.prgncy['Type'].str.upper()
-        # self.prvtxnmy = self.load_metadata_file('prvtxnmy')
-        # self.sauths = self.load_metadata_file('sauths')
-        # self.schip = self.load_metadata_file('schip')
-        # self.splans = self.load_metadata_file('splans')
-        # self.st_fips = self.load_metadata_file('st_fips')
-        # self.st_name = self.load_metadata_file('st_name')
-        # self.st_usps = self.load_metadata_file('st_usps')
-        # self.st2_name = self.load_metadata_file('st2_name')
-        # self.stabr = self.load_metadata_file('stabr')
-        # self.stc_cd = self.load_metadata_file('stc_cd')
-        # self.stc_cd['z_tos'] = self.stc_cd['TypeOfService'].map('{:03d}'.format)
-
-        # # self.logger = None
-        # self.logfile = None
-
-        # self.sql = {}
-
-        # self.actual_time = self.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
-        # pass
 
     # Palet Singleton
     @staticmethod
@@ -270,7 +219,6 @@ class Palet:
 
     def reserveSQLAlias(self):
         self._count += 1
-        print("Alias count: " + str(self._count))
         _next_alias_ = self._alphabet[self._count]
         self.logger.debug("Next alias: " + str(_next_alias_))
         self._cache_aliases_.append(_next_alias_)
