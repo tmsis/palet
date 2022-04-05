@@ -8,7 +8,6 @@ return datafranes created by high level objects.
 import pandas as pd
 from palet.CoverageType import CoverageType
 from palet.Enrollment import Enrollment
-from palet.EnrollmentType import EnrollmentType
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -160,6 +159,7 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def _getDerivedByGroup(self):
+        from palet.EnrollmentType import EnrollmentType
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.derived_by_group)) > 0:
