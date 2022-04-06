@@ -366,7 +366,6 @@ class Paletable():
         self.palet.logger.debug("Stacking the chip codes for enrollment type")
         select = ""
         if PaletMetadata.Enrollment.type in self.derived_by_group:
-            print("we found enrollment_type")
             select = """,stack(12,
                             1,  aa.chip_cd_01,
                             2,  aa.chip_cd_02,
