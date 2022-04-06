@@ -470,7 +470,9 @@ class Enrollment(Paletable):
 
         # df['year'] = df['de_fil_dt']
 
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        
+        if self.timeunit != 'year':
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
