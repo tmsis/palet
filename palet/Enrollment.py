@@ -114,6 +114,7 @@ class Enrollment(Paletable):
         self._user_runids = runIds
         self._marker_cache = []
         self._groupby_cache = []
+        self._sql = None
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -171,48 +172,11 @@ class Enrollment(Paletable):
         """
 
         breakdown = {
-            'year': f"""
+            'year': """
                 'In Year' as counter,
-                sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment_yr,
-                sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment_yr,
-                stack(12,
-                        1, { {0} }
-                        sum(case when aa.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_01 > 0 then 1 else 0 end),
-                        2, { {1} }
-                        sum(case when aa.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_02 > 0 then 1 else 0 end),
-                        3, { {2} }
-                        sum(case when aa.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_03 > 0 then 1 else 0 end),
-                        4, { {3} }
-                        sum(case when aa.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_04 > 0 then 1 else 0 end),
-                        5, { {4} }
-                        sum(case when aa.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_05 > 0 then 1 else 0 end),
-                        6, { {5} }
-                        sum(case when aa.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_06 > 0 then 1 else 0 end),
-                        7, { {6} }
-                        sum(case when aa.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_07 > 0 then 1 else 0 end),
-                        8, { {7} }
-                        sum(case when aa.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_08 > 0 then 1 else 0 end),
-                        9, { {8} }
-                        sum(case when aa.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_09 > 0 then 1 else 0 end),
-                    10, { {9} }
-                        sum(case when aa.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_10 > 0 then 1 else 0 end),
-                    11, { {10} }
-                        sum(case when aa.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_11 > 0 then 1 else 0 end),
-                    12, { {11} }
-                        sum(case when aa.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_12 > 0 then 1 else 0 end)
-                ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
+                sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
+                sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment
+                """,
 
             'month': f"""
                 'In Month' as counter,
@@ -661,7 +625,7 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    def sql(self):
+    def sql(self, isFetch: bool = False):
         """The SQL query that the Enrollment class uses to pull dataframes.
 
         This can be called allowing an analyst to view the SQL the Enrollment is using.
@@ -685,62 +649,65 @@ class Enrollment(Paletable):
 
             >>> print(Enrollment.sql())
         """
+        if isFetch is True:
+            super().sql()
 
-        super().sql()
-
-        # create or replace temporary view enrollment_by_month as
-        # taf.data_anltcs_taf_ade_base_vw as a
-        z = f"""
-            select
-                counter,
-                {self._getByGroup()}
-                {self._getDerivedSelections()}
-                {self._selectTimeunit()}
-                {self._select_indicators()}
-                sum(mdcd_enrollment) as mdcd_enrollment,
-                sum(chip_enrollment) as chip_enrollment
-            from (
+            # create or replace temporary view enrollment_by_month as
+            # taf.data_anltcs_taf_ade_base_vw as a
+            z = f"""
                 select
-                    {self._getByGroupWithAlias()}
-                    aa.de_fil_dt,
-                    {self._select_markers()}
-                    {self._getTimeUnitBreakdown()}
-                    {PaletMetadata.Enrichment._renderAgeRange(self)}
+                    counter,
+                    {self._getByGroup()}
+                    {self._getDerivedSelections()}
+                    {self._selectTimeunit()}
+                    {self._select_indicators()}
+                    {self._stackChipCode()}
+                    sum(mdcd_enrollment) as mdcd_enrollment,
+                    sum(chip_enrollment) as chip_enrollment
 
-                from
-                    taf.taf_ann_de_base as aa
-                    { self._apply_constraints() }
-                    { self._apply_markers() }
-                where
-                    aa.da_run_id in ( {self._getRunIds()} ) and
-                    {self._getByTimeunitCull()} and
-                    {self._defineWhereClause()}
+                from (
+                    select
+                        {self._getByGroupWithAlias()}
+                        aa.de_fil_dt,
+                        {self._select_markers()}
+                        {self._getTimeUnitBreakdown()}
+                        {PaletMetadata.Enrichment._renderAgeRange(self)}
+
+                    from
+                        taf.taf_ann_de_base as aa
+                        { self._apply_constraints() }
+                        { self._apply_markers() }
+                    where
+                        aa.da_run_id in ( {self._getRunIds()} ) and
+                        {self._getByTimeunitCull()} and
+                        {self._defineWhereClause()}
+                    group by
+                        {self._getByGroupWithAlias()}
+                        {self._getDerivedByGroup()}
+                        aa.de_fil_dt
+                        {self._groupby_markers()}
+                    order by
+                        {self._getByGroupWithAlias()}
+                        {self._getDerivedByGroup()}
+                        aa.de_fil_dt
+                        {self._groupby_markers()}
+                )
                 group by
-                    {self._getByGroupWithAlias()}
-                    {self._getDerivedByGroup()}
-                    aa.de_fil_dt
-                    {self._groupby_markers()}
+                    counter,
+                    {self._getByGroup()}
+                    {self._groupby_indicators()}
+                    {self._getDerivedSelections()}
+                    {self._groupTimeunit()}
                 order by
-                    {self._getByGroupWithAlias()}
-                    {self._getDerivedByGroup()}
-                    aa.de_fil_dt
-                    {self._groupby_markers()}
-            )
-            group by
-                counter,
-                {self._getByGroup()}
-                {self._groupby_indicators()}
-                {self._getDerivedSelections()}
-                {self._groupTimeunit()}
-            order by
-                {self._getByGroup()}
-                {self._groupby_indicators()}
-                {self._getDerivedSelections()}
-                {self._groupTimeunit()}
-         """
+                    {self._getByGroup()}
+                    {self._groupby_indicators()}
+                    {self._getDerivedSelections()}
+                    {self._groupTimeunit()}
+            """
 
-        self._addPostProcess(self._percentChange)
-
+            self._addPostProcess(self._percentChange)
+        else:
+            return self._sql
         return z
 
 

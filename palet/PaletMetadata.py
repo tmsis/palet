@@ -6,6 +6,9 @@ contructed code values correspond to.
 """
 
 
+from palet.ServiceCategory import ServiceCategory
+
+
 class PaletMetadata:
     """
     In addition to the readability aspect discussed above, the PaletMetadata class is essential to converting
@@ -500,6 +503,13 @@ class PaletMetadata:
             '70': "Health/Medical Home (retired value)",
             '80': "Integrated Care for Dual Eligibles"
             }
+
+    class Member():
+        service_category = {
+            ServiceCategory.inpatient: "data_anltcs_taf_iph_vw",
+            ServiceCategory.long_term: "data_anltcs_taf_lth_vw",
+            ServiceCategory.other_services: "data_anltcs_taf_oth_vw"
+        }
 
     class Enrichment():
 

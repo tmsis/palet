@@ -48,7 +48,6 @@ class Paletable():
         self.timeunit = 'year'
         self.by_group = []
         self.filter = {}
-        self.lookback = 1
         self.age_band = None
         self.derived_by_group = []
 
@@ -59,6 +58,7 @@ class Paletable():
 
         self.markers = {}
         self.having_constraints = []
+        self._sql = None
 
         self._user_runids = runIds
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
@@ -366,6 +366,7 @@ class Paletable():
         self.palet.logger.debug("Stacking the chip codes for enrollment type")
         select = ""
         if PaletMetadata.Enrollment.type in self.derived_by_group:
+            print("we found enrollment_type")
             select = """,stack(12,
                             1,  aa.chip_cd_01,
                             2,  aa.chip_cd_02,
@@ -959,7 +960,6 @@ class Paletable():
 
         self.timeunit = 'year'
         self.timeunitvalue = year
-        self.lookback = count
 
         if year is not None:
             self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
@@ -1149,9 +1149,10 @@ class Paletable():
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
 
-        self.palet.logger.debug('Fetching data - \n' + self.sql())
+        self._sql = self.sql(True)
 
-        sparkDF = session.sql(self.sql())
+        self.palet.logger.debug('Fetching data - \n' + self._sql)
+        sparkDF = session.sql(self._sql)
         self.palet.clearAliasCache()
 
         if (sparkDF is not None):

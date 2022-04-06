@@ -9,6 +9,7 @@ This module only contains the :class:`Diagnoses` class and the :meth:`Diagnoses.
 #
 # -------------------------------------------------------
 from palet.Palet import Palet
+from palet.PaletMetadata import PaletMetadata
 from palet.ServiceCategory import ServiceCategory
 
 
@@ -32,7 +33,12 @@ class Diagnoses:
                  'dgns_11_cd',
                  'dgns_12_cd']
 
-    alias = 'j'
+    other_services = ['dgns_1_cd',
+                      'dgns_2_cd',
+                      'dgns_3_cd',
+                      'dgns_4_cd',
+                      'dgns_5_cd'
+                      ]
 
     # -------------------------------------------------------
     #
@@ -102,7 +108,7 @@ class Diagnoses:
                     msis_ident_num,
                     1 as indicator
                 from
-                    taf.data_anltcs_taf_iph_vw
+                    taf.{ PaletMetadata.Member.service_category.get(service_category) }
                 where
                     da_run_id in (6939, 6938, 6937, 6936, 6935, 6934, 6933, 6932, 6931, 6930, 6929, 6928, 6927)
                     and (
