@@ -25,20 +25,29 @@ Setting Up PALET
 ****************
 To properly utilize this library, CMS analysts must follow a specific series of steps. These steps are outlined below:
 
-1. Log into Databricks using the PROD or VAL server
-2. PROD is the preferred server for user testing
-3. Open a notebook and ensure it is being run on the databricks-palet-uat-prod or databricks-palet-uat-val cluster
-      a. Note the cluster is critical to accessing the PALET library
-      b. If the cluster isn’t currently running, start the cluster
-4. Begin by importing one or more Paletable objects and the PaletMetadata module
-5. Example:
-      a. from palet.Enrollment import Enrollment
-      b. from palet.Eligibility import Eligibility
-      c. from palet.PaletMetadata import PaletMetadata
+#. Log into Databricks using the PROD or VAL server
+#. PROD is the preferred server for user testing
+#. Open a notebook and ensure it is being run on the databricks-palet-uat-prod or databricks-palet-uat-val cluster
+      * Note the cluster is critical to accessing the PALET library
+      * If the cluster isn’t currently running, start the cluster
+#. Begin by importing one or more Paletable objects and the PaletMetadata module
+#. Example:
+      * from palet.Enrollment import Enrollment
+      * from palet.Eligibility import Eligibility
+      * from palet.PaletMetadata import PaletMetadata
 
 From here, the analyst has more freedom and flexibility to explore and manipulate data as they see fit. Paletable objects can be combined with 
 by groups from the Paletable class and overwritten by other Paletable objects. Explicit examples can be found in the modules’ documentation below.
 
+PALET Current Release and Process information
+*********************************************
+* All Releases will run through the Assertion Notebook and MUST pass in order to complete the Sprint
+* At the end of each Sprint the PALET team will create an official library whl with the number of the Sprint and the date it was created. e.g. Sprint 7 will have a release of 1.7.20220408
+* Any user may test and log defects into JIRA to be prioritized based on urgency
+      * If critical fixes are needed the PALET team will work on those immediately
+      * Otherwise the PALET team will prioritize features, then fixes
+* The PALET team will release features as they are completed and assertion tests passed to keep the libraries on the clusters fresh with new items.
+* The official GITHUB channel will have published the assertion test notebook and examples of all features. These can be downloaded and updated at any time by anyone with GITHUB access
 
 .. toctree::
    :maxdepth: 2

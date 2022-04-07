@@ -433,7 +433,9 @@ class Enrollment(Paletable):
 
         # df['year'] = df['de_fil_dt']
 
-        if self.timeunit in ('month', 'full', 'partial'):
+        # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        
+        if self.timeunit != 'year':
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -477,6 +479,44 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def mark(self, condition: Diagnoses, marker: str):
+        """
+        The mark function appends a condition column to a dataframe that was filtered using the :meth:`~Enrollment.Enrollment.having` function. Additionally,        
+        it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
+
+        Note:
+            The mark function should only be utilized once the analyst has filtered their Enrollment object with :meth:`~Enrollment.Enrollment.having`.
+
+        Args:
+            condition: :class:`Diagnoses` object: Use the :meth:`~Diagnoses.Diagnoses.where` function to specify a :class:`ServiceCategory`
+            marker: `str`: The lable to be populated in the condition column.
+
+        Returns:
+            DataFrame: Returns the updated object filtered by the specified chronic condition with a condition column
+
+        Example:
+            Create a list of diagnoses codes:
+
+            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
+                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
+
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+
+            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+
+            Return DataFrame:
+
+            >>> display(api.fetch())
+
+            Use the mark function to add a column specifying the chronic condition which the user is filtering by:
+
+            >>> api = Enrollment().byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
+
+            Return the more readable version of the DataFrame:
+
+            >>> display(api.fetch())
+
+        """
+        
         self.markers[marker] = condition
         return self
 
