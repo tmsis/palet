@@ -531,7 +531,7 @@ class Enrollment(Paletable):
     def _apply_markers(self):
         markers = ''
         for i in self.markers.values():
-            markers += 'left join ' + str(i)
+            markers += ' left join ' + str(i)
 
         return markers
 

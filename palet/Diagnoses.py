@@ -41,11 +41,14 @@ class Diagnoses:
                  ]
 
     other_services = ['dgns_1_cd',
-                      'dgns_2_cd',
-                      'dgns_3_cd',
-                      'dgns_4_cd',
-                      'dgns_5_cd'
+                      'dgns_2_cd'
                       ]
+
+    link_key = {
+        ServiceCategory.inpatient: 'ip_link_key',
+        ServiceCategory.other_services: 'ot_link_key',
+        ServiceCategory.long_term: 'lt_link_key'
+    }
 
     # -------------------------------------------------------
     #
@@ -127,3 +130,48 @@ class Diagnoses:
                 on aa.submtg_state_cd = {alias}.submtg_state_cd and
                    aa.msis_ident_num = {alias}.msis_ident_num
         """
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    @staticmethod
+    def within(service_categories: list, diagnoses: list):
+
+        palet = Palet.getInstance()
+        alias = palet.reserveSQLAlias()
+
+        capture = []
+
+        for svc in service_categories:
+
+            service_category = svc[0]
+
+            capture.append(f"""
+                select distinct
+                    submtg_state_cd,
+                    msis_ident_num,
+                    min(1) as indicator,
+                    count(distinct {Diagnoses.link_key[service_category]}) as m
+                from
+                    taf.{ PaletMetadata.Member.service_category.get(service_category) }
+                where
+                    da_run_id in (6939, 6938, 6937, 6936, 6935, 6934, 6933, 6932, 6931, 6930, 6929, 6928, 6927)
+                    and (
+                        { Diagnoses._doWhere(service_category, diagnoses) }
+                    )
+                group by
+                    submtg_state_cd,
+                    msis_ident_num
+                having
+                    m >= {svc[1]}
+
+            """)
+
+        z = '(' + '\n union all  \n'.join(capture) + ')'
+
+        return f"""{z} as {alias}
+            on aa.submtg_state_cd = {alias}.submtg_state_cd and
+               aa.msis_ident_num = {alias}.msis_ident_num"""
+
