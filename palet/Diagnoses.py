@@ -33,6 +33,13 @@ class Diagnoses:
                  'dgns_11_cd',
                  'dgns_12_cd']
 
+    long_term = ['dgns_1_cd',
+                 'dgns_2_cd',
+                 'dgns_3_cd',
+                 'dgns_4_cd',
+                 'dgns_5_cd'
+                 ]
+
     other_services = ['dgns_1_cd',
                       'dgns_2_cd',
                       'dgns_3_cd',
@@ -49,9 +56,11 @@ class Diagnoses:
     def _doWhere(service_category: ServiceCategory, diagnoses: list):
         tuples = []
         delim = "','"
-        for i in Diagnoses.inpatient:
-            tuples.append(f"( {str(i)} in ('{ delim.join(diagnoses) }'))")
-        return ' or \n                        '.join(tuples)
+        for attr, value in Diagnoses.__dict__.items():
+            if attr == service_category:
+                for col in value:
+                    tuples.append(f"( {str(col)} in ('{ delim.join(diagnoses) }'))")
+                return ' or \n                        '.join(tuples)
 
     # -------------------------------------------------------
     #

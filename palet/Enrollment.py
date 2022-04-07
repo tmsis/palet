@@ -434,7 +434,7 @@ class Enrollment(Paletable):
         # df['year'] = df['de_fil_dt']
 
         # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
-        
+
         if self.timeunit != 'year':
 
             # Month-over-Month
@@ -480,7 +480,7 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def mark(self, condition: Diagnoses, marker: str):
         """
-        The mark function appends a condition column to a dataframe that was filtered using the :meth:`~Enrollment.Enrollment.having` function. Additionally,        
+        The mark function appends a condition column to a dataframe that was filtered using the :meth:`~Enrollment.Enrollment.having` function. Additionally,
         it is important to note that prior to including this function the analyst should create a list of the diagnoses codes they wish to filter by.
 
         Note:
@@ -499,7 +499,8 @@ class Enrollment(Paletable):
             >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
                         'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
 
-            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter to filter by chronic condition:
+            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where`
+            as a parameter to filter by chronic condition:
 
             >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
 
@@ -516,7 +517,7 @@ class Enrollment(Paletable):
             >>> display(api.fetch())
 
         """
-        
+
         self.markers[marker] = condition
         return self
 
