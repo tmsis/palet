@@ -689,7 +689,7 @@ class Enrollment(Paletable):
 
             >>> print(Enrollment.sql())
         """
-        if isFetch is True:
+        if self._sql is None:
             super().sql()
 
             # create or replace temporary view enrollment_by_month as
@@ -745,6 +745,7 @@ class Enrollment(Paletable):
             """
 
             self._addPostProcess(self._percentChange)
+            self._sql = z
         else:
             return self._sql
         return z
