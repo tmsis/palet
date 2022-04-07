@@ -98,7 +98,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "year"):
+    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
         super().__init__(runIds)
 
@@ -177,7 +177,6 @@ class Enrollment(Paletable):
                 sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
                 sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment
                 """,
-
             'month': f"""
                 'In Month' as counter,
                 stack(12,
@@ -434,7 +433,7 @@ class Enrollment(Paletable):
 
         # df['year'] = df['de_fil_dt']
 
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        if self.timeunit in ('month', 'full', 'partial'):
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -661,7 +660,6 @@ class Enrollment(Paletable):
                     {self._getDerivedSelections()}
                     {self._selectTimeunit()}
                     {self._select_indicators()}
-                    {self._stackChipCode()}
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
 

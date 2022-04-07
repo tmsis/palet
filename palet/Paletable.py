@@ -45,7 +45,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def __init__(self, runIds: list = None):
 
-        self.timeunit = 'year'
+        self.timeunit = None
         self.by_group = []
         self.filter = {}
         self.age_band = None
@@ -706,7 +706,7 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byState to the by Group')
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        if self.timeunit not in ('full', 'year', 'partial'):
             self.timeunit = 'month'
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
@@ -1009,7 +1009,6 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def _selectTimeunit(self):
-
         if self.timeunit == 'year':
             return "de_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
@@ -1025,7 +1024,6 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def _groupTimeunit(self):
-
         if self.timeunit == 'year':
             return "de_fil_dt"
         elif self.timeunit in ('month', 'full', 'partial'):
@@ -1034,51 +1032,13 @@ class Paletable():
                 month
                 """
 
-    # ---------------------------------------------------------------------------------
-    # _percentChange protected/private method that is called by each fetch() call
-    # to calculate the % change columns. Each Paletable class should override this
-    # and create it's own logic.
-    # ---------------------------------------------------------------------------------
-    def _percentChange(self, df: pd.DataFrame):
-        self.palet.logger.debug('Percent Change')
+    def _sumByTypeScenario(self, df: pd.DataFrame):
+        df['num_types_per_year'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
+        # if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
 
-        df['year'] = df['de_fil_dt']
+        # df.groupby(by=['STABBREV', timeunit]).sum().reset_index()
 
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
-
-            # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
-            self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
-
-            # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-
-        elif self.timeunit == 'year':
-
-            # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
-                df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            else:
-                df['isfirst'] = 0
-
-            self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
-            self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
-
-        return df
+        pass
 
     # ---------------------------------------------------------------------------------
     #
