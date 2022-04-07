@@ -1113,6 +1113,7 @@ class Paletable():
         self.palet.logger.debug('Fetching data - \n' + self._sql)
         sparkDF = session.sql(self._sql)
         self.palet.clearAliasCache()
+        self._sql = None
 
         if (sparkDF is not None):
 

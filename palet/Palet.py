@@ -7,6 +7,7 @@ the Paletable module inherit from Palet as well.
 
 from datetime import datetime
 import logging
+import secrets
 
 from typing import Any
 
@@ -63,10 +64,7 @@ class Palet:
         cls.actual_time = cls.now.strftime('%d%b%Y:%H:%M:%S').upper()  # ddmmmyy:hh:mm:ss
 
         # SQL Alias cache
-        cls._alphabet = []
         cls._cache_aliases_ = []
-        for letter in range(97, 123):
-            cls._alphabet.append(chr(letter))
         cls._last_used = None
         cls._count = -1
 
@@ -219,7 +217,7 @@ class Palet:
 
     def reserveSQLAlias(self):
         self._count += 1
-        _next_alias_ = self._alphabet[self._count]
+        _next_alias_ = self._create_alias(secrets.token_urlsafe(6))
         self.logger.debug("Next alias: " + str(_next_alias_))
         self._cache_aliases_.append(_next_alias_)
         self.logger.debug("Current alias cache: " + str(self._cache_aliases_))
@@ -232,6 +230,13 @@ class Palet:
 
     def clearAliasCache(self):
         self._cache_aliases_ = []
+
+    def _create_alias(self, alias: str):
+        sp_chars = ['_', '-']
+        for char in sp_chars:
+            alias = alias.replace(char, '')
+
+        return alias
 
     # ---------------------------------------------------------------------------------
     #
