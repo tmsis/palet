@@ -174,4 +174,3 @@ class Diagnoses:
         return f"""{z} as {alias}
             on aa.submtg_state_cd = {alias}.submtg_state_cd and
                aa.msis_ident_num = {alias}.msis_ident_num"""
-
