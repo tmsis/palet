@@ -89,7 +89,7 @@ class Eligibility(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Eligibility API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None):
+    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
         super().__init__(runIds)
 
@@ -102,6 +102,7 @@ class Eligibility(Paletable):
 
         self.isNotEnrolled = False
         self._user_runids = runIds
+        self.timeunit = period
         self.palet.logger.debug('Initializing Eligibility API')
 
     # ---------------------------------------------------------------------------------
@@ -166,7 +167,7 @@ class Eligibility(Paletable):
 
         df['year'] = df['de_fil_dt']
 
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        if self.timeunit != 'year':
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -262,28 +263,28 @@ class Eligibility(Paletable):
             z = f"""
                 select
                     {self._getByGroupWithAlias()}
-                    a.da_run_id,
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd,
-                    sum(a.benes) as benes,
-                    sum(a.mdcd_enrlmt) as mdcd_enrlmt,
-                    sum(a.chip_enrlmt) as chip_enrlmt
+                    aa.da_run_id,
+                    aa.de_fil_dt,
+                    aa.month,
+                    aa.elgblty_grp_cd,
+                    sum(aa.benes) as benes,
+                    sum(aa.mdcd_enrlmt) as mdcd_enrlmt,
+                    sum(aa.chip_enrlmt) as chip_enrlmt
                 from
-                    palet_mart.pivoted_eligibility as a
+                    palet_mart.pivoted_eligibility as aa
                 where
-                    a.da_run_id in ( {self._getRunIds()} )
+                    aa.da_run_id in ( {self._getRunIds()} )
                 group by
                     {self._getByGroupWithAlias()}
-                    a.da_run_id,
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd
+                    aa.da_run_id,
+                    aa.de_fil_dt,
+                    aa.month,
+                    aa.elgblty_grp_cd
                 order by
                     {self._getByGroupWithAlias()}
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd
+                    aa.de_fil_dt,
+                    aa.month,
+                    aa.elgblty_grp_cd
             """
 
         self._addPostProcess(self._percentChange)

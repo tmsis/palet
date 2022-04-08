@@ -223,12 +223,12 @@ class Palet:
         self.logger.debug("Current alias cache: " + str(self._cache_aliases_))
         return _next_alias_
 
-    def getCachedSQLAliases(self):
+    def getSQLAliasStack(self):
         _shallow_copy = self._cache_aliases_.copy()
         _shallow_copy.reverse()
         return _shallow_copy
 
-    def clearAliasCache(self):
+    def clearAliasStack(self):
         self._cache_aliases_ = []
 
     def _create_alias(self, alias: str):

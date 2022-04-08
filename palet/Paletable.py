@@ -1107,11 +1107,11 @@ class Paletable():
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
 
-        self._sql = self.sql(True)
+        self._sql = self.sql()
 
         self.palet.logger.debug('Fetching data - \n' + self._sql)
         sparkDF = session.sql(self._sql)
-        self.palet.clearAliasCache()
+        self.palet.clearAliasStack()
         self._sql = None
 
         if (sparkDF is not None):
