@@ -34,7 +34,6 @@ class Paletable():
 
     """
 
-    # TODO: Continue to clean up docstring using syntax formatting
     # Initialize the comann variables here.
     # All SQL objects should inherit from this class
     # ---------------------------------------------------------------------------------
@@ -226,7 +225,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def _getValueFromFilter(self, column: str):
         self.palet.logger.debug('creating filter values for SQL')
-        value = self.filter.get(column)  # TODO: required columns handling?
+        value = self.filter.get(column)
         return column + " = " + value
 
     # ---------------------------------------------------------------------------------p

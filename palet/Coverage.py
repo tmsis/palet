@@ -124,10 +124,6 @@ class Coverage(Paletable):
                     a.month
             """
 
-        #  TODO: {self._getRunIds()}
-        #  TODO: {self._defineWhereClause()}
-        #  TODO: {self._getByGroupWithAlias()}
-
         # compress rows from coverage if it is in the by group
         self._addPostProcess(self._percentChange)
 
