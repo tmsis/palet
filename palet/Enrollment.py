@@ -110,6 +110,7 @@ class Enrollment(Paletable):
             self._runids = paletable._runids
 
         self.palet = Palet.getInstance()
+        self.palet.clearAliasStack()
         self.timeunit = period
         self._user_runids = runIds
         self._marker_cache = []
@@ -549,7 +550,7 @@ class Enrollment(Paletable):
             alias = _marker_cache.pop()
             indicators.append(f"{alias}.indicator as {key},")
 
-        return '\n'.join(indicators)
+        return '\n\t\t'.join(indicators)
 
     # ---------------------------------------------------------------------------------
     #
@@ -563,7 +564,7 @@ class Enrollment(Paletable):
         for key, val in self.markers.items():
             indicators.append(f"coalesce({key}, 0) as {key},")
 
-        return '\n'.join(indicators)
+        return '\n\t\t'.join(indicators)
 
     # ---------------------------------------------------------------------------------
     #
@@ -577,7 +578,7 @@ class Enrollment(Paletable):
         for key, val in self.markers.items():
             groupby.append(f"{key},")
 
-        return '\n'.join(groupby)
+        return '\n\t\t'.join(groupby)
 
     # ---------------------------------------------------------------------------------
     #
@@ -593,7 +594,7 @@ class Enrollment(Paletable):
             alias = _groupby_cache.pop()
             groupby.append(f",{alias}.indicator")
 
-        return '\n'.join(groupby)
+        return '\n\t\t'.join(groupby)
 
     # ---------------------------------------------------------------------------------
     #

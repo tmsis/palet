@@ -66,7 +66,6 @@ class Palet:
         # SQL Alias cache
         cls._cache_aliases_ = []
         cls._last_used = None
-        cls._count = -1
 
     # Palet Singleton
     @staticmethod
@@ -166,7 +165,7 @@ class Palet:
         self.logger.setLevel(logging.INFO)
 
         ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
+        ch.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)
@@ -216,8 +215,7 @@ class Palet:
         print(self.sql[v])
 
     def reserveSQLAlias(self):
-        self._count += 1
-        _next_alias_ = self._create_alias(secrets.token_urlsafe(6))
+        _next_alias_ = self._clean_alias(secrets.token_urlsafe(6))
         self.logger.debug("Next alias: " + str(_next_alias_))
         self._cache_aliases_.append(_next_alias_)
         self.logger.debug("Current alias cache: " + str(self._cache_aliases_))
@@ -231,7 +229,7 @@ class Palet:
     def clearAliasStack(self):
         self._cache_aliases_ = []
 
-    def _create_alias(self, alias: str):
+    def _clean_alias(self, alias: str):
         sp_chars = ['_', '-']
         for char in sp_chars:
             alias = alias.replace(char, '')
