@@ -245,7 +245,7 @@ class Eligibility(Paletable):
                     from
                         palet_mart.aggregate_eligibility_vs_enrollment
                     where
-                        da_run_id in ( {self._getRunIds()} )
+                        da_run_id in ( {self.date_dimension.relevant_runids('BSE', 1)} )
                     group by
                         submtg_state_cd,
                         de_fil_dt,
@@ -273,7 +273,7 @@ class Eligibility(Paletable):
                 from
                     palet_mart.pivoted_eligibility as aa
                 where
-                    aa.da_run_id in ( {self._getRunIds()} )
+                    aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 1)} )
                 group by
                     {self._getByGroupWithAlias()}
                     aa.da_run_id,
