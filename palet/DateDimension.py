@@ -2,7 +2,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType, DecimalType, IntegerType, LongType, DoubleType
 from datetime import date, datetime, timedelta
 import pandas as pd
-import numpy as np
 from dateutil.relativedelta import relativedelta
 
 
@@ -91,7 +90,8 @@ class DateDimension:
             dt = dt - relativedelta(months=lookback)
 
         if self.df is not None:
-            rids = self.df[(self.df['dt_yearmon'] >= dt) & (self.df['dt_yearmon'] <= self.as_of_date) & (self.df['fil_4th_node_txt'] == taf_file_type)]['da_run_id']
+            rids = self.df[(self.df['dt_yearmon'] >= dt) & (self.df['dt_yearmon'] <= self.as_of_date) &
+                                                           (self.df['fil_4th_node_txt'] == taf_file_type)]['da_run_id']
 
         else:
             rids = ()
