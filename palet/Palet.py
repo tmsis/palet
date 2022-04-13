@@ -8,6 +8,7 @@ the Paletable module inherit from Palet as well.
 from datetime import datetime
 import logging
 import secrets
+import sys
 
 from typing import Any
 
@@ -162,6 +163,7 @@ class Palet:
         logging.Logger.performance = performance
 
         self.logger = logging.getLogger('palet_log')
+        self.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
         self.logger.setLevel(logging.INFO)
 
         ch = logging.StreamHandler()
@@ -201,6 +203,10 @@ class Palet:
         pdf = pd.read_pickle(pkl)
 
         return pdf
+
+    def setLogLevel(self, level: str = "DEBUG"):
+        self.logger = logging.getLogger('palet_log')
+        self.logger.setLevel(level)
 
     # ---------------------------------------------------------------------------------
     #
