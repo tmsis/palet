@@ -6,6 +6,7 @@ return datafranes created by high level objects.
 """
 
 import pandas as pd
+from palet.DateDimension import DateDimension
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 
@@ -50,7 +51,7 @@ class Paletable():
         self.age_band = None
         self.derived_by_group = []
 
-        self._runids = []
+        self.date_dimension = DateDimension(runIds=runIds)
 
         self.preprocesses = []
         self.postprocesses = []
@@ -59,7 +60,6 @@ class Paletable():
         self.having_constraints = []
         self._sql = None
 
-        self._user_runids = runIds
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
         # self.report_month = datetime.strptime(report_month, '%Y%m')
@@ -68,13 +68,13 @@ class Paletable():
 
         self.palet = Palet.getInstance()
 
-        if runIds is not None:
-            if not issubclass(type(runIds), Paletable):
-                self._user_runids = self.usingRunIds(runIds)
-        else:
-            self._runids = self.palet.cache_run_ids()
-            self._years = self.palet.cache_run_ids("fil_dt")
-        self.palet.logger.debug('Initializing Paletable super class')
+        # if runIds is not None:
+        #     if not issubclass(type(runIds), Paletable):
+        #         self._user_runids = self.usingRunIds(runIds)
+        # else:
+        #     self._runids = self.palet.cache_run_ids()
+        #     self._years = self.palet.cache_run_ids("fil_dt")
+        # self.palet.logger.debug('Initializing Paletable super class')
 
     # ----
     #
@@ -83,26 +83,6 @@ class Paletable():
     def setLoggingLevel(self, level: str):
         self.palet.logger.setLevel(level)
         return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    # _getRunIds
-    #  Determine if there are any user defined run Ids and use them instead.
-    # ---------------------------------------------------------------------------------
-    def _getRunIds(self):
-        if self._user_runids is not None and not issubclass(type(self._user_runids), Paletable):
-            return ','.join(map(str, self._user_runids))
-        else:
-            return ','.join(map(str, self._runids))
-
-    # ---------------------------------------------------------------------------------
-    #
-    # _getCorrespondingYears
-    #   Return the years associated with the runIds for full or partial month
-    #   Enrollment calculations
-    # ---------------------------------------------------------------------------------
-    def _getCorrespondingYears(self):
-        return self._years
 
     # ---------------------------------------------------------------------------------
     #
@@ -384,86 +364,6 @@ class Paletable():
 
     # ---------------------------------------------------------------------------------
     #
-    # Use this method to pass in user defined runIds
-    #
-    # ---------------------------------------------------------------------------------
-    def usingRunIds(self, ids: list = None):
-        """For users who which to pass in their own Run Ids, call this method by passing
-        in a list of run ids separated by comma. e.g. [6279, 6280]
-
-        Args:
-            ids: `list, optional`: Filter by specific runids by passing in a list of one or more.
-            default: `none`: Defaults to an Empty List [] and will clear user defined run ids when called by default
-
-        Returns:
-            No return values
-
-        Example:
-            Start with a Paletable object:
-
-            >>> api = Enrollment()
-
-            Specify run ids:
-
-            >>> api.usingRunIds([6279, 6280])
-
-            Return DataFrame:
-
-            >>> display(api.fetch())
-
-            Alternatively enter the list of run ids as a parameter of the Paletable object:
-
-            >>> api = Enrollment([6279, 6280])
-
-            Return DataFrame:
-
-            >>> display(api.fetch())
-
-        """
-        self.palet.logger.debug("using RunIds: " + str(ids))
-        if ids is not None:
-            self._user_runids = ids
-        else:
-            self._user_runids = None
-
-        return self
-
-    def displayCurrentRunIds(self):
-        """If you'd like to get a display of the current run ids set in the query then you can call this function
-        or check the full sql statement by :meth:`sql`.
-
-        Args:
-            None
-
-        Returns:
-            Prints the current list of run ids to the screen.
-
-        Example:
-            Create a Paletable object:
-
-            >>> api = Eligibility()
-
-            Return a list of the default run ids:
-
-            >>> api.displayCurrentRunIds()
-
-            Manually specify a list of run ids:
-
-            >>> api.usingRunIds([6279, 6280])
-
-            Return a list of the user defined run ids:
-
-            >>> api.displayCurrentRunIds()
-
-            Alternatively print the backend sql query and check the run ids there:
-
-            >>> print(api.sql())
-
-        """
-        print("Current RunIds: " + str(self._getRunIds()))
-
-    # ---------------------------------------------------------------------------------
-    #
     # Likely will be removed - consolidated to be included in byAgeRange()
     #
     # ---------------------------------------------------------------------------------
@@ -720,34 +620,6 @@ class Paletable():
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
 
         return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byCoverageTypeObject(self, type=None):
-        """DEPRECATED Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
-        If your object is already set by a by group this will add it as the next by group.
-
-        Note:
-            This function inherits from the deprecated :class:`Coverage` class and is no longer supported. Please see :meth:`byCoverageType`.
-
-        Args:
-            type:`str, (optional)`: Filter by coverage type using coverage code. Defaults to None.
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-
-        """
-
-        from palet.Coverage import Coverage
-
-        self.palet.logger.info('adding byCoverageType to the by Group')
-
-        self._addByGroup(PaletMetadata.Coverage.type)
-
-        return Coverage(self._user_runids, self)
 
     # ---------------------------------------------------------------------------------
     #

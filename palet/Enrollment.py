@@ -107,12 +107,11 @@ class Enrollment(Paletable):
             self.derived_by_group = paletable.derived_by_group
             self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
-            self._runids = paletable._runids
+            
 
         self.palet = Palet.getInstance()
         self.palet.clearAliasStack()
         self.timeunit = period
-        self._user_runids = runIds
         self._marker_cache = []
         self._groupby_cache = []
         self._sql = None
@@ -718,7 +717,7 @@ class Enrollment(Paletable):
                         { self._apply_constraints() }
                         { self._apply_markers() }
                     where
-                        aa.da_run_id in ( {self._getRunIds()} ) and
+                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
                         {self._getByTimeunitCull()} and
                         {self._defineWhereClause()}
                     group by
