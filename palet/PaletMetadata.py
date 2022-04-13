@@ -378,7 +378,6 @@ class PaletMetadata:
             Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
-        eligibiltyGroup = 'elgblty_grp_cd'
         primaryEligibilityGroup = 'prmry_elgblty_grp_ind'
         eligibiltyGroupCategory = 'elgblty_grp_ctgry_flag'
         maintenanceAssistanceStatus = 'mas_cd'
@@ -531,7 +530,7 @@ class PaletMetadata:
                 'race_ethncty_exp_flag': PaletMetadata.Enrichment._buildRaceEthnicityExpColumn,
                 'ethncty_cd': PaletMetadata.Enrichment._buildEthnicityColumn,
                 'enrollment_type': PaletMetadata.Enrichment._buildEnrollmentType,
-                'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
+                'eligibility_type': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
                 'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
@@ -673,9 +672,10 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _findEligibiltyType(x):
+            from palet.EligibilityType import EligibilityType
             # self.palet.logger.debug('looking up the eligibility value from our metadata')
             # get this row's ref value from the column by name
-            y = x[PaletMetadata.Eligibility.eligibiltyGroup]
+            y = x[EligibilityType.alias]
             # lookup label with value
             return PaletMetadata.Eligibility.eligibility_cd.get(y)
 

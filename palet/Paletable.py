@@ -169,6 +169,7 @@ class Paletable():
     def _getDerivedByTypeGroup(self):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
+        from palet.EligibilityType import EligibilityType
 
         z = ""
         new_line_comma = '\n\t\t\t   ,'
@@ -184,6 +185,10 @@ class Paletable():
 
                 if str(column) == "<class 'palet.CoverageType.CoverageType'>":
                     for j in CoverageType.cols:
+                        z += j + new_line_comma
+
+                if str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
+                    for j in EligibilityType.cols:
                         z += j + new_line_comma
 
             return f"{z}"
@@ -653,7 +658,6 @@ class Paletable():
 
         """
 
-        from palet.Enrollment import Enrollment
         from palet.CoverageType import CoverageType
 
         self.palet.logger.info('adding CoverageType to the by Group')
@@ -662,7 +666,8 @@ class Paletable():
         # if type is not None:
         #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
-        return Enrollment(self._user_runids, self)
+        # return Enrollment(self._user_runids, self)
+        return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -670,7 +675,6 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def byEnrollmentType(self):
-        from palet.Enrollment import Enrollment
 
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
@@ -702,7 +706,48 @@ class Paletable():
         # if type is not None:
         #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
-        return Enrollment(self.date_dimension.runIds, self)
+        # return Enrollment(self.date_dimension.runIds, self)
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def byEligibilityType(self):
+
+        """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
+        correspond to chip_cd in PaletMetadata.
+
+        Args:
+            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            default: `none`: Filter by all available enrollment types
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Create Paletable object:
+
+            >>> api = Enrollment().byEnrollmentType()
+
+            Return Paletable object as a DataFrame:
+
+            >>> display(api.fetch())
+
+        """
+
+        from palet.EligibilityType import EligibilityType
+
+        self.palet.logger.info('adding byEnrollmentType to the by Group')
+        self.derived_by_type_group.append(EligibilityType)
+
+        # if type is not None:
+        #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+
+        # return Enrollment(self.date_dimension.runIds, self)
+        return self
 
     # ---------------------------------------------------------------------------------
     #

@@ -337,7 +337,19 @@ class Enrollment(Paletable):
                 (aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0) or
                 (aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0) or
                 (aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0) or
-                (aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0)
+                (aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0) or
+                (aa.elgblty_grp_cd_01 > 0) or
+                (aa.elgblty_grp_cd_02 > 0) or
+                (aa.elgblty_grp_cd_03 > 0) or
+                (aa.elgblty_grp_cd_04 > 0) or
+                (aa.elgblty_grp_cd_05 > 0) or
+                (aa.elgblty_grp_cd_06 > 0) or
+                (aa.elgblty_grp_cd_07 > 0) or
+                (aa.elgblty_grp_cd_08 > 0) or
+                (aa.elgblty_grp_cd_09 > 0) or
+                (aa.elgblty_grp_cd_10 > 0) or
+                (aa.elgblty_grp_cd_11 > 0) or
+                (aa.elgblty_grp_cd_12 > 0)
             )""",
 
             'full': "1=1",
@@ -354,6 +366,7 @@ class Enrollment(Paletable):
     def _getDerivedTypeSelections(self):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
+        from palet.EligibilityType import EligibilityType
 
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
@@ -363,6 +376,9 @@ class Enrollment(Paletable):
 
                 elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
                     return CoverageType.alias + ','
+                
+                elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
+                    return EligibilityType.alias + ','
 
         return ''
 
@@ -374,6 +390,7 @@ class Enrollment(Paletable):
     def _getTimeUnitBreakdown(self):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
+        from palet.EligibilityType import EligibilityType
 
         breakdown = Enrollment.timeunit.breakdown[self.timeunit]
 
@@ -411,6 +428,22 @@ class Enrollment(Paletable):
                         'aa.' + CoverageType.cols[10] + ',',
                         'aa.' + CoverageType.cols[11] + ',',
                         CoverageType.alias + ',',
+                        )
+                elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
+                    return breakdown.format(
+                        'aa.' + EligibilityType.cols[0] + ',',
+                        'aa.' + EligibilityType.cols[1] + ',',
+                        'aa.' + EligibilityType.cols[2] + ',',
+                        'aa.' + EligibilityType.cols[3] + ',',
+                        'aa.' + EligibilityType.cols[4] + ',',
+                        'aa.' + EligibilityType.cols[5] + ',',
+                        'aa.' + EligibilityType.cols[6] + ',',
+                        'aa.' + EligibilityType.cols[7] + ',',
+                        'aa.' + EligibilityType.cols[8] + ',',
+                        'aa.' + EligibilityType.cols[9] + ',',
+                        'aa.' + EligibilityType.cols[10] + ',',
+                        'aa.' + EligibilityType.cols[11] + ',',
+                        EligibilityType.alias + ',',
                         )
 
         return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '')
