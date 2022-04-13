@@ -49,7 +49,8 @@ class Paletable():
         self.by_group = []
         self.filter = {}
         self.age_band = None
-        self.derived_by_group = []
+        self.derived_by_type_group = []
+        self.aggregate_group = []
 
         self.date_dimension = DateDimension(runIds=runIds)
 
@@ -129,24 +130,50 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _addDerivedByGroup(self, var):
-        if var not in self.derived_by_group:
-            self.palet.logger.debug(f'Adding By Group {var}')
-            self.derived_by_group.append(var)
+    def _addDerivedByTypeGroup(self, var):
+        if var not in self.derived_by_type_group:
+            self.palet.logger.debug(f'Adding By Type Group {var}')
+            self.derived_by_type_group.append(var)
 
     # ---------------------------------------------------------------------------------
     #
     #
     #
     # ---------------------------------------------------------------------------------
-    def _getDerivedByGroup(self):
+    def _addAggregateGroup(self, var):
+        if var not in self.aggregate_group:
+            self.palet.logger.debug(f'Adding By Aggregate Group {var}')
+            self.aggregate_group.append(var)
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getAggregateGroup(self):
+        self.palet.logger.debug('Forming SQL Aggregate by Groups')
+        z = ""
+        new_line_comma = '\n\t\t\t   ,'
+        if (len(self.aggregate_group)) > 0:
+            for column in self.aggregate_group:
+                z += column + new_line_comma
+            return f"{z}"
+        else:
+            return ''
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _getDerivedByTypeGroup(self):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
 
         z = ""
         new_line_comma = '\n\t\t\t   ,'
-        if (len(self.derived_by_group)) > 0:
-            for column in self.derived_by_group:
+        if (len(self.derived_by_type_group)) > 0:
+            for column in self.derived_by_type_group:
 
                 if isinstance(column, str):
                     z += column + new_line_comma
@@ -323,44 +350,18 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byAgeRange to by Group')
+        self.palet.logger.info('adding byAgeRange to aggregate by Group')
 
         if age_range is not None:
             self._removeByGroup(PaletMetadata.Enrollment.identity.ageGroup)
             self.age_band = age_range
-            self._addDerivedByGroup(PaletMetadata.Enrollment.identity.age_band)
+            self._addDerivedByTypeGroup(PaletMetadata.Enrollment.identity.age_band)
+            self._addAggregateGroup(PaletMetadata.Enrollment.identity.age_band)
 
         else:
             self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
         return self
-
-    # ----------------------------------------------------------
-    #
-    # _stackChipCode
-    #  Use this method if we have entrollment type request
-    #  within the derived by groups
-    # ----------------------------------------------------------
-    def _stackChipCode(self):
-        self.palet.logger.debug("Stacking the chip codes for enrollment type")
-        select = ""
-        if PaletMetadata.Enrollment.type in self.derived_by_group:
-            select = """,stack(12,
-                            1,  aa.chip_cd_01,
-                            2,  aa.chip_cd_02,
-                            3,  aa.chip_cd_03,
-                            4,  aa.chip_cd_04,
-                            5,  aa.chip_cd_05,
-                            6,  aa.chip_cd_06,
-                            7,  aa.chip_cd_07,
-                            8,  aa.chip_cd_08,
-                            9,  aa.chip_cd_09,
-                            10, aa.chip_cd_10,
-                            11, aa.chip_cd_11,
-                            12, aa.chip_cd_12
-                            ) as (month, enrollment_type)
-                        """
-        return select
 
     # ---------------------------------------------------------------------------------
     #
@@ -656,7 +657,7 @@ class Paletable():
         from palet.CoverageType import CoverageType
 
         self.palet.logger.info('adding CoverageType to the by Group')
-        self.derived_by_group.append(CoverageType)
+        self.derived_by_type_group.append(CoverageType)
 
         # if type is not None:
         #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
@@ -696,12 +697,12 @@ class Paletable():
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
-        self.derived_by_group.append(EnrollmentType)
+        self.derived_by_type_group.append(EnrollmentType)
 
         # if type is not None:
         #     self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
 
-        return Enrollment(self._user_runids, self)
+        return Enrollment(self.date_dimension.runIds, self)
 
     # ---------------------------------------------------------------------------------
     #
@@ -984,7 +985,7 @@ class Paletable():
         self.palet.logger.debug('Fetching data - \n' + self._sql)
 
         sparkDF = session.sql(self._sql)
-        
+
         self._sql = None
 
         if (sparkDF is not None):

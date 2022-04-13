@@ -104,10 +104,10 @@ class Enrollment(Paletable):
 
         if (paletable is not None):
             self.by_group = paletable.by_group
-            self.derived_by_group = paletable.derived_by_group
+            self.derived_by_type_group = paletable.derived_by_type_group
+            self.aggregate_group = paletable.aggregate_group
             self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
-            
 
         self.palet = Palet.getInstance()
         self.palet.clearAliasStack()
@@ -351,13 +351,13 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    def _getDerivedSelections(self):
+    def _getDerivedTypeSelections(self):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
 
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
-        if (len(self.derived_by_group)) > 0:
-            for column in self.derived_by_group:
+        if (len(self.derived_by_type_group)) > 0:
+            for column in self.derived_by_type_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
                     return EnrollmentType.alias + ','
 
@@ -377,8 +377,8 @@ class Enrollment(Paletable):
 
         breakdown = Enrollment.timeunit.breakdown[self.timeunit]
 
-        if (len(self.derived_by_group)) > 0:
-            for column in self.derived_by_group:
+        if (len(self.derived_by_type_group)) > 0:
+            for column in self.derived_by_type_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
                     return breakdown.format(
                         'aa.' + EnrollmentType.cols[0] + ',',
@@ -698,7 +698,8 @@ class Enrollment(Paletable):
                 select
                     counter,
                     {self._getByGroup()}
-                    {self._getDerivedSelections()}
+                    {self._getDerivedTypeSelections()}
+                    {self._getAggregateGroup()}
                     {self._selectTimeunit()}
                     {self._select_indicators()}
                     sum(mdcd_enrollment) as mdcd_enrollment,
@@ -722,12 +723,12 @@ class Enrollment(Paletable):
                         {self._defineWhereClause()}
                     group by
                         {self._getByGroupWithAlias()}
-                        {self._getDerivedByGroup()}
+                        {self._getDerivedByTypeGroup()}
                         aa.de_fil_dt
                         {self._groupby_markers()}
                     order by
                         {self._getByGroupWithAlias()}
-                        {self._getDerivedByGroup()}
+                        {self._getDerivedByTypeGroup()}
                         aa.de_fil_dt
                         {self._groupby_markers()}
                 )
@@ -735,12 +736,14 @@ class Enrollment(Paletable):
                     counter,
                     {self._getByGroup()}
                     {self._groupby_indicators()}
-                    {self._getDerivedSelections()}
+                    {self._getDerivedTypeSelections()}
+                    {self._getAggregateGroup()}
                     {self._groupTimeunit()}
                 order by
                     {self._getByGroup()}
                     {self._groupby_indicators()}
-                    {self._getDerivedSelections()}
+                    {self._getDerivedTypeSelections()}
+                    {self._getAggregateGroup()}
                     {self._groupTimeunit()}
             """
 

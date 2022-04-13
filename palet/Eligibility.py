@@ -95,13 +95,11 @@ class Eligibility(Paletable):
 
         if (paletable is not None):
             self.by_group = paletable.by_group
-            self.derived_by_group = paletable.derived_by_group
+            self.derived_by_type_group = paletable.derived_by_type_group
             self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
-            self._runids = paletable._runids
 
         self.isNotEnrolled = False
-        self._user_runids = runIds
         self.timeunit = period
         self.palet.logger.debug('Initializing Eligibility API')
 

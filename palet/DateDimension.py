@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from dateutil.relativedelta import relativedelta
 
+
 # -----------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------
@@ -13,7 +14,7 @@ class DateDimension:
     # -----------------------------------------------------------------------
     #
     # -----------------------------------------------------------------------
-    def __init__(self, as_of_date: date=None, runIds: list = None):
+    def __init__(self, as_of_date: date = None, runIds: list = None):
         z = """
             select distinct
                 fil_4th_node_txt,
@@ -25,7 +26,7 @@ class DateDimension:
                 taf.efts_fil_meta
             where
                 ltst_run_ind = true
-                and otpt_name in ('TAF_ANN_DE_BASE', 
+                and otpt_name in ('TAF_ANN_DE_BASE',
                                     'TAF_IPH',
                                     'TAF_LTH',
                                     'TAF_OTH',
@@ -45,16 +46,16 @@ class DateDimension:
             ;
         """
         spark = SparkSession.getActiveSession()
-        if spark is not None:    
+        if spark is not None:
             spark_df = spark.sql(z)
             spark_df = spark_df.withColumn('fil_4th_node_txt', spark_df['fil_4th_node_txt'].cast(StringType()))
             spark_df = spark_df.withColumn('otpt_name', spark_df['otpt_name'].cast(StringType()))
             spark_df = spark_df.withColumn('da_run_id', spark_df['da_run_id'].cast(LongType()))
             spark_df = spark_df.withColumn('rptg_prd', spark_df['rptg_prd'].cast(StringType()))
             spark_df = spark_df.withColumn('fil_dt', spark_df['fil_dt'].cast(StringType()))
-            
+
             df = spark_df.toPandas()
-            
+
             df['yyyy'] = df['fil_dt'].str[0:4]
             df['mmlen'] = df['fil_dt'].apply(len)
             df['mm'] = df.apply(lambda x: x['fil_dt'][4:6] if x['mmlen'] == 6 else '01', axis=1)
@@ -63,32 +64,32 @@ class DateDimension:
             df['month'] = pd.to_numeric(df['mm'])
             df['month'].fillna(1, inplace=True)
             df['dt_yearmon'] = df.apply(lambda x: date(x['year'], int(x['month']), 1), axis=1)
-            self.df = df 
-        
+            self.df = df
+
         else:
             self.df = None
-        
+
         if as_of_date is None:
             as_of_date = datetime.now().replace(day=1).date()
 
         self.as_of_date = as_of_date
 
         self.runIds = runIds
-        
+
     # -----------------------------------------------------------------------
     #
     # -----------------------------------------------------------------------
     def relevant_runids(self, taf_file_type, lookback):
-        
+
         dt = self.as_of_date
-        
+
         if taf_file_type == 'BSE':
             if self.runIds is not None:
-                return ','.join(map(str, self.runIds))    
+                return ','.join(map(str, self.runIds))
             dt = dt - relativedelta(years=lookback)
         else:
             dt = dt - relativedelta(months=lookback)
-        
+
         if self.df is not None:
             rids = self.df[(self.df['dt_yearmon'] >= dt) & (self.df['dt_yearmon'] <= self.as_of_date) & (self.df['fil_4th_node_txt'] == taf_file_type)]['da_run_id']
 
