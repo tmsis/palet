@@ -722,7 +722,7 @@ class Enrollment(Paletable):
 
             >>> print(Enrollment.sql())
         """
-        if self._sql is None:
+        if self._sql is None or isFetch:
             super().sql()
 
             # create or replace temporary view enrollment_by_month as

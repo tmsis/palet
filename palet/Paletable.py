@@ -1025,7 +1025,7 @@ class Paletable():
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
 
-        self._sql = str(self.sql())
+        self._sql = self.sql(isFetch=True)
 
         self.palet.logger.debug('Fetching data - \n' + self._sql)
 
