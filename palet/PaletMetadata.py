@@ -751,6 +751,11 @@ class PaletMetadata:
 
         def _renderAgeRange(self):
             if self.age_band is not None:
+                if type(self.age_band) != 'dict':
+                    PaletMetadata.Enrichment._getPaletObj().logger.warn(str(self.age_band) + " is not a valid range.\
+                        Please enter in the form of a dict. e.g. {'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
+                    return ",'n/a' as age_band"
+
                 ageBandWhere = []
 
                 ageBandWhere.append(', case')
@@ -765,7 +770,7 @@ class PaletMetadata:
                 return ' '.join(ageBandWhere)
 
             else:
-                return ''
+                return ""
 
         # ---------------------------------------------------------------------------------
         #

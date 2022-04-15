@@ -1,0 +1,10 @@
+PALET Library Release Notes
+Version 1.7.20220415
+
+*** Added this message on first Palet startup w/ version number
+*** Fixed byAgeRange to display column of the specified range(s)
+*** Added a warning to byAgeRange function if the input is not dict and display an example input
+*** Moved Eligibility into enrollment via byEligibilityType()
+*** DEPRECATED: Eligibility class. Use Paletable.byEligibilityType()
+
+--end of release--

@@ -75,7 +75,7 @@ class Enrollment(Paletable):
 
     Methods:
         usingRundIds(): Specify the run ids you would like to query. See :meth:`~Paletable.Paletable.usingRunIds`.
-        displayCurrentRunIds(): Return a list of the run ids included in your query. See :meth:`~Paletable.Paletable.displayCurrentRunIds`.
+        displayCurrentRunIds(): DEPRECATED. See DateDimension
         byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
         byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
         byRaceEthnicityExpanded(): Filter your query by Race (expanded options). See :meth:`~Paletable.Paletable.byRaceEthnicityExpanded`.
@@ -376,7 +376,7 @@ class Enrollment(Paletable):
 
                 elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
                     return CoverageType.alias + ','
-                
+
                 elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
                     return EligibilityType.alias + ','
 

@@ -9,6 +9,7 @@ from datetime import datetime
 import logging
 import secrets
 import sys
+import os
 
 from typing import Any
 
@@ -68,6 +69,13 @@ class Palet:
         cls._cache_aliases_ = []
         cls._last_used = None
 
+        # ---------------------------------------------------------------------------------
+        #
+        # Show current release notes on first load of Paletable
+        #    This will log.info the release.readme file
+        # ---------------------------------------------------------------------------------
+        cls.showReleaseNotes()
+
     # Palet Singleton
     @staticmethod
     def getInstance():
@@ -84,6 +92,26 @@ class Palet:
             raise Exception("This class is a singleton! Use getInstance()")
         else:
             Palet.__instance = self
+            self.showReleaseNotes()
+
+    @staticmethod
+    def showReleaseNotes():
+        sys.path.append('/dbfs/FileStore/shared_uploads/akira/lib')
+        _logger = logging.getLogger('palet_log')
+        _std_path = "/dbfs/FileStore/shared_uploads/akira/lib/palet/release.readme"
+        _whl_path = " /databricks/python/lib/python3.8/site-packages/palet/release.readme"
+
+        if os.path.exists(_std_path):
+            file = open(_std_path, "r")
+        elif os.path.exists(_whl_path):
+            file = open(_whl_path, "r")
+        else:
+            return
+
+        for line in file:
+            if line != "--end of release--":
+                _logger.info(line)
+        file.close()
 
     # --------------------------------------------------------------------
     #
@@ -337,6 +365,7 @@ class Palet:
             import pickle
             aliases: dict = pickle.load(filename, 'rb')
             return aliases
+
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
