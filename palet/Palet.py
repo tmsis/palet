@@ -100,6 +100,7 @@ class Palet:
         _logger = logging.getLogger('palet_log')
         _std_path = "/dbfs/FileStore/shared_uploads/akira/lib/palet/release.readme"
         _whl_path = " /databricks/python/lib/python3.8/site-packages/palet/release.readme"
+        readme = ""
 
         if os.path.exists(_std_path):
             file = open(_std_path, "r")
@@ -109,9 +110,13 @@ class Palet:
             return
 
         for line in file:
-            if line != "--end of release--":
-                _logger.info(line)
+            readme += line
         file.close()
+
+        release = readme.splitlines()
+
+        for rl in release:
+            _logger.info(rl)
 
     # --------------------------------------------------------------------
     #
