@@ -339,19 +339,7 @@ class Enrollment(Paletable):
                 (aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0) or
                 (aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0) or
                 (aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0) or
-                (aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0) or
-                (aa.elgblty_grp_cd_01 > 0) or
-                (aa.elgblty_grp_cd_02 > 0) or
-                (aa.elgblty_grp_cd_03 > 0) or
-                (aa.elgblty_grp_cd_04 > 0) or
-                (aa.elgblty_grp_cd_05 > 0) or
-                (aa.elgblty_grp_cd_06 > 0) or
-                (aa.elgblty_grp_cd_07 > 0) or
-                (aa.elgblty_grp_cd_08 > 0) or
-                (aa.elgblty_grp_cd_09 > 0) or
-                (aa.elgblty_grp_cd_10 > 0) or
-                (aa.elgblty_grp_cd_11 > 0) or
-                (aa.elgblty_grp_cd_12 > 0)
+                (aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0)
             )""",
 
             'full': "1=1",
