@@ -37,3 +37,10 @@ class EligibilityType():
             'elgblty_grp_cd_10',
             'elgblty_grp_cd_11',
             'elgblty_grp_cd_12']
+
+    def aggregate(alias):
+        a = map(lambda x: alias + '.' + x, EligibilityType.cols)
+        b = list(a)
+        b.reverse()
+        f = ','.join(b)
+        return f'coalesce({f})'

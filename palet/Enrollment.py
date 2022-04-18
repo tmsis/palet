@@ -431,6 +431,7 @@ class Enrollment(Paletable):
                         'aa.' + CoverageType.cols[10] + ',',
                         'aa.' + CoverageType.cols[11] + ',',
                         CoverageType.alias + ',',
+                        CoverageType.aggregate('aa') + ','
                         )
                 elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
                     return breakdown.format(
@@ -447,6 +448,7 @@ class Enrollment(Paletable):
                         'aa.' + EligibilityType.cols[10] + ',',
                         'aa.' + EligibilityType.cols[11] + ',',
                         EligibilityType.alias + ',',
+                        EligibilityType.aggregate('aa') + ','
                         )
 
         return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '')
