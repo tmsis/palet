@@ -20,4 +20,5 @@ if defined svr goto :publish
 :publish
 echo on
 databricks --profile val fs cp ./dist/palet-1.0.1-py3-none-any.whl dbfs:/FileStore/shared_uploads/akira/lib/palet-%1-py3-none-any.whl --overwrite
+databricks --profile val fs cp ./palet/release.readme dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
 @REM databricks --profile prod fs cp ./dist/palet-1.0.1-py3-none-any.whl dbfs:/FileStore/shared_uploads/akira/lib/palet-%1-py3-none-any.whl --overwrite
