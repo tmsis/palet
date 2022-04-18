@@ -373,6 +373,30 @@ class Enrollment(Paletable):
         return ''
 
     # ---------------------------------------------------------------------------------
+    # Used in _percentChange to enure the columns for mdcd_pct and chip_pct are included
+    # in the sort and order commands. 
+    #
+    # ---------------------------------------------------------------------------------
+    def _getDerivedTypePctSort(self):
+        from palet.EnrollmentType import EnrollmentType
+        from palet.CoverageType import CoverageType
+        from palet.EligibilityType import EligibilityType
+
+        # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
+        if (len(self.derived_by_type_group)) > 0:
+            for column in self.derived_by_type_group:
+                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+                    return [EnrollmentType.alias]
+
+                elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
+                    return [CoverageType.alias]
+
+                elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
+                    return [EligibilityType.alias]
+
+        return []
+
+    # ---------------------------------------------------------------------------------
     # _getTimeunitBreakdown
     # This function is used to dynamically generate the SQL statement by returning the
     # selected timeunit. e.g. byMonth() or byYear()
@@ -439,7 +463,7 @@ class Enrollment(Paletable):
                         EligibilityType.aggregate('aa') + ','
                         )
 
-        return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '')
+        return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '', '')
 
     # ---------------------------------------------------------------------------------
     # _getByTimeunitCull
@@ -455,6 +479,7 @@ class Enrollment(Paletable):
     # and create it's own logic.
     # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
+        from palet.EnrollmentType import EnrollmentType
         self.palet.logger.debug('Percent Change')
 
         # df['year'] = df['de_fil_dt']
@@ -486,10 +511,23 @@ class Enrollment(Paletable):
         elif self.timeunit == 'year':
 
             # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            if (len(self.by_group)) > 0:
+            # df = df.sort_values(by=self.by_group + ['year'], ascending=True)
+            # if (len(self.by_group)) > 0:
+            #      df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            # else:
+            #     df['isfirst'] = 0
+
+            if (len(self.derived_by_type_group)) > 0 and (len(self.by_group)) > 0:
+                df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year'], ascending=True)
+                df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort()).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.by_group)) > 0:
+                df = df.sort_values(by=self.by_group + ['year'], ascending=True)
                 df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.derived_by_type_group)) > 0:
+                df = df.sort_values(by=self._getDerivedTypePctSort() + ['year'], ascending=True)
+                df.loc[df.groupby(self._getDerivedTypePctSort()).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
             else:
+                df = df.sort_values(by=['year'], ascending=True)
                 df['isfirst'] = 0
 
             self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
