@@ -37,3 +37,10 @@ class CoverageType():
             'mc_plan_type_cd_10',
             'mc_plan_type_cd_11',
             'mc_plan_type_cd_12']
+
+    def aggregate(alias):
+        a = map(lambda x: alias + '.' + x, CoverageType.cols)
+        b = list(a)
+        b.reverse()
+        f = ','.join(b)
+        return f'coalesce({f})'
