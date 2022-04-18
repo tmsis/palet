@@ -37,3 +37,10 @@ class EnrollmentType():
             'chip_cd_10',
             'chip_cd_11',
             'chip_cd_12']
+
+    def aggregate(alias):
+        a = map(lambda x: alias + '.' + x, EnrollmentType.cols)
+        b = list(a)
+        b.reverse()
+        f = ','.join(b)
+        return f'coalesce({f})'
