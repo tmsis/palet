@@ -172,11 +172,13 @@ class Enrollment(Paletable):
         """
 
         breakdown = {
-            'year': """
+            'year': f"""
                 'In Year' as counter,
-                sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end) as mdcd_enrollment,
-                sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end) as chip_enrollment
-                """,
+                stack(1,
+                    1, { {13} }
+                        sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end),
+                        sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end)
+                    ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
                 'In Month' as counter,
                 stack(12,
@@ -411,6 +413,7 @@ class Enrollment(Paletable):
                         'aa.' + EnrollmentType.cols[10] + ',',
                         'aa.' + EnrollmentType.cols[11] + ',',
                         EnrollmentType.alias + ',',
+                        EnrollmentType.aggregate('aa') + ','
                         )
 
                 elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
