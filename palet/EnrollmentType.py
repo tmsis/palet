@@ -44,3 +44,17 @@ class EnrollmentType():
         b.reverse()
         f = ','.join(b)
         return f'coalesce({f})'
+
+    def filter(alias, filter_val):
+        a = []
+        vals = "','".join(filter_val)
+
+        for cols in EnrollmentType.cols:
+            a.append(alias + '.' + cols + " in ('" + vals + "')\n\t\t\t")
+
+        b = list(a)
+        f = ' or '.join(b)
+        return f'{f}'
+
+    def __hash__(self):
+        return(hash(str(self)))
