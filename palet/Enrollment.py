@@ -784,7 +784,8 @@ class Enrollment(Paletable):
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
                         {self._getByTimeunitCull()} and
-                        {self._defineWhereClause()}
+                        {self._defineWhereClause()} and
+                        ({self._defFilterTypeClause()})
                     group by
                         {self._getByGroupWithAlias()}
                         {self._getDerivedByTypeGroup()}

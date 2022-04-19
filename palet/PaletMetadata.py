@@ -522,6 +522,14 @@ class PaletMetadata:
             palet = enrichment.Palet.getInstance()
             return palet
 
+        @staticmethod
+        def _checkForHelperMsg(field, field_type, value_example: str):
+
+            if type(field) != field_type:
+                PaletMetadata.Enrichment._getPaletObj().logger.warn(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
+                                                                               + " e.g. " + value_example)
+                return ",'n/a' as " + str(field)
+
         def getDefinedColumns(self):
             self.defined_columns = {
                 'age_grp_flag': PaletMetadata.Enrichment._buildAgeGroupColumn,
@@ -751,10 +759,7 @@ class PaletMetadata:
 
         def _renderAgeRange(self):
             if self.age_band is not None:
-                if type(self.age_band) != 'dict':
-                    PaletMetadata.Enrichment._getPaletObj().logger.warn(str(self.age_band) + " is not a valid range.\
-                        Please enter in the form of a dict. e.g. {'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
-                    return ",'n/a' as age_band"
+                PaletMetadata.Enrichment._checkForHelperMsg(self.age_band, dict, "{'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
 
                 ageBandWhere = []
 
