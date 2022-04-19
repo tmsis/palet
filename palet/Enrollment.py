@@ -489,34 +489,48 @@ class Enrollment(Paletable):
         if self.timeunit != 'year':
 
             # Month-over-Month
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
-            if (len(self.by_group)) > 0:
+            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
+                df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year', 'month'], ascending=True)
+                df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort()).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.by_group)) > 0:
+                df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
                 df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.derived_by_type_group)) > 0:
+                df = df.sort_values(by=self._getDerivedTypePctSort() + ['year', 'month'], ascending=True)
+                df.loc[df.groupby(self._getDerivedTypePctSort()).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
             else:
+                df = df.sort_values(by=['year', 'month'], ascending=True)
                 df['isfirst'] = 0
 
             self._buildPctChangeColumn(df, 'mdcd_pct_mom', 'mdcd_enrollment', 1, False)
             self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
 
             # Year-over-Year
-            df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
-            df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0: 
+                df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
+                df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.by_group)) > 0: 
+                df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
+                df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            elif (len(self.derived_by_type_group)) > 0: 
+                df = df.sort_values(by=self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
+                df.loc[df.groupby(self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
+            else:
+                df = df.sort_values(by=['month', 'year'], ascending=True)
+                df.loc[df.groupby(['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
 
             self._buildPctChangeColumn(df, 'mdcd_pct_yoy', 'mdcd_enrollment', 1, False)
             self._buildPctChangeColumn(df, 'chip_pct_yoy', 'chip_enrollment', 1, False)
 
             # Re-sort Chronologically
-            df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
+            if (len(self.derived_by_type_group)) > 0:
+                df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year', 'month'], ascending=True)
+            else:
+                df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
 
         elif self.timeunit == 'year':
 
             # Year-over-Year
-            # df = df.sort_values(by=self.by_group + ['year'], ascending=True)
-            # if (len(self.by_group)) > 0:
-            #      df.loc[df.groupby(self.by_group).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            # else:
-            #     df['isfirst'] = 0
-
             if (len(self.derived_by_type_group)) > 0 and (len(self.by_group)) > 0:
                 df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year'], ascending=True)
                 df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort()).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
