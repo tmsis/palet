@@ -45,12 +45,10 @@ class EnrollmentType():
         f = ','.join(b)
         return f'coalesce({f})'
 
-    def filter(alias, filter_val):
+    def filter(filter_val):
         a = []
         vals = "','".join(filter_val)
-
-        for cols in EnrollmentType.cols:
-            a.append(alias + '.' + cols + " in ('" + vals + "')\n\t\t\t")
+        a.append("('" + vals + "')")
 
         b = list(a)
         f = ' or '.join(b)

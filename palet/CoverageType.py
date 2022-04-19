@@ -44,3 +44,15 @@ class CoverageType():
         b.reverse()
         f = ','.join(b)
         return f'coalesce({f})'
+
+    def filter(filter_val):
+        a = []
+        vals = "','".join(filter_val)
+        a.append("('" + vals + "')")
+
+        b = list(a)
+        f = ' or '.join(b)
+        return f'{f}'
+
+    def __hash__(self):
+        return(hash(str(self)))

@@ -262,6 +262,21 @@ class PaletMetadata:
                 Nov = 'chip_enrlmt_days_11'
                 Dec = 'chip_enrlmt_days_12'
 
+                enrollment = {
+                        '01':  "chip_enrlmt_days_01",
+                        '02':  "chip_enrlmt_days_02",
+                        '03':  "chip_enrlmt_days_03",
+                        '04':  "chip_enrlmt_days_04",
+                        '05':  "chip_enrlmt_days_05",
+                        '06':  "chip_enrlmt_days_06",
+                        '07':  "chip_enrlmt_days_07",
+                        '08':  "chip_enrlmt_days_08",
+                        '09':  "chip_enrlmt_days_09",
+                        '10':  "chipenrlmt_days_10",
+                        '11':  "chip_enrlmt_days_11",
+                        '12':  "chip_enrlmt_days_12"
+                    }
+
         class Medicaid:
             """
             The Medicaid class is a subclass within Enrollment. This subclass assigns time periods to
