@@ -34,7 +34,7 @@ class Paletable():
         >>> e.fetch()
 
     """
-
+    
     # Initialize the comann variables here.
     # All SQL objects should inherit from this class
     # ---------------------------------------------------------------------------------
