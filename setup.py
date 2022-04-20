@@ -9,8 +9,8 @@ setuptools.setup(
     author="Jesse Beaumont",
     author_email="jesse.beaumont@cms.hhs.gov",
     description="A package to calculate data quality measures on T-MSIS data using Databricks",
-   # long_description=long_description,
-   # long_description_content_type="text/markdown",
+    # long_description=long_description,
+    # long_description_content_type="text/markdown",
     url="https://git-codecommit.us-east-2.amazonaws.com/v1/repos/DQ-Measures",
     classifiers=[
         "Programming Language :: Python :: 3.8.6 :: Only",
