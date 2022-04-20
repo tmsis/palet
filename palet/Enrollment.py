@@ -394,6 +394,9 @@ class Enrollment(Paletable):
                 elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
                     return [EligibilityType.alias]
 
+                elif str(column) == "age_band":
+                    return self.derived_by_type_group
+
         return []
 
     # ---------------------------------------------------------------------------------
