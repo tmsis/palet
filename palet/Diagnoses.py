@@ -70,6 +70,15 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
+    def _getRunIds(run_id_file: ServiceCategory):
+        from palet.DateDimension import DateDimension
+        return DateDimension().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), 6)
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     @staticmethod
     def where(service_category: ServiceCategory, diagnoses: list):
         """
@@ -122,7 +131,7 @@ class Diagnoses:
                 from
                     taf.{ PaletMetadata.Member.service_category.get(service_category) }
                 where
-                    da_run_id in (6939, 6938, 6937, 6936, 6935, 6934, 6933, 6932, 6931, 6930, 6929, 6928, 6927)
+                    da_run_id in ( { Diagnoses._getRunIds(service_category) } )
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
@@ -157,7 +166,7 @@ class Diagnoses:
                 from
                     taf.{ PaletMetadata.Member.service_category.get(service_category) }
                 where
-                    da_run_id in (6939, 6938, 6937, 6936, 6935, 6934, 6933, 6932, 6931, 6930, 6929, 6928, 6927)
+                    da_run_id in ( { Diagnoses._getRunIds(service_category) } )
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
