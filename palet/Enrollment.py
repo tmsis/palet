@@ -502,7 +502,8 @@ class Enrollment(Paletable):
 
             else:
                 return "1=1"
-        return breakdown
+        return breakdown.format('1', '(1)')
+
     # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
     # to calculate the % change columns. Each Paletable class should override this
@@ -535,13 +536,13 @@ class Enrollment(Paletable):
             self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
 
             # Year-over-Year
-            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0: 
+            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            elif (len(self.by_group)) > 0: 
+            elif (len(self.by_group)) > 0:
                 df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            elif (len(self.derived_by_type_group)) > 0: 
+            elif (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
             else:
