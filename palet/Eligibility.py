@@ -211,7 +211,7 @@ class Eligibility(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    def sql(self):
+    def sql(self, isFetch: bool = False):
         """The SQL query that the Eligibility class uses to pull dataframes.
 
         This can be called allowing an analyst to view the SQL the Eligibility is using.

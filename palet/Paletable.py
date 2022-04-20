@@ -288,19 +288,6 @@ class Paletable():
         else:
             return "1=1"
 
-    def _defFilterTypeClause(self):
-        self.palet.logger.debug('defining our where filter type clause based on api calls')
-        where = []
-
-        if len(self.filter_by_type) > 0:
-            for key in self.filter_by_type:
-                where.append(key.filter(alias='aa', filter_val=self.filter_by_type[key]))
-
-            return f"{' or '.join(where)}"
-
-        else:
-            return "1=1"
-
     # ---------------------------------------------------------------------------------
     #
     # _chcekForMultiVarFilter
@@ -646,7 +633,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, type: list = None):
+    def byCoverageType(self, *ctype):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
@@ -671,14 +658,21 @@ class Paletable():
             >>> display(api.fetch())
 
         """
+        if len(ctype) > 1:
+            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
+            self.__byCoverageType__([])
+        else:
+            self.__byCoverageType__(ctype[0])
 
+    def __byCoverageType__(self, type: list = None):
         from palet.CoverageType import CoverageType
 
         self.palet.logger.info('adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
         if type is not None:
-            self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
+            self.filter_by_type.update({CoverageType: type})
 
         # return Enrollment(self._user_runids, self)
         return self
@@ -688,8 +682,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, type: list = None):
-
+    def byEnrollmentType(self, *ctype):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -711,7 +704,13 @@ class Paletable():
             >>> display(api.fetch())
 
         """
+        if len(ctype) > 1:
+            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['1', '2', '3']")
+            self.__byEnrollmentType__([])
+        else:
+            self.__byEnrollmentType__(ctype[0])
 
+    def __byEnrollmentType__(self, type: list = None):
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
@@ -729,8 +728,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, type: list = None):
-
+    def byEligibilityType(self, *ctype):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -752,14 +750,21 @@ class Paletable():
             >>> display(api.fetch())
 
         """
+        if len(ctype) > 1:
+            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
+            self.__byEnrollmentType__([])
+        else:
+            self.__byEnrollmentType__(ctype[0])
 
+    def __byEligibilityType__(self, type: list = None):
         from palet.EligibilityType import EligibilityType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
         if type is not None:
-            self.filter.update({PaletMetadata.Enrollment.type: "'" + type + "'"})
+            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
+            self.filter_by_type.update({EligibilityType: type})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self

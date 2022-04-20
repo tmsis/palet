@@ -319,7 +319,7 @@ class Enrollment(Paletable):
                        sum(case when aa.chip_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
                     12, { {11} }
                        sum(case when aa.mdcd_enrlmt_days_12 between 1 and 30 then 1 else 0 end),
-                       sum(case when aa.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)
+                       sum(case when aa.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)e
                     ) as (month, { {12} } mdcd_enrollment, chip_enrollment)"""
         }
 
@@ -328,24 +328,37 @@ class Enrollment(Paletable):
                 (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0))""",
 
             'month': """(
-                (aa.mdcd_enrlmt_days_01 > 0) or (aa.chip_enrlmt_days_01 > 0) or
-                (aa.mdcd_enrlmt_days_02 > 0) or (aa.chip_enrlmt_days_02 > 0) or
-                (aa.mdcd_enrlmt_days_03 > 0) or (aa.chip_enrlmt_days_03 > 0) or
-                (aa.mdcd_enrlmt_days_04 > 0) or (aa.chip_enrlmt_days_04 > 0) or
-                (aa.mdcd_enrlmt_days_05 > 0) or (aa.chip_enrlmt_days_05 > 0) or
-                (aa.mdcd_enrlmt_days_06 > 0) or (aa.chip_enrlmt_days_06 > 0) or
-                (aa.mdcd_enrlmt_days_07 > 0) or (aa.chip_enrlmt_days_07 > 0) or
-                (aa.mdcd_enrlmt_days_08 > 0) or (aa.chip_enrlmt_days_08 > 0) or
-                (aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0) or
-                (aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0) or
-                (aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0) or
-                (aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0)
+                ((aa.mdcd_enrlmt_days_01 > 0) or (aa.chip_enrlmt_days_01 > 0)) or
+                ((aa.mdcd_enrlmt_days_02 > 0) or (aa.chip_enrlmt_days_02 > 0)) or
+                ((aa.mdcd_enrlmt_days_03 > 0) or (aa.chip_enrlmt_days_03 > 0)) or
+                ((aa.mdcd_enrlmt_days_04 > 0) or (aa.chip_enrlmt_days_04 > 0)) or
+                ((aa.mdcd_enrlmt_days_05 > 0) or (aa.chip_enrlmt_days_05 > 0)) or
+                ((aa.mdcd_enrlmt_days_06 > 0) or (aa.chip_enrlmt_days_06 > 0)) or
+                ((aa.mdcd_enrlmt_days_07 > 0) or (aa.chip_enrlmt_days_07 > 0)) or
+                ((aa.mdcd_enrlmt_days_08 > 0) or (aa.chip_enrlmt_days_08 > 0)) or
+                ((aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0)) or
+                ((aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0)) or
+                ((aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0)) or
+                ((aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0))
             )""",
 
             'full': "1=1",
 
             'partial': '1=1'
 
+        }
+
+        cull_filter = {
+            'year': """(
+                    (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0))""",
+
+            'month': f"""(
+                ({ {0} } in { {1} })
+            )""",
+
+            'full': "1=1",
+
+            'partial': '1=1'
         }
 
     # ---------------------------------------------------------------------------------
@@ -374,7 +387,7 @@ class Enrollment(Paletable):
 
     # ---------------------------------------------------------------------------------
     # Used in _percentChange to enure the columns for mdcd_pct and chip_pct are included
-    # in the sort and order commands. 
+    # in the sort and order commands.
     #
     # ---------------------------------------------------------------------------------
     def _getDerivedTypePctSort(self):
@@ -473,8 +486,26 @@ class Enrollment(Paletable):
     # This function is used to dynamically generate the SQL where clause by returning the
     # selected timeunit. e.g. byMonth() or byYear()
     # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self):
-        return Enrollment.timeunit.cull[self.timeunit]
+    def _getByTimeunitCull(self, cull_type: list):
+        from palet.EnrollmentType import EnrollmentType
+        from palet.CoverageType import CoverageType
+        from palet.EligibilityType import EligibilityType
+
+        breakdown = cull_type[self.timeunit]
+        for key in self.filter_by_type:
+            _type = self.filter_by_type[key]
+            if str(key) == "<class 'palet.EnrollmentType.EnrollmentType'>":
+                return breakdown.format(EnrollmentType.alias, key.filter(_type))
+
+            elif str(key) == "<class 'palet.CoverageType.CoverageType'>":
+                return breakdown.format(CoverageType.alias, key.filter(_type))
+
+            elif str(key) == "<class 'palet.EligibilityType.EligibilityType'>":
+                return breakdown.format(EligibilityType.alias, key.filter(_type))
+
+            else:
+                return "1=1"
+        return breakdown.format('1', '(1)')
 
     # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
@@ -482,7 +513,6 @@ class Enrollment(Paletable):
     # and create it's own logic.
     # ---------------------------------------------------------------------------------
     def _percentChange(self, df: pd.DataFrame):
-        from palet.EnrollmentType import EnrollmentType
         self.palet.logger.debug('Percent Change')
 
         # df['year'] = df['de_fil_dt']
@@ -509,13 +539,13 @@ class Enrollment(Paletable):
             self._buildPctChangeColumn(df, 'chip_pct_mom', 'chip_enrollment', 1, False)
 
             # Year-over-Year
-            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0: 
+            if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self.by_group + self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            elif (len(self.by_group)) > 0: 
+            elif (len(self.by_group)) > 0:
                 df = df.sort_values(by=self.by_group + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self.by_group + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
-            elif (len(self.derived_by_type_group)) > 0: 
+            elif (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self._getDerivedTypePctSort() + ['month', 'year'], ascending=True)
                 df.loc[df.groupby(self._getDerivedTypePctSort() + ['month']).apply(pd.DataFrame.first_valid_index), 'isfirst'] = 1
             else:
@@ -800,9 +830,8 @@ class Enrollment(Paletable):
                         { self._apply_markers() }
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
-                        {self._getByTimeunitCull()} and
-                        {self._defineWhereClause()} and
-                        ({self._defFilterTypeClause()})
+                        {self._getByTimeunitCull(Enrollment.timeunit.cull)} and
+                        {self._defineWhereClause()}
                     group by
                         {self._getByGroupWithAlias()}
                         {self._getDerivedByTypeGroup()}
@@ -814,6 +843,8 @@ class Enrollment(Paletable):
                         aa.de_fil_dt
                         {self._groupby_markers()}
                 )
+                where
+                    {self._getByTimeunitCull(Enrollment.timeunit.cull_filter)}
                 group by
                     counter,
                     {self._getByGroup()}
