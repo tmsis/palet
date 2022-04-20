@@ -67,12 +67,12 @@ class Diagnoses:
 
     # -------------------------------------------------------
     #
-    #
+    # Used by where and within to return relevant run ids
     #
     # -------------------------------------------------------
-    def _getRunIds(run_id_file: ServiceCategory):
+    def _getRunIds(run_id_file: ServiceCategory, lookback: int = 6):
         from palet.DateDimension import DateDimension
-        return DateDimension().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), 6)
+        return DateDimension().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), lookback)
 
     # -------------------------------------------------------
     #
@@ -80,7 +80,7 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     @staticmethod
-    def where(service_category: ServiceCategory, diagnoses: list):
+    def where(service_category: ServiceCategory, diagnoses: list, lookback: int = 6):
         """
         The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
         This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
@@ -131,7 +131,7 @@ class Diagnoses:
                 from
                     taf.{ PaletMetadata.Member.service_category.get(service_category) }
                 where
-                    da_run_id in ( { Diagnoses._getRunIds(service_category) } )
+                    da_run_id in ( { Diagnoses._getRunIds(service_category, lookback) } )
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
@@ -146,7 +146,7 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     @staticmethod
-    def within(service_categories: list, diagnoses: list):
+    def within(service_categories: list, diagnoses: list, lookback: int = 6):
 
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
@@ -166,7 +166,7 @@ class Diagnoses:
                 from
                     taf.{ PaletMetadata.Member.service_category.get(service_category) }
                 where
-                    da_run_id in ( { Diagnoses._getRunIds(service_category) } )
+                    da_run_id in ( { Diagnoses._getRunIds(service_category, lookback) } )
                     and (
                         { Diagnoses._doWhere(service_category, diagnoses) }
                     )
