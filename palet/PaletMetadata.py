@@ -525,6 +525,13 @@ class PaletMetadata:
             ServiceCategory.other_services: "data_anltcs_taf_oth_vw"
         }
 
+        run_id_file = {
+            ServiceCategory.inpatient: 'IPH',
+            ServiceCategory.other_services: 'OTH',
+            ServiceCategory.long_term: 'LTH',
+            ServiceCategory.prescription: 'RXH'
+        }
+
     class Enrichment():
 
         import pandas as pd
