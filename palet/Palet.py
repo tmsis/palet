@@ -92,20 +92,19 @@ class Palet:
             raise Exception("This class is a singleton! Use getInstance()")
         else:
             Palet.__instance = self
-            self.showReleaseNotes()
+            Palet.showReleaseNotes()
 
     @staticmethod
     def showReleaseNotes():
-        sys.path.append('/dbfs/FileStore/shared_uploads/akira/lib')
         _logger = logging.getLogger('palet_log')
         _std_path = "/dbfs/FileStore/shared_uploads/akira/lib/palet/release.readme"
-        _whl_path = " /databricks/python/lib/python3.8/site-packages/palet/release.readme"
+        _whl_path = "release.readme"
         readme = ""
 
         if os.path.exists(_std_path):
-            file = open(_std_path, "r")
+            file = open(_std_path)
         elif os.path.exists(_whl_path):
-            file = open(_whl_path, "r")
+            file = open(_whl_path)
         else:
             return
 
