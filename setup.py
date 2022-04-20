@@ -18,7 +18,7 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(),
     package_data={
-        "palet": ["cfg/*.pkl"],
+        "palet": ["cfg/*.pkl", "release.readme"],
     },
     project_urls={
         'Documentation': 'https://tmsis2.atlassian.net/wiki/spaces/PAL/pages/2928345193/PALET+-+General+Wiki+Work+in+Progress',
