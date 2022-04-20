@@ -502,7 +502,7 @@ class Enrollment(Paletable):
 
             else:
                 return "1=1"
-
+        return breakdown
     # ---------------------------------------------------------------------------------
     # _percentChange protected/private method that is called by each fetch() call
     # to calculate the % change columns. Each Paletable class should override this
