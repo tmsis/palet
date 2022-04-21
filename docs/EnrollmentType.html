@@ -51,17 +51,21 @@
             
   <div class="section" id="module-EnrollmentType">
 <span id="enrollmenttype"></span><h1>EnrollmentType<a class="headerlink" href="#module-EnrollmentType" title="Permalink to this headline">¶</a></h1>
-<p>The EnrollmentType module is a critical component of the by group <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a> in <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>. This module only contains one class, EnrollmentType.</p>
+<p>The EnrollmentType module is a critical component of the by group <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a> in <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>.
+This module only contains one class, EnrollmentType.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="EnrollmentType.EnrollmentType">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">EnrollmentType.</span></span><span class="sig-name descname"><span class="pre">EnrollmentType</span></span><a class="headerlink" href="#EnrollmentType.EnrollmentType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The EnrollmentType class creates an alias called enrollment_type that transposes the 12 chip_cd columns allowing <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a>
-to filter by various coverage types. It also plays a role in the backend method for decorating the enrollment_type_label column that is included when one runs <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a>
+<p>The EnrollmentType class creates an alias called enrollment_type that transposes the 12 chip_cd
+columns allowing <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a> to filter by various coverage types.
+It also plays a role in the backend method for decorating the enrollment_type_label column
+that is included when one runs <a class="reference internal" href="Paletable.html#Paletable.Paletable.byEnrollmentType" title="Paletable.Paletable.byEnrollmentType"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byEnrollmentType()</span></code></a>
 on a Paletable object like <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>PALET users and analysts will not interact with this module directly. It’s purpose is for aliasing and backend decorating that occures when its respective
+<p>PALET users and analysts will not interact with this module directly.
+It’s purpose is for aliasing and backend decorating that occures when its respective
 by group is called.</p>
 </div>
 <dl class="py attribute">
@@ -72,6 +76,16 @@ by group is called.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="EnrollmentType.EnrollmentType.cols">
 <span class="sig-name descname"><span class="pre">cols</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['chip_cd_01',</span> <span class="pre">'chip_cd_02',</span> <span class="pre">'chip_cd_03',</span> <span class="pre">'chip_cd_04',</span> <span class="pre">'chip_cd_05',</span> <span class="pre">'chip_cd_06',</span> <span class="pre">'chip_cd_07',</span> <span class="pre">'chip_cd_08',</span> <span class="pre">'chip_cd_09',</span> <span class="pre">'chip_cd_10',</span> <span class="pre">'chip_cd_11',</span> <span class="pre">'chip_cd_12']</span></em><a class="headerlink" href="#EnrollmentType.EnrollmentType.cols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="EnrollmentType.EnrollmentType.aggregate">
+<span class="sig-name descname"><span class="pre">aggregate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#EnrollmentType.EnrollmentType.aggregate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="EnrollmentType.EnrollmentType.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#EnrollmentType.EnrollmentType.filter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PALET Wiki [v. 1.7.20220401] &#8212; PALET Wiki Test 1.3 documentation</title>
+    <title>PALET Wiki [v. 1.7.20220407] &#8212; PALET Wiki Test 1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -36,7 +36,7 @@
           <a href="Coverage.html" title="Coverage (Deprecated)"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">PALET Wiki Test 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">PALET Wiki [v. 1.7.20220401]</a></li> 
+        <li class="nav-item nav-item-this"><a href="">PALET Wiki [v. 1.7.20220407]</a></li> 
       </ul>
     </div>  
 
@@ -45,8 +45,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="palet-wiki-v-1-7-20220401">
-<h1>PALET Wiki [v. 1.7.20220401]<a class="headerlink" href="#palet-wiki-v-1-7-20220401" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="palet-wiki-v-1-7-20220407">
+<h1>PALET Wiki [v. 1.7.20220407]<a class="headerlink" href="#palet-wiki-v-1-7-20220407" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Documentation for the Python Analytics Library Essential Toolkit. Below are links which lead to the documentation for the modules that make up
@@ -69,33 +69,52 @@ for each module below for more details.</p>
 <li><p>Log into Databricks using the PROD or VAL server</p></li>
 <li><p>PROD is the preferred server for user testing</p></li>
 <li><dl class="simple">
-<dt>Open a notebook and ensure it is being run on the databricks-palet-uat-prod or databricks-palet-uat-val cluster</dt><dd><ol class="loweralpha simple">
+<dt>Open a notebook and ensure it is being run on the databricks-palet-uat-prod or databricks-palet-uat-val cluster</dt><dd><ul class="simple">
 <li><p>Note the cluster is critical to accessing the PALET library</p></li>
 <li><p>If the cluster isn’t currently running, start the cluster</p></li>
-</ol>
+</ul>
 </dd>
 </dl>
 </li>
 <li><p>Begin by importing one or more Paletable objects and the PaletMetadata module</p></li>
 <li><dl class="simple">
-<dt>Example:</dt><dd><ol class="loweralpha simple">
+<dt>Example:</dt><dd><ul class="simple">
 <li><p>from palet.Enrollment import Enrollment</p></li>
 <li><p>from palet.Eligibility import Eligibility</p></li>
 <li><p>from palet.PaletMetadata import PaletMetadata</p></li>
-</ol>
+</ul>
 </dd>
 </dl>
 </li>
 </ol>
 <p>From here, the analyst has more freedom and flexibility to explore and manipulate data as they see fit. Paletable objects can be combined with
 by groups from the Paletable class and overwritten by other Paletable objects. Explicit examples can be found in the modules’ documentation below.</p>
+</div>
+<div class="section" id="palet-current-release-and-process-information">
+<h2>PALET Current Release and Process information<a class="headerlink" href="#palet-current-release-and-process-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>All Releases will run through the Assertion Notebook and MUST pass in order to complete the Sprint</p></li>
+<li><p>At the end of each Sprint the PALET team will create an official library whl with the number of the Sprint and the date it was created. e.g. Sprint 7 will have a release of 1.7.20220408</p></li>
+<li><dl class="simple">
+<dt>Any user may test and log defects into JIRA to be prioritized based on urgency</dt><dd><ul>
+<li><p>If critical fixes are needed the PALET team will work on those immediately</p></li>
+<li><p>Otherwise the PALET team will prioritize features, then fixes</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>The PALET team will release features as they are completed and assertion tests passed to keep the libraries on the clusters fresh with new items.</p></li>
+<li><p>The official GITHUB channel will have published the assertion test notebook and examples of all features. These can be downloaded and updated at any time by anyone with GITHUB access</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Coverage.html">Coverage (Deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CoverageType.html">CoverageType</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DateDimension.html">DateDimension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Diagnoses.html">Diagnoses</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Eligibility.html">Eligibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Eligibility.html">Eligibility (Deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EligibilityType.html">EligibilityType</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Enrollment.html">Enrollment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EnrollmentType.html">EnrollmentType</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Palet.html">Palet</a></li>
@@ -124,10 +143,11 @@ by groups from the Paletable class and overwritten by other Paletable objects. E
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PALET Wiki [v. 1.7.20220401]</a><ul>
+<li><a class="reference internal" href="#">PALET Wiki [v. 1.7.20220407]</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#background-preface">Background &amp; Preface</a></li>
 <li><a class="reference internal" href="#setting-up-palet">Setting Up PALET</a></li>
+<li><a class="reference internal" href="#palet-current-release-and-process-information">PALET Current Release and Process information</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -170,7 +190,7 @@ by groups from the Paletable class and overwritten by other Paletable objects. E
           <a href="Coverage.html" title="Coverage (Deprecated)"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">PALET Wiki Test 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">PALET Wiki [v. 1.7.20220401]</a></li> 
+        <li class="nav-item nav-item-this"><a href="">PALET Wiki [v. 1.7.20220407]</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

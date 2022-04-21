@@ -1,5 +1,5 @@
-Eligibility
-==================
+Eligibility (Deprecated)
+========================
 
 .. automodule:: Eligibility
    :members:

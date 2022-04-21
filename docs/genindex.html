@@ -51,12 +51,15 @@
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#W"><strong>W</strong></a>
@@ -65,10 +68,20 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="CoverageType.html#CoverageType.CoverageType.aggregate">aggregate() (CoverageType.CoverageType method)</a>
+
+      <ul>
+        <li><a href="EligibilityType.html#EligibilityType.EligibilityType.aggregate">(EligibilityType.EligibilityType method)</a>
+</li>
+        <li><a href="EnrollmentType.html#EnrollmentType.EnrollmentType.aggregate">(EnrollmentType.EnrollmentType method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="CoverageType.html#CoverageType.CoverageType.alias">alias (CoverageType.CoverageType attribute)</a>
 
       <ul>
-        <li><a href="Diagnoses.html#Diagnoses.Diagnoses.alias">(Diagnoses.Diagnoses attribute)</a>
+        <li><a href="EligibilityType.html#EligibilityType.EligibilityType.alias">(EligibilityType.EligibilityType attribute)</a>
 </li>
         <li><a href="EnrollmentType.html#EnrollmentType.EnrollmentType.alias">(EnrollmentType.EnrollmentType attribute)</a>
 </li>
@@ -97,8 +110,12 @@
         <li><a href="Paletable.html#Paletable.Paletable.byCoverageType">(Paletable.Paletable method)</a>
 </li>
       </ul></li>
-      <li><a href="Paletable.html#Paletable.Paletable.byCoverageTypeObject">byCoverageTypeObject() (Paletable.Paletable method)</a>
+      <li><a href="Enrollment.html#Enrollment.Enrollment.byEligibilityType">byEligibilityType() (Enrollment.Enrollment method)</a>
+
+      <ul>
+        <li><a href="Paletable.html#Paletable.Paletable.byEligibilityType">(Paletable.Paletable method)</a>
 </li>
+      </ul></li>
       <li><a href="Eligibility.html#Eligibility.Eligibility.byEnrollmentType">byEnrollmentType() (Eligibility.Eligibility method)</a>
 
       <ul>
@@ -191,9 +208,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Palet.html#Palet.Palet.cache_run_ids">cache_run_ids() (Palet.Palet method)</a>
 </li>
+      <li><a href="Palet.html#Palet.Palet.clearAliasStack">clearAliasStack() (Palet.Palet method)</a>
+</li>
       <li><a href="CoverageType.html#CoverageType.CoverageType.cols">cols (CoverageType.CoverageType attribute)</a>
 
       <ul>
+        <li><a href="EligibilityType.html#EligibilityType.EligibilityType.cols">(EligibilityType.EligibilityType attribute)</a>
+</li>
         <li><a href="EnrollmentType.html#EnrollmentType.EnrollmentType.cols">(EnrollmentType.EnrollmentType attribute)</a>
 </li>
       </ul></li>
@@ -223,11 +244,26 @@
 </li>
       <li><a href="Enrollment.html#Enrollment.Enrollment.timeunit.cull">cull (Enrollment.Enrollment.timeunit attribute)</a>
 </li>
+      <li><a href="Enrollment.html#Enrollment.Enrollment.timeunit.cull_filter">cull_filter (Enrollment.Enrollment.timeunit attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    DateDimension
+
+      <ul>
+        <li><a href="DateDimension.html#module-DateDimension">module</a>
+</li>
+      </ul></li>
+      <li><a href="DateDimension.html#DateDimension.DateDimension">DateDimension (class in DateDimension)</a>
+</li>
+      <li><a href="Palet.html#Palet.Palet.Utils.deserialize">deserialize() (Palet.Palet.Utils static method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     Diagnoses
@@ -238,14 +274,10 @@
       </ul></li>
       <li><a href="Diagnoses.html#Diagnoses.Diagnoses">Diagnoses (class in Diagnoses)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Eligibility.html#Eligibility.Eligibility.displayCurrentRunIds">displayCurrentRunIds() (Eligibility.Eligibility method)</a>
 
       <ul>
         <li><a href="Enrollment.html#Enrollment.Enrollment.displayCurrentRunIds">(Enrollment.Enrollment method)</a>
-</li>
-        <li><a href="Paletable.html#Paletable.Paletable.displayCurrentRunIds">(Paletable.Paletable method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -263,8 +295,19 @@
       </ul></li>
       <li><a href="Eligibility.html#Eligibility.Eligibility">Eligibility (class in Eligibility)</a>
 </li>
+      <li>
+    EligibilityType
+
+      <ul>
+        <li><a href="EligibilityType.html#module-EligibilityType">module</a>
+</li>
+      </ul></li>
+      <li><a href="EligibilityType.html#EligibilityType.EligibilityType">EligibilityType (class in EligibilityType)</a>
+</li>
       <li><a href="Eligibility.html#Eligibility.Eligibility.enrolled">enrolled() (Eligibility.Eligibility method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     Enrollment
 
@@ -272,8 +315,6 @@
         <li><a href="Enrollment.html#module-Enrollment">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Enrollment.html#Enrollment.Enrollment">Enrollment (class in Enrollment)</a>
 </li>
       <li><a href="Enrollment.html#Enrollment.Enrollment.timeunit">Enrollment.timeunit (class in Enrollment)</a>
@@ -301,6 +342,28 @@
         <li><a href="Paletable.html#Paletable.Paletable.fetch">(Paletable.Paletable method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="CoverageType.html#CoverageType.CoverageType.filter">filter() (CoverageType.CoverageType method)</a>
+
+      <ul>
+        <li><a href="EligibilityType.html#EligibilityType.EligibilityType.filter">(EligibilityType.EligibilityType method)</a>
+</li>
+        <li><a href="EnrollmentType.html#EnrollmentType.EnrollmentType.filter">(EnrollmentType.EnrollmentType method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Palet.html#Palet.Palet.getInstance">getInstance() (Palet.Palet static method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Palet.html#Palet.Palet.getSQLAliasStack">getSQLAliasStack() (Palet.Palet method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -331,14 +394,22 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Diagnoses.html#Diagnoses.Diagnoses.link_key">link_key (Diagnoses.Diagnoses attribute)</a>
+</li>
       <li><a href="Palet.html#Palet.Palet.load_metadata_file">load_metadata_file() (Palet.Palet method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Coverage.html#Coverage.Coverage.log">log() (Coverage.Coverage method)</a>
 
       <ul>
         <li><a href="Paletable.html#Paletable.Paletable.log">(Paletable.Paletable method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Diagnoses.html#Diagnoses.Diagnoses.long_term">long_term (Diagnoses.Diagnoses attribute)</a>
+
+      <ul>
+        <li><a href="ServiceCategory.html#ServiceCategory.ServiceCategory.long_term">(ServiceCategory.ServiceCategory attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -357,9 +428,13 @@
 </li>
         <li><a href="CoverageType.html#module-CoverageType">CoverageType</a>
 </li>
+        <li><a href="DateDimension.html#module-DateDimension">DateDimension</a>
+</li>
         <li><a href="Diagnoses.html#module-Diagnoses">Diagnoses</a>
 </li>
         <li><a href="Eligibility.html#module-Eligibility">Eligibility</a>
+</li>
+        <li><a href="EligibilityType.html#module-EligibilityType">EligibilityType</a>
 </li>
         <li><a href="Enrollment.html#module-Enrollment">Enrollment</a>
 </li>
@@ -387,6 +462,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Diagnoses.html#Diagnoses.Diagnoses.other_services">other_services (Diagnoses.Diagnoses attribute)</a>
+
+      <ul>
+        <li><a href="ServiceCategory.html#ServiceCategory.ServiceCategory.other_services">(ServiceCategory.ServiceCategory attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -401,8 +488,6 @@
 </li>
       <li><a href="Palet.html#Palet.Palet.Utils">Palet.Utils (class in Palet)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     Paletable
 
@@ -410,11 +495,27 @@
         <li><a href="Paletable.html#module-Paletable">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Paletable.html#Paletable.Paletable">Paletable (class in Paletable)</a>
 </li>
       <li><a href="Palet.html#Palet.Palet.PERFORMANCE">PERFORMANCE (Palet.Palet attribute)</a>
 </li>
+      <li><a href="ServiceCategory.html#ServiceCategory.ServiceCategory.prescription">prescription (ServiceCategory.ServiceCategory attribute)</a>
+</li>
       <li><a href="Palet.html#Palet.Palet.Utils.propertiesOf">propertiesOf() (Palet.Palet.Utils static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="DateDimension.html#DateDimension.DateDimension.relevant_runids">relevant_runids() (DateDimension.DateDimension method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Palet.html#Palet.Palet.reserveSQLAlias">reserveSQLAlias() (Palet.Palet method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -422,6 +523,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Palet.html#Palet.Palet.Utils.serialize">serialize() (Palet.Palet.Utils static method)</a>
+</li>
       <li>
     ServiceCategory
 
@@ -433,14 +536,18 @@
 </li>
       <li><a href="Paletable.html#Paletable.Paletable.setLoggingLevel">setLoggingLevel() (Paletable.Paletable method)</a>
 </li>
+      <li><a href="Palet.html#Palet.Palet.setLogLevel">setLogLevel() (Palet.Palet method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Palet.html#Palet.Palet.show">show() (Palet.Palet method)</a>
 
       <ul>
         <li><a href="Palet.html#Palet.Palet.Utils.show">(Palet.Palet.Utils static method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Palet.html#Palet.Palet.showReleaseNotes">showReleaseNotes() (Palet.Palet static method)</a>
+</li>
       <li><a href="Coverage.html#Coverage.Coverage.sql">sql() (Coverage.Coverage method)</a>
 
       <ul>
@@ -465,7 +572,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Paletable.html#Paletable.Paletable.usingRunIds">usingRunIds() (Paletable.Paletable method)</a>
+      <li><a href="DateDimension.html#DateDimension.DateDimension.usingRunIds">usingRunIds() (DateDimension.DateDimension method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -474,6 +581,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Diagnoses.html#Diagnoses.Diagnoses.where">where() (Diagnoses.Diagnoses static method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Diagnoses.html#Diagnoses.Diagnoses.within">within() (Diagnoses.Diagnoses static method)</a>
 </li>
   </ul></td>
 </tr></table>

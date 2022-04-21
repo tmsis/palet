@@ -57,7 +57,7 @@ metadata, and showing data. The Paletable module inherits from this module, and 
 the Paletable module inherit from Palet as well.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="Palet.Palet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Palet.</span></span><span class="sig-name descname"><span class="pre">Palet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Palet.</span></span><span class="sig-name descname"><span class="pre">Palet</span></span><a class="headerlink" href="#Palet.Palet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The class responsible initialization, logging and utilities.
 This class is critical to utilizing the PALET library. It initializes the API, logs data, and provides access to the Utils subclass.</p>
@@ -71,6 +71,17 @@ manually imported.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="Palet.Palet.PERFORMANCE">
 <span class="sig-name descname"><span class="pre">PERFORMANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#Palet.Palet.PERFORMANCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.getInstance">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getInstance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.getInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static access method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.showReleaseNotes">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">showReleaseNotes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.showReleaseNotes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -109,10 +120,30 @@ Logging contains multiple levels: INFO, DEBUG, WARNING, ERROR, CRITICAL, and FAT
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.setLogLevel">
+<span class="sig-name descname"><span class="pre">setLogLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'DEBUG'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.setLogLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="Palet.Palet.show">
 <span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>To be Determined.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.reserveSQLAlias">
+<span class="sig-name descname"><span class="pre">reserveSQLAlias</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.reserveSQLAlias" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.getSQLAliasStack">
+<span class="sig-name descname"><span class="pre">getSQLAliasStack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.getSQLAliasStack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.clearAliasStack">
+<span class="sig-name descname"><span class="pre">clearAliasStack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.clearAliasStack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="Palet.Palet.Utils">
@@ -170,6 +201,16 @@ The Utils subclass features static methods that can be used by CMS analysts.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Palet.Palet.Utils.numDaysInMonth">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numDaysInMonth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.numDaysInMonth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.serialize">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alias_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Palet.Palet.Utils.deserialize">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'alias.pkl'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palet.Palet.Utils.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

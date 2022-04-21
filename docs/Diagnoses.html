@@ -17,8 +17,8 @@
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Eligibility" href="Eligibility.html" />
-    <link rel="prev" title="CoverageType" href="CoverageType.html" />
+    <link rel="next" title="Eligibility (Deprecated)" href="Eligibility.html" />
+    <link rel="prev" title="DateDimension" href="DateDimension.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -34,10 +34,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Eligibility.html" title="Eligibility"
+          <a href="Eligibility.html" title="Eligibility (Deprecated)"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="CoverageType.html" title="CoverageType"
+          <a href="DateDimension.html" title="DateDimension"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Diagnoses</a></li> 
@@ -51,33 +51,46 @@
             
   <div class="section" id="module-Diagnoses">
 <span id="diagnoses"></span><h1>Diagnoses<a class="headerlink" href="#module-Diagnoses" title="Permalink to this headline">¶</a></h1>
-<p>The Diagnoses module is a critical component of filtering <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a> by chronic coniditions. This module only contains the <a class="reference internal" href="#module-Diagnoses" title="Diagnoses"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diagnoses</span></code></a> class and the <a class="reference internal" href="#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Diagnoses.Diagnoses.where()</span></code></a> static method.</p>
+<p>The Diagnoses module is a critical component of filtering <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a> by chronic coniditions.
+This module only contains the <a class="reference internal" href="#module-Diagnoses" title="Diagnoses"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diagnoses</span></code></a> class and the <a class="reference internal" href="#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Diagnoses.Diagnoses.where()</span></code></a> static method.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="Diagnoses.Diagnoses">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Diagnoses.</span></span><span class="sig-name descname"><span class="pre">Diagnoses</span></span><a class="headerlink" href="#Diagnoses.Diagnoses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The Diagnoses class creates an alias called diagnoses_cd that transposes the 12 dgns_cd columns allowing <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Enrollment.Enrollment.having()</span></code></a> to filter
-by various diagnoses types. It also plays a role in the backend method for decorating the chronic conidition column the user specifies.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="Diagnoses.Diagnoses.alias">
-<span class="sig-name descname"><span class="pre">alias</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'diagnosis_cd'</span></em><a class="headerlink" href="#Diagnoses.Diagnoses.alias" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>The Diagnoses class creates an alias called inpatient that transposes the 12 dgns_cd columns allowing <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Enrollment.Enrollment.having()</span></code></a> to filter
+by various diagnosis types. It also plays a role in the backend method for decorating the chronic conidition column the user specifies.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="Diagnoses.Diagnoses.inpatient">
 <span class="sig-name descname"><span class="pre">inpatient</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['dgns_1_cd',</span> <span class="pre">'dgns_2_cd',</span> <span class="pre">'dgns_3_cd',</span> <span class="pre">'dgns_4_cd',</span> <span class="pre">'dgns_5_cd',</span> <span class="pre">'dgns_6_cd',</span> <span class="pre">'dgns_7_cd',</span> <span class="pre">'dgns_8_cd',</span> <span class="pre">'dgns_9_cd',</span> <span class="pre">'dgns_10_cd',</span> <span class="pre">'dgns_11_cd',</span> <span class="pre">'dgns_12_cd']</span></em><a class="headerlink" href="#Diagnoses.Diagnoses.inpatient" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Diagnoses.Diagnoses.long_term">
+<span class="sig-name descname"><span class="pre">long_term</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['dgns_1_cd',</span> <span class="pre">'dgns_2_cd',</span> <span class="pre">'dgns_3_cd',</span> <span class="pre">'dgns_4_cd',</span> <span class="pre">'dgns_5_cd']</span></em><a class="headerlink" href="#Diagnoses.Diagnoses.long_term" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Diagnoses.Diagnoses.other_services">
+<span class="sig-name descname"><span class="pre">other_services</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['dgns_1_cd',</span> <span class="pre">'dgns_2_cd']</span></em><a class="headerlink" href="#Diagnoses.Diagnoses.other_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Diagnoses.Diagnoses.link_key">
+<span class="sig-name descname"><span class="pre">link_key</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'inpatient':</span> <span class="pre">'ip_link_key',</span> <span class="pre">'long_term':</span> <span class="pre">'lt_link_key',</span> <span class="pre">'other_services':</span> <span class="pre">'ot_link_key'}</span></em><a class="headerlink" href="#Diagnoses.Diagnoses.link_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="Diagnoses.Diagnoses.where">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ServiceCategory.html#ServiceCategory.ServiceCategory" title="ServiceCategory.ServiceCategory"><span class="pre">ServiceCategory.ServiceCategory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnoses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Diagnoses.Diagnoses.where" title="Permalink to this definition">¶</a></dt>
-<dd><p>The static method where() is used to assign parameters for the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> in <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a>. This is where the user assigns
-a service category from the <a class="reference internal" href="ServiceCategory.html#module-ServiceCategory" title="ServiceCategory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceCategory</span></code></a> class and the list of diagnosis codes they have specified.</p>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ServiceCategory.html#ServiceCategory.ServiceCategory" title="ServiceCategory.ServiceCategory"><span class="pre">ServiceCategory.ServiceCategory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnoses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Diagnoses.Diagnoses.where" title="Permalink to this definition">¶</a></dt>
+<dd><p>The static method where() is used to assign parameters for the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> in <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a>. Unlike the <a class="reference internal" href="#Diagnoses.Diagnoses.within" title="Diagnoses.Diagnoses.within"><code class="xref py py-meth docutils literal notranslate"><span class="pre">within()</span></code></a>
+This method is specifically for filtering by a single chronic conditions.
+This is where the user assigns a service category from the <a class="reference internal" href="ServiceCategory.html#module-ServiceCategory" title="ServiceCategory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceCategory</span></code></a> class and the list of diagnoses codes they have specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service_category</strong> – <cite>attribute</cite>: Specify an attribute from the <a class="reference internal" href="ServiceCategory.html#module-ServiceCategory" title="ServiceCategory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceCategory</span></code></a> such as ServiceCategory.inpaitent</p></li>
-<li><p><strong>diagnoses</strong> – <cite>list</cite>: User defined list of diagnosis codes</p></li>
+<li><p><strong>diagnoses</strong> – <cite>list</cite>: User defined list of diagnoses codes</p></li>
+<li><p><strong>lookback</strong> – <cite>int defaults to 6</cite>: Enter an integer for the number of years you wish to be included. Defaults to 6.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -97,7 +110,8 @@ a service category from the <a class="reference internal" href="ServiceCategory.
 <span class="go">            &#39;I221&#39;, &#39;I222&#39;, &#39;I228&#39;, &#39;I229&#39;, &#39;I21A1&#39;, &#39;I21A9&#39;, &#39;I2101&#39;, &#39;I2102&#39;, &#39;I2109&#39;, &#39;I2111&#39;, &#39;I2119&#39;, &#39;I2121&#39;, &#39;I2129&#39;]</span>
 </pre></div>
 </div>
-<p>Create an Enrollment object &amp; use the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> function with <a class="reference internal" href="#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">where()</span></code></a> as a parameter to filter by chronic condition:</p>
+<p>Create an Enrollment object &amp; use the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> function with <a class="reference internal" href="#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">where()</span></code></a> as a parameter
+to filter by chronic condition:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ByMonth</span><span class="p">()</span><span class="o">.</span><span class="n">having</span><span class="p">(</span><span class="n">Diagnoses</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="n">AFib</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -107,6 +121,74 @@ a service category from the <a class="reference internal" href="ServiceCategory.
 </div>
 <p>Use the mark function to add a column specifying the chronic condition which the user is filtering by:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">([</span><span class="mi">6280</span><span class="p">])</span><span class="o">.</span><span class="n">byMonth</span><span class="p">()</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="n">Diagnoses</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="n">AFib</span><span class="p">),</span> <span class="s1">&#39;AFib&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Return the more readable version of the DataFrame:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Diagnoses.Diagnoses.within">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnoses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Diagnoses.Diagnoses.within" title="Permalink to this definition">¶</a></dt>
+<dd><p>The static method within() is used to assign parameters for the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> in <a class="reference internal" href="Enrollment.html#module-Enrollment" title="Enrollment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enrollment</span></code></a>. Unlike the <a class="reference internal" href="#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">where()</span></code></a>
+This method is specifically for filtering by multiple chronic conditions.
+This is where the user assigns a service category from the <a class="reference internal" href="ServiceCategory.html#module-ServiceCategory" title="ServiceCategory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceCategory</span></code></a> class and the list of diagnoses codes they have specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_category</strong> – <cite>attribute</cite>: Specify an attribute from the <a class="reference internal" href="ServiceCategory.html#module-ServiceCategory" title="ServiceCategory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceCategory</span></code></a> such as ServiceCategory.inpaitent</p></li>
+<li><p><strong>diagnoses</strong> – <cite>list</cite>: User defined list of diagnoses codes</p></li>
+<li><p><strong>lookback</strong> – <cite>int defaults to 6</cite>: Enter an integer for the number of years you wish to be included. Defaults to 6.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the updated object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Spark DataFrame</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The within() function is nested within <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a>.</p>
+</div>
+<p class="rubric">Example</p>
+<p>Create two lists of diagnoses codes:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AFib</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;I230&#39;</span><span class="p">,</span> <span class="s1">&#39;I231&#39;</span><span class="p">,</span> <span class="s1">&#39;I232&#39;</span><span class="p">,</span> <span class="s1">&#39;I233&#39;</span><span class="p">,</span> <span class="s1">&#39;I234&#39;</span><span class="p">,</span> <span class="s1">&#39;I235&#39;</span><span class="p">,</span> <span class="s1">&#39;I236&#39;</span><span class="p">,</span> <span class="s1">&#39;I237&#39;</span><span class="p">,</span> <span class="s1">&#39;I238&#39;</span><span class="p">,</span> <span class="s1">&#39;I213&#39;</span><span class="p">,</span> <span class="s1">&#39;I214&#39;</span><span class="p">,</span> <span class="s1">&#39;I219&#39;</span><span class="p">,</span> <span class="s1">&#39;I220&#39;</span><span class="p">,</span>
+<span class="go">            &#39;I221&#39;, &#39;I222&#39;, &#39;I228&#39;, &#39;I229&#39;, &#39;I21A1&#39;, &#39;I21A9&#39;, &#39;I2101&#39;, &#39;I2102&#39;, &#39;I2109&#39;, &#39;I2111&#39;, &#39;I2119&#39;, &#39;I2121&#39;, &#39;I2129&#39;]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Diabetes</span> <span class="o">=</span> <span class="p">[</span>   <span class="s1">&#39;E0800&#39;</span><span class="p">,</span><span class="s1">&#39;E0801&#39;</span><span class="p">,</span><span class="s1">&#39;E0810&#39;</span><span class="p">,</span><span class="s1">&#39;E0811&#39;</span><span class="p">,</span><span class="s1">&#39;E0821&#39;</span><span class="p">,</span><span class="s1">&#39;E0822&#39;</span><span class="p">,</span><span class="s1">&#39;E0829&#39;</span><span class="p">,</span><span class="s1">&#39;E08311&#39;</span><span class="p">,</span><span class="s1">&#39;E08319&#39;</span><span class="p">,</span><span class="s1">&#39;E08321&#39;</span><span class="p">,</span><span class="s1">&#39;E083211&#39;</span><span class="p">,</span><span class="s1">&#39;E083212&#39;</span><span class="p">,</span><span class="s1">&#39;E083213&#39;</span><span class="p">,</span>
+<span class="go">            &#39;E083219&#39;,&#39;E08329&#39;,&#39;E083291&#39;,&#39;E083292&#39;,&#39;E083293&#39;,&#39;E083299&#39;,&#39;E08331&#39;,&#39;E083311&#39;,&#39;E083312&#39;,&#39;E083313&#39;,&#39;E083319&#39;,&#39;E08339&#39;]</span>
+</pre></div>
+</div>
+<p>Create an Enrollment object &amp; use the <a class="reference internal" href="Enrollment.html#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> function with <a class="reference internal" href="#Diagnoses.Diagnoses.within" title="Diagnoses.Diagnoses.within"><code class="xref py py-meth docutils literal notranslate"><span class="pre">within()</span></code></a> as a parameter
+to filter by multiple chronic conditions:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">([</span><span class="mi">6280</span><span class="p">])</span><span class="o">.</span><span class="n">byMonth</span><span class="p">()</span><span class="o">.</span><span class="n">having</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">Diagnoses</span><span class="o">.</span><span class="n">within</span><span class="p">([</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">other_services</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">Diabetes</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Return DataFrame:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Use the mark function to add a column specifying the chronic condition which the user is filtering by:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api_mark</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">([</span><span class="mi">6280</span><span class="p">])</span><span class="o">.</span><span class="n">byMonth</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="o">.</span><span class="n">mark</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">Diagnoses</span><span class="o">.</span><span class="n">within</span><span class="p">([</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">other_services</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="n">Diabetes</span><span class="p">),</span> <span class="s1">&#39;Diabetes&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="o">.</span><span class="n">mark</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">Diagnoses</span><span class="o">.</span><span class="n">within</span><span class="p">([</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">other_services</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="n">AFib</span><span class="p">),</span> <span class="s1">&#39;AFib&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Return the more readable version of the DataFrame:</p>
@@ -127,11 +209,11 @@ a service category from the <a class="reference internal" href="ServiceCategory.
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="CoverageType.html"
-                        title="previous chapter">CoverageType</a></p>
+  <p class="topless"><a href="DateDimension.html"
+                        title="previous chapter">DateDimension</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="Eligibility.html"
-                        title="next chapter">Eligibility</a></p>
+                        title="next chapter">Eligibility (Deprecated)</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -163,10 +245,10 @@ a service category from the <a class="reference internal" href="ServiceCategory.
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Eligibility.html" title="Eligibility"
+          <a href="Eligibility.html" title="Eligibility (Deprecated)"
              >next</a> |</li>
         <li class="right" >
-          <a href="CoverageType.html" title="CoverageType"
+          <a href="DateDimension.html" title="DateDimension"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Diagnoses</a></li> 
