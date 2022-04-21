@@ -1,8 +1,8 @@
 """
-The PaletMetadata module is composed of the PaletMetadata Class and its respective subclasses. The subclassess correspond
-to high level objects like Enrollment & Eligibility. These classes work to make TAF data more easily readable. Column names
+The PaletMetadata module is composed of the PaletMetadata Class its respective subclasses and the Enrichment. The subclassess correspond
+to high level objects like Enrollment. These classes work to make TAF data more easily readable. Column names
 within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what
-contructed code values correspond to.
+contructed code values correspond to. The Enrichment class exists to decorate DateFrames and make the information PALET derives more readable.
 """
 
 
@@ -519,6 +519,15 @@ class PaletMetadata:
             }
 
     class Member():
+        """
+        The Member class is a subclass of PaletMetadata. This class primaryily assigns more readable
+        and concise column names to the TAF data pertaining to chronic coniditions. It also plays an important role
+        in ensuring the correct file types and run ids are utilized in chronic condition queries.
+
+        Note:
+            Incomplete, work in progress.
+        """
+
         service_category = {
             ServiceCategory.inpatient: "data_anltcs_taf_iph_vw",
             ServiceCategory.long_term: "data_anltcs_taf_lth_vw",
@@ -533,6 +542,13 @@ class PaletMetadata:
         }
 
     class Enrichment():
+        """
+        The Enrichment class is responsible for decorating and enhancing DataFrames created by PALET. This class consists of a series of backend
+        functions that build out additional columns, include user defined values, and more. 
+
+        Note:
+            Enrichment is not directly interacted with by analysts and consists solely of back end functions. See the source code for more information.
+        """
 
         import pandas as pd
         from datetime import datetime
