@@ -19,7 +19,7 @@ class Enrollment(Paletable):
     Enrollment counts are the sum of the unique beneficiaries enrolled at least one day in a given month or year.
 
     Note:
-        If the Enrollment class is called without a by group, it defaults to by year.
+        If the Enrollment class is called without a by group, it defaults to by month.
 
     Examples:
         Import enrollment:
@@ -74,8 +74,8 @@ class Enrollment(Paletable):
         Spark DataFrame: DataFrame with counts for enrollment and precentage changes from previous period.
 
     Methods:
-        usingRundIds(): Specify the run ids you would like to query. See :meth:`~Paletable.Paletable.usingRunIds`.
-        displayCurrentRunIds(): DEPRECATED. See DateDimension
+        usingRundIds(): Specify the run ids you would like to query. See :meth:`~DateDimension.DateDimension.usingRunIds`.
+        displayCurrentRunIds(): DEPRECATED. See :class:`DateDimension`.
         byAgeRange(): Filter your query by Age Range. See :meth:`~Paletable.Paletable.byAgeRange`.
         byRaceEthnicity(): Filter your query by Race. See :meth:`~Paletable.Paletable.byRaceEthnicity`.
         byRaceEthnicityExpanded(): Filter your query by Race (expanded options). See :meth:`~Paletable.Paletable.byRaceEthnicityExpanded`.
@@ -84,6 +84,7 @@ class Enrollment(Paletable):
         byState(): Filter your query by State. See :meth:`~Paletable.Paletable.byState`.
         byCoverageType(): Filter your query by Coverage Type. See :meth:`~Paletable.Paletable.byCoverageType`.
         byEnrollmentType(): Filter your query by Enrollment Type. See :meth:`~Paletable.Paletable.byEnrollmentType`.
+        byEligibilityType(): Filter your query by Eligibility Type. See :meth:`~Paletable.Paletable.byEligibilityType`.
         byMedicaidOnly(): Filter your query to only look at Medicaid enrollment :meth:`~Paletable.Paletable.byMedicaidOnly`.
         byIncomeBracket(): Filter your query by Income Bracket. See :meth:`~Paletable.Paletable.byIncomeBracket`.
         byYear(): Filter your query by Year. See :meth:`~Paletable.Paletable.byYear`.
@@ -91,7 +92,7 @@ class Enrollment(Paletable):
         fetch(): Call this function when you are ready to return results. See :meth:`~Paletable.Paletable.fetch`.
 
     Note:
-        The above attributes are inherited from the :class:`Paletable` class. Attributes directly from the Enrollment class can be seen below.
+        The above attributes are inherited from the :class:`Paletable` class with the exception of :meth:`~DateDimension.DateDimension.usingRunIds`. See :class:`DateDimension` Attributes directly from the Enrollment class can be seen below.
 
     """
 
@@ -716,7 +717,7 @@ class Enrollment(Paletable):
     def having(self, constraint: Diagnoses):
         """
         The having function, allows user to filter Enrollment objects by chronic conidition diagnoses.
-        The :meth:`~Diagnoses.Diagnoses.where` from :class:`Diagnoses`.
+        The :meth:`~Diagnoses.Diagnoses.where` and :meth:`~Diagnoses.Diagnoses.within` from :class:`Diagnoses`.
         Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes
         they wish to filter by.
 

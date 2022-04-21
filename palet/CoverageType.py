@@ -12,8 +12,8 @@ This module only contains one class, CoverageType.
 class CoverageType():
     """
     The CoverageType class creates an alias called coverage_type that transposes the 12 mc_plan_type_cd
-    columns allowing :meth:`~Paletable.Paletable.byCoverageType`
-    to filter by various coverage types. It also plays a role in the backend method for decorating the coverage_type_label column
+    columns allowing :meth:`~Paletable.Paletable.byCoverageType` to filter by various coverage types. It also plays a role 
+    in the backend method for decorating the coverage_type_label column
     that is included when one runs :meth:`~Paletable.Paletable.byCoverageType`
     on a Paletable object like :class:`Enrollment`.
 

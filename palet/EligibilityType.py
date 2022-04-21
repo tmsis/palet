@@ -1,6 +1,6 @@
 """
-The EnrollmentType module is a critical component of the by group :meth:`~Paletable.Paletable.byEnrollmentType` in :class:`Paletable`.
-This module only contains one class, EnrollmentType.
+The EligibilityType module is a critical component of the by group :meth:`~Paletable.Paletable.byEligibilityType` in :class:`Paletable`.
+This module only contains one class, EligibilityType.
 """
 
 
@@ -11,10 +11,10 @@ This module only contains one class, EnrollmentType.
 # -------------------------------------------------------
 class EligibilityType():
     """
-    The EnrollmentType class creates an alias called enrollment_type that transposes the 12 chip_cd
-    columns allowing :meth:`~Paletable.Paletable.byEnrollmentType` to filter by various coverage types.
-    It also plays a role in the backend method for decorating the enrollment_type_label column
-    that is included when one runs :meth:`~Paletable.Paletable.byEnrollmentType`
+    The EligibilityType class creates an alias called enrollment_type that transposes the 12 elgblty_grp_cd
+    columns allowing :meth:`~Paletable.Paletable.byEligibilityType` to filter by various eligibility types.
+    It also plays a role in the backend method for decorating the eligibility_type_label column
+    that is included when one runs :meth:`~Paletable.Paletable.byEligibilityype`
     on a Paletable object like :class:`Enrollment`.
 
     Note:
