@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PALET Wiki [v. 1.7.20220407]
+PALET Wiki [v. 1.8.20220421]
 ===========================================
 
 Introduction
