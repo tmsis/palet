@@ -350,8 +350,7 @@ class Enrollment(Paletable):
         }
 
         cull_filter = {
-            'year': """(
-                    (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0))""",
+            'year': """1=1""",
 
             'month': f"""(
                 ({ {0} } in { {1} })
@@ -396,20 +395,24 @@ class Enrollment(Paletable):
         from palet.CoverageType import CoverageType
         from palet.EligibilityType import EligibilityType
 
+        _type_groups = []
+
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
             for column in self.derived_by_type_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-                    return [EnrollmentType.alias]
+                    _type_groups.append(EnrollmentType.alias)
 
                 elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
-                    return [CoverageType.alias]
+                    _type_groups.append(CoverageType.alias)
 
                 elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
-                    return [EligibilityType.alias]
+                    _type_groups.append(EligibilityType.alias)
 
-                elif str(column) == "age_band":
-                    return self.derived_by_type_group
+                else:
+                    _type_groups.append(column)
+
+            return _type_groups
 
         return []
 
