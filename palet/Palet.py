@@ -27,6 +27,7 @@ class Palet:
     """
     __instance = None
     PERFORMANCE = 15
+    RELEASE = 100
 
     def __new__(cls):
         from datetime import datetime
@@ -115,7 +116,7 @@ class Palet:
         release = readme.splitlines()
 
         for rl in release:
-            _logger.info(rl)
+            _logger.release(rl)
 
     # --------------------------------------------------------------------
     #
@@ -188,11 +189,16 @@ class Palet:
         """
 
         logging.addLevelName(Palet.PERFORMANCE, 'PERFORMANCE')
+        logging.addLevelName(Palet.RELEASE, 'RELEASE')
 
         def performance(self, message, *args, **kws):
             self.log(Palet.PERFORMANCE, message, *args, **kws)
 
+        def release(self, message, *args, **kws):
+            self.log(Palet.RELEASE, message, *args, **kws)
+
         logging.Logger.performance = performance
+        logging.Logger.release = release
 
         self.logger = logging.getLogger('palet_log')
         self.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
