@@ -92,7 +92,8 @@ class Enrollment(Paletable):
         fetch(): Call this function when you are ready to return results. See :meth:`~Paletable.Paletable.fetch`.
 
     Note:
-        The above attributes are inherited from the :class:`Paletable` class with the exception of :meth:`~DateDimension.DateDimension.usingRunIds`. See :class:`DateDimension` Attributes directly from the Enrollment class can be seen below.
+        The above attributes are inherited from the :class:`Paletable` class with the exception of :meth:`~DateDimension.DateDimension.usingRunIds`.
+        See :class:`DateDimension` Attributes directly from the Enrollment class can be seen below.
 
     """
 

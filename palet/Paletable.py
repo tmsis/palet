@@ -254,6 +254,7 @@ class Paletable():
         self.palet.logger.debug('defining our where clause based on api calls')
         clause = ""
         where = []
+        range_stmt = ""
 
         if len(self.filter) > 0:
             for key in self.filter:
@@ -280,7 +281,9 @@ class Paletable():
                         elif str(values).find("+") > -1:
                             range_stmt = "aa." + key + " >= " + values.strip("+")
                         # take the x+ and strip out the +
-                        where.append(range_stmt)
+                        else:
+                            range_stmt = values.join(",")
+                        where.append(' in (' + range_stmt + ')')
 
                 else:  # else parse the single value
                     clause = ("aa." + key, self.filter[key])
@@ -636,7 +639,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, *ctype):
+    def byCoverageType(self, type: list = None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
@@ -661,13 +664,6 @@ class Paletable():
             >>> display(api.fetch())
 
         """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
-            self.__byCoverageType__([])
-        else:
-            self.__byCoverageType__(ctype[0])
-
-    def __byCoverageType__(self, type: list = None):
         from palet.CoverageType import CoverageType
 
         self.palet.logger.info('adding CoverageType to the by Group')
@@ -685,7 +681,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, *ctype):
+    def byEnrollmentType(self, type: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -707,13 +703,6 @@ class Paletable():
             >>> display(api.fetch())
 
         """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['1', '2', '3']")
-            self.__byEnrollmentType__([])
-        else:
-            self.__byEnrollmentType__(ctype[0])
-
-    def __byEnrollmentType__(self, type: list = None):
         from palet.EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
@@ -731,7 +720,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, *ctype):
+    def byEligibilityType(self, type: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -753,16 +742,9 @@ class Paletable():
             >>> display(api.fetch())
 
         """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
-            self.__byEnrollmentType__([])
-        else:
-            self.__byEnrollmentType__(ctype[0])
-
-    def __byEligibilityType__(self, type: list = None):
         from palet.EligibilityType import EligibilityType
 
-        self.palet.logger.info('adding byEnrollmentType to the by Group')
+        self.palet.logger.info('adding EligibilityType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
         if type is not None:
