@@ -55,6 +55,33 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
+    def __init__(self, service_categories: list, diagnoses: list, service_category: ServiceCategory = None):
+
+        self.service_categories = service_categories
+        self.diagnoses = diagnoses
+        self.service_category = service_category
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def sql(self):
+        return Diagnoses.within(self.service_categories, self.diagnoses)
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def __str__(self):
+        return self.sql()
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     @staticmethod
     def _doWhere(service_category: ServiceCategory, diagnoses: list):
         tuples = []
@@ -211,6 +238,8 @@ class Diagnoses:
         alias = palet.reserveSQLAlias()
 
         capture = []
+
+        # TODO: { self.date_dimension.relevant_runids('BSE', 6) }
 
         for svc in service_categories:
 

@@ -803,3 +803,4 @@ deploy-val-std.bat
 QueryTest.py
 deploy_fury_std.bat
 deploy_fury_std.ps1
+docs/TAF_TechGuide_Claims_Files.pdf
