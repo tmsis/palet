@@ -1,5 +1,5 @@
 PALET Library Release Notes
-Version 1.7.20220420
+Version 1.8.20220425
 
 *** Added this message on first Palet startup w/ version number
 *** Fixed byAgeRange to display column of the specified range(s)
