@@ -1,10 +1,12 @@
 """
+DEPRECATED: Use :meth:`~Paletable.Paletable.byEligibilityType()`
 The Eligibility module allows CMS analysts to view eligible beneficiaries. This module can be levereged with the Paletable module
 to apply specific filters. Doing so, analysts can view eligibility by state, income bracket, age, etc. This module
 uses the pandas library and elements of the pyspark library. Note the Paletable module is imported here as well. As such,
 the Enrollment module inherits from the Paletable module.
 """
 import pandas as pd
+from Palet import Palet
 from PaletMetadata import PaletMetadata
 from Paletable import Paletable
 
@@ -89,19 +91,19 @@ class Eligibility(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Eligibility API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None):
+    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
         super().__init__(runIds)
 
         if (paletable is not None):
             self.by_group = paletable.by_group
-            self.derived_by_group = paletable.derived_by_group
+            self.derived_by_type_group = paletable.derived_by_type_group
             self.filter = paletable.filter
             self.defined_columns = paletable.defined_columns
-            self._runids = paletable._runids
 
+        self.palet = Palet.getInstance()
         self.isNotEnrolled = False
-        self._user_runids = runIds
+        self.timeunit = period
         self.palet.logger.debug('Initializing Eligibility API')
 
     # ---------------------------------------------------------------------------------
@@ -166,7 +168,7 @@ class Eligibility(Paletable):
 
         df['year'] = df['de_fil_dt']
 
-        if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
+        if self.timeunit != 'year':
 
             # Month-over-Month
             df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
@@ -209,7 +211,7 @@ class Eligibility(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    def sql(self):
+    def sql(self, isFetch: bool = False):
         """The SQL query that the Eligibility class uses to pull dataframes.
 
         This can be called allowing an analyst to view the SQL the Eligibility is using.
@@ -238,53 +240,74 @@ class Eligibility(Paletable):
             z = f"""select
                         SUBMTG_STATE_CD,
                         de_fil_dt,
-                        month,
-                        elgblty_grp_cd,
+                        {self._selectTimeunit()}
                         mdcd_not_enrolled
                     from
-                        palet_mart.aggregate_eligibility_vs_enrollment
+                        taf.taf_ann_de_base as aa
                     where
-                        da_run_id in ( {self._getRunIds()} )
+                        da_run_id in ( {self.date_dimension.relevant_runids('BSE', 1)} )
                     group by
                         submtg_state_cd,
                         de_fil_dt,
-                        month,
-                        elgblty_grp_cd,
                         mdcd_not_enrolled,
                         da_run_id
                     order by
                         submtg_state_cd,
-                        de_fil_dt,
-                        month
+                        de_fil_dt
                 """
         else:
             # create or replace temporary view Eligibility_by_month
-            z = f"""
-                select
-                    {self._getByGroupWithAlias()}
-                    a.da_run_id,
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd,
-                    sum(a.benes) as benes,
-                    sum(a.mdcd_enrlmt) as mdcd_enrlmt,
-                    sum(a.chip_enrlmt) as chip_enrlmt
-                from
-                    palet_mart.pivoted_eligibility as a
-                where
-                    a.da_run_id in ( {self._getRunIds()} )
-                group by
-                    {self._getByGroupWithAlias()}
-                    a.da_run_id,
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd
-                order by
-                    {self._getByGroupWithAlias()}
-                    a.de_fil_dt,
-                    a.month,
-                    a.elgblty_grp_cd
-            """
+            if self._sql is None:
+                super().sql()
+
+                # create or replace temporary view enrollment_by_month as
+                # taf.data_anltcs_taf_ade_base_vw as a
+                z = f"""
+                    select
+                        counter,
+                        {self._getByGroup()}
+                        {self._getAggregateGroup()}
+                        {self._selectTimeunit()}
+
+                        sum(mdcd_enrollment) as mdcd_enrollment,
+                        sum(chip_enrollment) as chip_enrollment
+
+                    from (
+                        select
+                            {self._getByGroupWithAlias()}
+                            aa.de_fil_dt,
+                            {PaletMetadata.Enrichment._renderAgeRange(self)}
+
+                        from
+                            taf.taf_ann_de_base as aa
+                        where
+                            aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
+                            {self._defineWhereClause()}
+                        group by
+                            {self._getByGroupWithAlias()}
+                            {self._getDerivedByTypeGroup()}
+                            aa.de_fil_dt
+                        order by
+                            {self._getByGroupWithAlias()}
+                            {self._getDerivedByTypeGroup()}
+                            aa.de_fil_dt
+                    )
+                    group by
+                        counter,
+                        {self._getByGroup()}
+                        {self._getAggregateGroup()}
+                        {self._groupTimeunit()}
+                    order by
+                        {self._getByGroup()}
+                        {self._getAggregateGroup()}
+                        {self._groupTimeunit()}
+                """
+
+                self._addPostProcess(self._percentChange)
+                self._sql = z
+            else:
+                return self._sql
+            return z
 
         self._addPostProcess(self._percentChange)
 

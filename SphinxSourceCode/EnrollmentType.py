@@ -1,6 +1,8 @@
 """
-The EnrollmentType module is a critical component of the by group :meth:`~Paletable.Paletable.byEnrollmentType` in :class:`Paletable`. This module only contains one class, EnrollmentType.
+The EnrollmentType module is a critical component of the by group :meth:`~Paletable.Paletable.byEnrollmentType` in :class:`Paletable`.
+This module only contains one class, EnrollmentType.
 """
+
 
 # -------------------------------------------------------
 #
@@ -9,13 +11,16 @@ The EnrollmentType module is a critical component of the by group :meth:`~Paleta
 # -------------------------------------------------------
 class EnrollmentType():
     """
-    The EnrollmentType class creates an alias called enrollment_type that transposes the 12 chip_cd columns allowing :meth:`~Paletable.Paletable.byEnrollmentType`
-    to filter by various coverage types. It also plays a role in the backend method for decorating the enrollment_type_label column that is included when one runs :meth:`~Paletable.Paletable.byEnrollmentType`
+    The EnrollmentType class creates an alias called enrollment_type that transposes the 12 chip_cd
+    columns allowing :meth:`~Paletable.Paletable.byEnrollmentType` to filter by various coverage types.
+    It also plays a role in the backend method for decorating the enrollment_type_label column
+    that is included when one runs :meth:`~Paletable.Paletable.byEnrollmentType`
     on a Paletable object like :class:`Enrollment`.
 
     Note:
-        PALET users and analysts will not interact with this module directly. It's purpose is for aliasing and backend decorating that occures when its respective
-        by group is called. 
+        PALET users and analysts will not interact with this module directly.
+        It's purpose is for aliasing and backend decorating that occures when its respective
+        by group is called.
     """
 
     alias = 'enrollment_type'
@@ -32,3 +37,22 @@ class EnrollmentType():
             'chip_cd_10',
             'chip_cd_11',
             'chip_cd_12']
+
+    def aggregate(alias):
+        a = map(lambda x: alias + '.' + x, EnrollmentType.cols)
+        b = list(a)
+        b.reverse()
+        f = ','.join(b)
+        return f'coalesce({f})'
+
+    def filter(filter_val):
+        a = []
+        vals = "','".join(filter_val)
+        a.append("('" + vals + "')")
+
+        b = list(a)
+        f = ' or '.join(b)
+        return f'{f}'
+
+    def __hash__(self):
+        return(hash(str(self)))

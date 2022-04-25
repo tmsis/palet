@@ -1,5 +1,3 @@
-
-# TODO: Find out if analysts want acronyms spelled out or are ok with something like Third Party Liability instead of TPL
 class AnnualDE():
 
     columns = {

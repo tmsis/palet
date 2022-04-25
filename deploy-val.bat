@@ -4,9 +4,8 @@ setlocal
 @REM e.g. deploy-palet .bat 1.5.20220311
 
 set ver=%1
-set svr=%2
+set svr=%2S
 if not defined ver goto :usage
-if not defined svr goto :usage
 if defined ver goto :proceed
 :usage
 echo off
@@ -20,5 +19,6 @@ echo off
 if defined svr goto :publish
 :publish
 echo on
-databricks --profile val  fs cp ./dist/palet-1.0.1-py3-none-any.whl dbfs:/FileStore/shared_uploads/akira/lib/palet-%1-py3-none-any.whl --overwrite
+databricks --profile val fs cp ./dist/palet-1.0.1-py3-none-any.whl dbfs:/FileStore/shared_uploads/akira/lib/palet-%1-py3-none-any.whl --overwrite
+databricks --profile val fs cp ./palet/release.readme dbfs:/FileStore/shared_uploads/akira/lib/palet/ --overwrite
 @REM databricks --profile prod fs cp ./dist/palet-1.0.1-py3-none-any.whl dbfs:/FileStore/shared_uploads/akira/lib/palet-%1-py3-none-any.whl --overwrite

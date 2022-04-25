@@ -800,3 +800,7 @@ notes/PALET Epic Burn.xlsx
 notes/Screenshot 2022-03-08 142043.png
 test/TestEnrollment.py
 deploy-val-std.bat
+QueryTest.py
+deploy_fury_std.bat
+deploy_fury_std.ps1
+docs/TAF_TechGuide_Claims_Files.pdf

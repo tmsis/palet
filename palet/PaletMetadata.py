@@ -1,9 +1,12 @@
 """
-The PaletMetadata module is composed of the PaletMetadata Class and its respective subclasses. The subclassess correspond
-to high level objects like Enrollment & Eligibility. These classes work to make TAF data more easily readable. Column names
+The PaletMetadata module is composed of the PaletMetadata Class its respective subclasses and the Enrichment. The subclassess correspond
+to high level objects like Enrollment. These classes work to make TAF data more easily readable. Column names
 within TAF data are assigned more readable values. Additionally, some columns have dictionaries within them that explain what
-contructed code values correspond to.
+contructed code values correspond to. The Enrichment class exists to decorate DateFrames and make the information PALET derives more readable.
 """
+
+
+from palet.ServiceCategory import ServiceCategory
 
 
 class PaletMetadata:
@@ -259,6 +262,21 @@ class PaletMetadata:
                 Nov = 'chip_enrlmt_days_11'
                 Dec = 'chip_enrlmt_days_12'
 
+                enrollment = {
+                        '01':  "chip_enrlmt_days_01",
+                        '02':  "chip_enrlmt_days_02",
+                        '03':  "chip_enrlmt_days_03",
+                        '04':  "chip_enrlmt_days_04",
+                        '05':  "chip_enrlmt_days_05",
+                        '06':  "chip_enrlmt_days_06",
+                        '07':  "chip_enrlmt_days_07",
+                        '08':  "chip_enrlmt_days_08",
+                        '09':  "chip_enrlmt_days_09",
+                        '10':  "chipenrlmt_days_10",
+                        '11':  "chip_enrlmt_days_11",
+                        '12':  "chip_enrlmt_days_12"
+                    }
+
         class Medicaid:
             """
             The Medicaid class is a subclass within Enrollment. This subclass assigns time periods to
@@ -307,7 +325,7 @@ class PaletMetadata:
 
         # ---------------------------------------------------------------------------------
         #
-        #   TODO:
+        #
         #
         #
         # ---------------------------------------------------------------------------------
@@ -375,7 +393,6 @@ class PaletMetadata:
             Incomplete, work in progress.
         """
         fileDate = 'DE_FIL_DT'
-        eligibiltyGroup = 'elgblty_grp_cd'
         primaryEligibilityGroup = 'prmry_elgblty_grp_ind'
         eligibiltyGroupCategory = 'elgblty_grp_ctgry_flag'
         maintenanceAssistanceStatus = 'mas_cd'
@@ -501,7 +518,37 @@ class PaletMetadata:
             '80': "Integrated Care for Dual Eligibles"
             }
 
+    class Member():
+        """
+        The Member class is a subclass of PaletMetadata. This class primaryily assigns more readable
+        and concise column names to the TAF data pertaining to chronic coniditions. It also plays an important role
+        in ensuring the correct file types and run ids are utilized in chronic condition queries.
+
+        Note:
+            Incomplete, work in progress.
+        """
+
+        service_category = {
+            ServiceCategory.inpatient: "data_anltcs_taf_iph_vw",
+            ServiceCategory.long_term: "data_anltcs_taf_lth_vw",
+            ServiceCategory.other_services: "data_anltcs_taf_oth_vw"
+        }
+
+        run_id_file = {
+            ServiceCategory.inpatient: 'IPH',
+            ServiceCategory.other_services: 'OTH',
+            ServiceCategory.long_term: 'LTH',
+            ServiceCategory.prescription: 'RXH'
+        }
+
     class Enrichment():
+        """
+        The Enrichment class is responsible for decorating and enhancing DataFrames created by PALET. This class consists of a series of backend
+        functions that build out additional columns, include user defined values, and more. 
+
+        Note:
+            Enrichment is not directly interacted with by analysts and consists solely of back end functions. See the source code for more information.
+        """
 
         import pandas as pd
         from datetime import datetime
@@ -510,9 +557,16 @@ class PaletMetadata:
         @staticmethod
         def _getPaletObj():
             enrichment = PaletMetadata.Enrichment()
-            d = enrichment.datetime.now()
-            palet = enrichment.Palet(d.strftime("%Y") + "" + d.strftime("%m"))
+            palet = enrichment.Palet.getInstance()
             return palet
+
+        @staticmethod
+        def _checkForHelperMsg(field, field_type, value_example: str):
+
+            if type(field) != field_type:
+                PaletMetadata.Enrichment._getPaletObj().logger.warn(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
+                                                                               + " e.g. " + value_example)
+                return ",'n/a' as " + str(field)
 
         def getDefinedColumns(self):
             self.defined_columns = {
@@ -522,7 +576,7 @@ class PaletMetadata:
                 'race_ethncty_exp_flag': PaletMetadata.Enrichment._buildRaceEthnicityExpColumn,
                 'ethncty_cd': PaletMetadata.Enrichment._buildEthnicityColumn,
                 'enrollment_type': PaletMetadata.Enrichment._buildEnrollmentType,
-                'elgblty_grp_cd': PaletMetadata.Enrichment._buildEligibilityType,
+                'eligibility_type': PaletMetadata.Enrichment._buildEligibilityType,
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
                 'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
@@ -557,7 +611,7 @@ class PaletMetadata:
                                                    right_on=['USPS'])
             df = df.drop(['USPS'], axis=1)
 
-            df.groupby(by=['STABBREV', 'de_fil_dt', timeunit]).sum().reset_index()
+            df.groupby(by=['STABBREV', timeunit]).sum().reset_index()
 
             return df
 
@@ -664,9 +718,10 @@ class PaletMetadata:
         #
         # ---------------------------------------------------------------------------------
         def _findEligibiltyType(x):
+            from palet.EligibilityType import EligibilityType
             # self.palet.logger.debug('looking up the eligibility value from our metadata')
             # get this row's ref value from the column by name
-            y = x[PaletMetadata.Eligibility.eligibiltyGroup]
+            y = x[EligibilityType.alias]
             # lookup label with value
             return PaletMetadata.Eligibility.eligibility_cd.get(y)
 
@@ -742,6 +797,8 @@ class PaletMetadata:
 
         def _renderAgeRange(self):
             if self.age_band is not None:
+                PaletMetadata.Enrichment._checkForHelperMsg(self.age_band, dict, "{'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
+
                 ageBandWhere = []
 
                 ageBandWhere.append(', case')
@@ -756,7 +813,7 @@ class PaletMetadata:
                 return ' '.join(ageBandWhere)
 
             else:
-                return ''
+                return ""
 
         # ---------------------------------------------------------------------------------
         #
