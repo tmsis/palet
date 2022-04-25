@@ -1,3 +1,3 @@
 git branch -v -agit fetch --all
 gig fetch --all
-git switch 1.8
+git switch 1.9
