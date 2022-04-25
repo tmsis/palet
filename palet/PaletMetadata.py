@@ -544,7 +544,7 @@ class PaletMetadata:
     class Enrichment():
         """
         The Enrichment class is responsible for decorating and enhancing DataFrames created by PALET. This class consists of a series of backend
-        functions that build out additional columns, include user defined values, and more. 
+        functions that build out additional columns, include user defined values, and more.
 
         Note:
             Enrichment is not directly interacted with by analysts and consists solely of back end functions. See the source code for more information.
@@ -563,9 +563,9 @@ class PaletMetadata:
         @staticmethod
         def _checkForHelperMsg(field, field_type, value_example: str):
 
-            if type(field) != field_type:
-                PaletMetadata.Enrichment._getPaletObj().logger.warn(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
-                                                                               + " e.g. " + value_example)
+            if type(field) != field_type and field is not None:
+                PaletMetadata.Enrichment._getPaletObj().logger.error(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
+                                                                                + " e.g. " + value_example)
                 return ",'n/a' as " + str(field)
 
         def getDefinedColumns(self):

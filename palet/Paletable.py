@@ -830,7 +830,7 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-
+        PaletMetadata.Enrichment._checkForHelperMsg(bracket, str, "byIncomeBracket('02,03,05') or byIncomeBracket('01-03')")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
