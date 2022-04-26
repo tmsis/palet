@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC ##### Git Pull Request
+# MAGIC ##### Diabetes Revised Paletable using HCC
 
 # COMMAND ----------
 
