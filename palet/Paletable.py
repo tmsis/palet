@@ -759,53 +759,6 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byMedicaidOnly(self, state_fips=None):
-        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects
-        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this
-        will add it as the next by group.
-
-        Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code.
-            default: `none`: Change counts to focus only on Medicaid.
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-
-        Example:
-            Create Paletable object:
-
-            >>> api = Enrollment().byMedicaidOnly()
-
-            Return Paletable object as a DataFrame:
-
-            >>> display(api.fetch())
-
-        """
-
-        self.palet.logger.info('adding byMedicaidOnly to the by Group')
-
-        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
-
-        if state_fips is not None:
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        for month in PaletMetadata.Enrollment.CHIP.half1:
-            for field in month:
-                if field in self.filter:
-                    del self.filter[field]
-                    del self.by_group[field]
-            for month in PaletMetadata.Enrollment.CHIP.half2:
-                for field in month:
-                    if field in self.filter:
-                        del self.filter[field]
-                        del self.by_group[field]
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     # This function is just returning the straight data from the table
     def byIncomeBracket(self, bracket=None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
@@ -843,7 +796,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byYear(self, year: int = None, count: int = 1):
+    def byYear(self, year: int = None):
         """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
