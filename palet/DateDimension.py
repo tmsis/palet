@@ -166,7 +166,7 @@ class DateDimension:
             >>> display(api.fetch())
 
         """
-        self.palet.logger.debug("using RunIds: " + str(ids))
+        # self.palet.logger.debug("using RunIds: " + str(ids))
         if ids is not None:
             self._user_runids = ids
         else:
