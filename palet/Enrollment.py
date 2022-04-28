@@ -661,7 +661,7 @@ class Enrollment(Paletable):
     def _select_markers(self):
         indicators = []
         _marker_cache = self.palet.getSQLAliasStack()
-        for key, val in self.markers.items():
+        for key, _val in self.markers.items():
             alias = _marker_cache.pop()
             indicators.append(f"{alias}.indicator as {key},")
 
@@ -676,7 +676,7 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _select_indicators(self):
         indicators = []
-        for key, val in self.markers.items():
+        for key, _val in self.markers.items():
             indicators.append(f"coalesce({key}, 0) as {key},")
 
         return '\n\t\t'.join(indicators)
@@ -690,7 +690,7 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _groupby_indicators(self):
         groupby = []
-        for key, val in self.markers.items():
+        for key, _val in self.markers.items():
             groupby.append(f"{key},")
 
         return '\n\t\t'.join(groupby)
@@ -705,7 +705,7 @@ class Enrollment(Paletable):
     def _groupby_markers(self):
         groupby = []
         _groupby_cache = self.palet.getSQLAliasStack()
-        for key, val in self.markers.items():
+        for _key, _val in self.markers.items():
             alias = _groupby_cache.pop()
             groupby.append(f",{alias}.indicator")
 
