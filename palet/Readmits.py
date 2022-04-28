@@ -6,6 +6,8 @@
 from pyspark.sql import SparkSession
 
 from palet.Palet import Palet
+from palet.DateDimension import DateDimension
+
 
 
 # -------------------------------------------------------
@@ -20,7 +22,7 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    palet_readmits_edge_ip = """
+    palet_readmits_edge_ip = f"""
         create or replace temporary view palet_readmits_edge_ip as
         select distinct
             'IP' as svc_cat
@@ -33,7 +35,7 @@ class Readmits:
             taf.taf_iph
         where
                 submtg_state_cd = '36'
-            and da_run_id in (7204,7205,7206,7207,7208,7209,7210,7211,7212,7213,7214,7215)
+            and da_run_id in ( { { DateDimension.relevant_runids('IPH', 12) } } )
             and clm_type_cd in (1, 3)
             and substring(bill_type_cd,3,1) in ('1', '2')
         order by
@@ -48,7 +50,7 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    palet_readmits_edge_lt = """
+    palet_readmits_edge_lt = f"""
         create or replace temporary view palet_readmits_edge_lt as
         select distinct
             'LT' as svc_cat
@@ -63,7 +65,7 @@ class Readmits:
             taf.taf_lth
         where
             submtg_state_cd = '36'
-            and da_run_id in (7216, 7217,7218,7219,7220,7221,7222,7223,7224,7225,7226,7227,7228)
+            and da_run_id in ( { { DateDimension.relevant_runids('LTH', 12) } } )
             and clm_type_cd in (1, 3)
             and substring(bill_type_cd,3,1) in ('1', '2')
         order by
