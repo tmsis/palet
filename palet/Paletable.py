@@ -60,6 +60,7 @@ class Paletable():
 
         self.markers = {}
         self.having_constraints = []
+        self._outersql = {}
         self._sql = None
 
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
@@ -252,42 +253,20 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
         self.palet.logger.debug('defining our where clause based on api calls')
-        clause = ""
         where = []
-        range_stmt = ""
 
         if len(self.filter) > 0:
             for key in self.filter:
+                _in_stmt = []
+                _join = ""
 
                 # get the value(s) in case there are multiple
                 values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
 
-                # Check for multiple values here, space separator is default
-                if str(values).find(" ") > -1:
-                    splitRange = self._checkForMultiVarFilter(values)
-                    for value in splitRange:
-                        clause = ("aa." + key, value)
-                        where.append(' ((= '.join(clause))
-
-                # Check for multiples with , separator
-                elif str(values).find(",") > -1:
-                    splitVals = self._checkForMultiVarFilter(values, ",")
-                    for values in splitVals:
-                        # check for age ranges here with the - separator
-                        if str(values).find("-") > -1:
-                            splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "aa." + key + " between " + splitRange[0] + " and " + splitRange[1]
-                        # check for greater than; i.e. x+ equals >= x
-                        elif str(values).find("+") > -1:
-                            range_stmt = "aa." + key + " >= " + values.strip("+")
-                        # take the x+ and strip out the +
-                        else:
-                            range_stmt = values.join(",")
-                        where.append(' in (' + range_stmt + ')')
-
-                else:  # else parse the single value
-                    clause = ("aa." + key, self.filter[key])
-                    where.append(' = '.join(clause))
+                _join = ",".join(_in_stmt)
+                where.append(key + ' in (' + _join + ')')
 
             return f"{' and '.join(where)}"
 
@@ -435,7 +414,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: ethnicity})
 
         return self
 
@@ -482,7 +461,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: ethnicity})
 
         return self
 
@@ -529,7 +508,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: ethnicity})
 
         return self
 
@@ -578,7 +557,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.gender: gender})
 
         return self
 
@@ -630,7 +609,7 @@ class Paletable():
                 state_fips = fips.iloc[0]
             else:
                 state_fips = state_cd
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: state_fips})
 
         return self
 
@@ -760,7 +739,7 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     # This function is just returning the straight data from the table
-    def byIncomeBracket(self, bracket=None):
+    def byIncomeBracket(self, bracket: list = None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -783,10 +762,10 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-        PaletMetadata.Enrichment._checkForHelperMsg(bracket, str, "byIncomeBracket('02,03,05') or byIncomeBracket('01-03')")
+        PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: bracket})
 
         return self
 
@@ -796,7 +775,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byYear(self, year: int = None):
+    def byYear(self, year: list = None):
         """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
@@ -833,10 +812,9 @@ class Paletable():
         self.palet.logger.info('adding byYear to the by Group')
 
         self.timeunit = 'year'
-        self.timeunitvalue = year
 
         if year is not None:
-            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
+            self.filter.update({PaletMetadata.Enrollment.fileDate: year})
 
         return self
 
@@ -846,7 +824,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byMonth(self, month: int = None):
+    def byMonth(self, month: list = None):
         """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
@@ -870,10 +848,11 @@ class Paletable():
             >>> api = Enrollment().byMonth(12)
 
         """
+        # TODO: Fix best way to allow for multiple month and year
 
         self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
-        self.timeunitvalue = month
+        self._outersql.update({"month": month})
 
         return self
 
@@ -885,12 +864,11 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def _selectTimeunit(self):
         if self.timeunit == 'year':
-            return "de_fil_dt as year,"
+            return "\tde_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
             return """
-                de_fil_dt as year,
-                month,
-                """
+                    de_fil_dt as year,
+                    month,\n"""
 
     # ---------------------------------------------------------------------------------
     #

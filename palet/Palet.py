@@ -376,6 +376,10 @@ class Palet:
             aliases: dict = pickle.load(filename, 'rb')
             return aliases
 
+        @staticmethod
+        def sql_formatter():
+            pass
+
 
 # -------------------------------------------------------------------------------------
 # CC0 1.0 Universal
