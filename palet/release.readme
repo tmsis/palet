@@ -1,4 +1,9 @@
 PALET Library Release Notes
+Version 1.8.20220428
+
+*** Fixed filtering for all by Groups to allow for list of values. i.e. ['01', '02', ... ,'10']
+*** Now able to filter byYear and byMonth at the same time
+
 Version 1.8.20220425
 
 *** Added this message on first Palet startup w/ version number

@@ -35,6 +35,7 @@ class PaletMetadata:
         fileDate = 'DE_FIL_DT'
         type = 'chip_cd_01'
         derived_enrollment_field = 'enrollment_type'
+        month = 'month'
 
         chip_cd_mon = ['chip_cd_01',
                        'chip_cd_02',
