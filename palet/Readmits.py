@@ -9,7 +9,6 @@ from palet.Palet import Palet
 from palet.DateDimension import DateDimension
 
 
-
 # -------------------------------------------------------
 #
 #
@@ -34,8 +33,7 @@ class Readmits:
         from
             taf.taf_iph
         where
-                submtg_state_cd = '36'
-            and da_run_id in ( { { DateDimension.relevant_runids('IPH', 12) } } )
+            da_run_id in ( {  DateDimension().relevant_runids('IPH', 12) } )
             and clm_type_cd in (1, 3)
             and substring(bill_type_cd,3,1) in ('1', '2')
         order by
@@ -64,8 +62,7 @@ class Readmits:
         from
             taf.taf_lth
         where
-            submtg_state_cd = '36'
-            and da_run_id in ( { { DateDimension.relevant_runids('LTH', 12) } } )
+            da_run_id in ( { DateDimension().relevant_runids('LTH', 12) } )
             and clm_type_cd in (1, 3)
             and substring(bill_type_cd,3,1) in ('1', '2')
         order by
@@ -163,67 +160,70 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    palet_readmits = f"""
-        select
-             submtg_state_cd
-            ,msis_ident_num
-            ,year
-            ,month
-            ,min(1) as indicator
-        from (
+    def _sql():
+        palet_readmits = f"""
             select
-                 submtg_state_cd
+                submtg_state_cd
                 ,msis_ident_num
-                ,admit
-                ,discharge
-                ,datediff(lead(admit) over (
-                    partition by
-                         submtg_state_cd
-                        ,msis_ident_num
-                    order by
-                         submtg_state_cd
-                        ,msis_ident_num
-                ), discharge) as lead_diff_days
-                ,year(admit) as year
-                ,month(admit) as month
+                ,year
+                ,month
+                ,min(1) as indicator
             from (
                 select
-                     submtg_state_cd
+                    submtg_state_cd
                     ,msis_ident_num
                     ,admit
-                    ,max(discharge) as discharge
-                from
-                    palet_readmits_edge_x_ip_lt
-                group by
-                     submtg_state_cd
-                    ,msis_ident_num
-                    ,admit
+                    ,discharge
+                    ,datediff(lead(admit) over (
+                        partition by
+                            submtg_state_cd
+                            ,msis_ident_num
+                        order by
+                            submtg_state_cd
+                            ,msis_ident_num
+                    ), discharge) as lead_diff_days
+                    ,year(admit) as year
+                    ,month(admit) as month
+                from (
+                    select
+                        submtg_state_cd
+                        ,msis_ident_num
+                        ,admit
+                        ,max(discharge) as discharge
+                    from
+                        palet_readmits_edge_x_ip_lt
+                    group by
+                        submtg_state_cd
+                        ,msis_ident_num
+                        ,admit
+                    order by
+                        submtg_state_cd
+                        ,msis_ident_num
+                        ,admit
+                        ,discharge
+                )
                 order by
-                     submtg_state_cd
+                    submtg_state_cd
                     ,msis_ident_num
                     ,admit
                     ,discharge
             )
-            order by
-                 submtg_state_cd
+            where
+                lead_diff_days > 1 and lead_diff_days <= { {0} }
+            group by
+                submtg_state_cd
                 ,msis_ident_num
-                ,admit
-                ,discharge
-        )
-        where
-            lead_diff_days > 1 and lead_diff_days <= {0}
-        group by
-             submtg_state_cd
-            ,msis_ident_num
-            ,year
-            ,month
-    """
+                ,year
+                ,month
+        """
+        return palet_readmits
 
     # -------------------------------------------------------
     #
     #
     #
     # -------------------------------------------------------
+    @staticmethod
     def allcause(days):
 
         spark = SparkSession.getActiveSession()
@@ -233,12 +233,13 @@ class Readmits:
             spark.sql(Readmits.palet_readmits_edge_lt)
             spark.sql(Readmits.palet_readmits_edge)
             spark.sql(Readmits.palet_readmits_edge_x_ip_lt)
-            spark.sql(Readmits.palet_readmits)
+            # spark.sql(Readmits.palet_readmits)
 
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        z = '(' + Readmits.palet_readmits.format(days) + ')'
+        _snippet = Readmits._sql()
+        z = '(' + _snippet.format(str(days)) + ')'
 
         return f"""{z} as {alias}
             on     aa.submtg_state_cd = {alias}.submtg_state_cd

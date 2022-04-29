@@ -266,7 +266,7 @@ class Paletable():
                     _in_stmt.append(f"'{val}'")
 
                 _join = ",".join(_in_stmt)
-                where.append(key + ' in (' + _join + ')')
+                where.append('aa.' + key + ' in (' + _join + ')')
 
             return f"{' and '.join(where)}"
 
@@ -566,7 +566,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_cd=None):
+    def byState(self, state_cds: list = None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -588,13 +588,18 @@ class Paletable():
 
             Focus in one state, for this example Alabama:
 
-            api = Enrollment().byState('01')
+            >>> api = Enrollment().byState(['01'])
+
+            or
+
+            >>> api = Enrollment().byState(['NC'])
 
             Return the object as DataFrame:
 
             >>> display(api.fetch())
 
         """
+        _states_ = []
 
         self.palet.logger.info('adding byState to the by Group')
         if self.timeunit not in ('full', 'year', 'partial'):
@@ -602,14 +607,16 @@ class Paletable():
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_cd is not None:
-            if type(state_cd) is not int:
+        if state_cds is not None:
+            if type(state_cds) is not int:
                 lkup = self.palet.st_fips
-                fips = lkup[lkup['STABBREV'] == state_cd]['FIPS']
-                state_fips = fips.iloc[0]
+                for state in state_cds:
+                    fips = lkup[lkup['STABBREV'] == state]['FIPS']
+                    state_fips = fips.iloc[0]
+                    _states_.append(state_fips)
             else:
-                state_fips = state_cd
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: state_fips})
+                _states_.extend(state_cds)
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
 
         return self
 

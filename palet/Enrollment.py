@@ -521,8 +521,9 @@ class Enrollment(Paletable):
         if self._outersql is not None:
             for key in self._outersql:
                 vals = self._outersql[key]
-                _str = ','.join(f"'{x}'" for x in vals)
-                _stmt_list.append(filter.format(key, _str))
+                if vals is not None:
+                    _str = ','.join(f"'{x}'" for x in vals)
+                    _stmt_list.append(filter.format(key, _str))
 
             _outer = " AND ".join(_stmt_list)
             return _outer
