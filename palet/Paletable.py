@@ -607,7 +607,7 @@ class Paletable():
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_cds is not None:
+        if state_cds is not None and type(state_cds) is list:
             if type(state_cds) is not int:
                 lkup = self.palet.st_fips
                 for state in state_cds:
@@ -617,6 +617,8 @@ class Paletable():
             else:
                 _states_.extend(state_cds)
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
+        else:
+            PaletMetadata.Enrichment._checkForHelperMsg(type(state_cds), list, "['NC','NY', 'FL']")
 
         return self
 
@@ -625,7 +627,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, type: list = None):
+    def byCoverageType(self, types: list = None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
@@ -656,7 +658,7 @@ class Paletable():
         self.derived_by_type_group.append(CoverageType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
+            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['01', '02', '03']")
             self.filter_by_type.update({CoverageType: type})
 
         # return Enrollment(self._user_runids, self)
@@ -667,7 +669,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, type: list = None):
+    def byEnrollmentType(self, types: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -695,7 +697,7 @@ class Paletable():
         self.derived_by_type_group.append(EnrollmentType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['1', '2', '3']")
+            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['1', '2', '3']")
             self.filter_by_type.update({EnrollmentType: type})
 
         # return Enrollment(self.date_dimension.runIds, self)
@@ -706,7 +708,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, type: list = None):
+    def byEligibilityType(self, types: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -734,7 +736,7 @@ class Paletable():
         self.derived_by_type_group.append(EligibilityType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
+            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['01', '02', '03']")
             self.filter_by_type.update({EligibilityType: type})
 
         # return Enrollment(self.date_dimension.runIds, self)
@@ -769,7 +771,7 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-        PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
+        PaletMetadata.Enrichment._checkForHelperMsg(type(bracket), list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: bracket})

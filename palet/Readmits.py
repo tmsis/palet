@@ -30,6 +30,7 @@ class Readmits:
             ,admsn_dt
             ,blg_prvdr_num
             ,coalesce(dschrg_dt, srvc_endg_dt_drvd) as dschrg_dt
+            ,ptnt_stus_cd
         from
             taf.taf_iph
         where
@@ -59,6 +60,7 @@ class Readmits:
             ,dschrg_dt
             ,srvc_bgnng_dt
             ,srvc_endg_dt
+            ,ptnt_stus_cd
         from
             taf.taf_lth
         where
@@ -87,6 +89,7 @@ class Readmits:
             ,msis_ident_num
             ,blg_prvdr_num
             ,admsn_dt
+            ,ptnt_stus_cd
         from (
             select distinct
                  svc_cat
@@ -94,6 +97,7 @@ class Readmits:
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
+                ,ptnt_stus_cd
             from
                 palet_readmits_edge_ip
         )
@@ -104,6 +108,7 @@ class Readmits:
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
+                ,ptnt_stus_cd
             from
                 palet_readmits_edge_lt
         )
@@ -113,6 +118,7 @@ class Readmits:
             ,msis_ident_num
             ,admsn_dt
             ,blg_prvdr_num
+            ,ptnt_stus_cd
         """
 
     # -------------------------------------------------------
@@ -134,6 +140,7 @@ class Readmits:
 
             ,e.admsn_dt as admit
             ,coalesce(ip.dschrg_dt, lt.dschrg_dt, lt.srvc_endg_dt) as discharge
+            ,e.ptnt_stus_cd
         from
             palet_readmits_edge as e
         left join
@@ -182,8 +189,8 @@ class Readmits:
                             submtg_state_cd
                             ,msis_ident_num
                     ), discharge) as lead_diff_days
-                    ,year(admit) as year
-                    ,month(admit) as month
+                    ,year(discharge) as year
+                    ,month(discharge) as month
                 from (
                     select
                         submtg_state_cd
@@ -192,6 +199,7 @@ class Readmits:
                         ,max(discharge) as discharge
                     from
                         palet_readmits_edge_x_ip_lt
+                    where ptnt_stus_cd not in ('30', null)
                     group by
                         submtg_state_cd
                         ,msis_ident_num
