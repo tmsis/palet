@@ -389,9 +389,8 @@ class Enrollment(Paletable):
         return ''
 
     # ---------------------------------------------------------------------------------
-    # Used in _percentChange to enure the columns for mdcd_pct and chip_pct are included
-    # in the sort and order commands.
-    #
+    # Used in _percentChange to enure the derived by groups for mdcd_pct and chip_pct
+    # are included in the sort and order commands.
     # ---------------------------------------------------------------------------------
     def _getDerivedTypePctSort(self):
         from palet.EnrollmentType import EnrollmentType
@@ -418,6 +417,16 @@ class Enrollment(Paletable):
             return _type_groups
 
         return []
+
+    # ---------------------------------------------------------------------------------
+    # Used in _percentChange to enure marked columns for mdcd_pct and chip_pct are included
+    # in the sort and order commands.
+    # ---------------------------------------------------------------------------------
+    def _getMarkerPctSort(self):
+        indicators = []
+        for key, val in self.markers.items():
+            indicators.append(key)
+        return indicators
 
     # ---------------------------------------------------------------------------------
     # _getTimeunitBreakdown
