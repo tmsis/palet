@@ -155,6 +155,16 @@ class Readmits:
                     e.msis_ident_num = lt.msis_ident_num
                 and e.blg_prvdr_num = lt.blg_prvdr_num
                 and e.admsn_dt = lt.admsn_dt
+        group by
+            e.submtg_state_cd
+            ,e.msis_ident_num
+            ,e.blg_prvdr_num
+            ,lt.srvc_bgnng_dt
+            ,lt.srvc_endg_dt
+            ,e.admsn_dt
+            ,lt.dschrg_dt
+            ,ip.dschrg_dt
+            ,e.ptnt_stus_cd
         order by
             e.submtg_state_cd
             ,e.msis_ident_num
@@ -175,6 +185,7 @@ class Readmits:
                 ,year
                 ,month
                 ,min(1) as indicator
+                ,ptnt_stus_cd
             from (
                 select
                     submtg_state_cd
@@ -191,12 +202,14 @@ class Readmits:
                     ), discharge) as lead_diff_days
                     ,year(discharge) as year
                     ,month(discharge) as month
+                    ,ptnt_stus_cd
                 from (
                     select
                         submtg_state_cd
                         ,msis_ident_num
                         ,admit
                         ,max(discharge) as discharge
+                        ,ptnt_stus_cd
                     from
                         palet_readmits_edge_x_ip_lt
                     where ptnt_stus_cd not in ('30', null)
@@ -204,6 +217,7 @@ class Readmits:
                         submtg_state_cd
                         ,msis_ident_num
                         ,admit
+                        ,ptnt_stus_cd
                     order by
                         submtg_state_cd
                         ,msis_ident_num
@@ -221,6 +235,7 @@ class Readmits:
             group by
                 submtg_state_cd
                 ,msis_ident_num
+                ,ptnt_stus_cd
                 ,year
                 ,month
         """
