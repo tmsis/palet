@@ -123,8 +123,8 @@ class Readmits:
 
     # -------------------------------------------------------
     #
-    #
-    #
+    # palet_readmits_edge_x_ip_lt temporary view
+    # uses logic to determine the indiciator
     # -------------------------------------------------------
     palet_readmits_edge_x_ip_lt = """
         create or replace temporary view palet_readmits_edge_x_ip_lt as
@@ -133,9 +133,33 @@ class Readmits:
             ,e.msis_ident_num
             ,e.blg_prvdr_num
             ,case
-                when ((lt.srvc_bgnng_dt <= e.admsn_dt) and (ip.dschrg_dt <= lt.srvc_endg_dt)) then 1
-                when ((e.admsn_dt <= lt.srvc_bgnng_dt) and (lt.srvc_bgnng_dt <= ip.dschrg_dt)) then 1
-                when ((e.admsn_dt <= lt.srvc_endg_dt) and (lt.srvc_endg_dt <= ip.dschrg_dt)) then 1
+                when ((lt.srvc_bgnng_dt <= e.admsn_dt) and (ip.dschrg_dt <= lt.srvc_endg_dt)
+                        and
+                        lag( e.ptnt_stus_cd not in ('30', null))
+                                    over( partition by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num
+                                        order by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num )) then 1
+                when ((e.admsn_dt <= lt.srvc_bgnng_dt) and (lt.srvc_bgnng_dt <= ip.dschrg_dt)
+                       and
+                       lag( e.ptnt_stus_cd not in ('30', null))
+                                    over( partition by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num
+                                        order by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num )) then 1
+                when ((e.admsn_dt <= lt.srvc_endg_dt) and (lt.srvc_endg_dt <= ip.dschrg_dt)
+                      and
+                      lag( e.ptnt_stus_cd not in ('30', null))
+                                    over( partition by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num
+                                        order by
+                                            e.submtg_state_cd
+                                           ,e.msis_ident_num )) then 1
                 else 0 end as overlap
 
             ,e.admsn_dt as admit
@@ -212,7 +236,6 @@ class Readmits:
                         ,ptnt_stus_cd
                     from
                         palet_readmits_edge_x_ip_lt
-                    where ptnt_stus_cd not in ('30', null)
                     group by
                         submtg_state_cd
                         ,msis_ident_num
