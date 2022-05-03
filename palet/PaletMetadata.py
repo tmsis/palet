@@ -861,7 +861,7 @@ class PaletMetadata:
 
         def _renderAgeRange(self):
             if self.age_band is not None:
-                PaletMetadata.Enrichment._checkForHelperMsg(type(self.age_band), dict, "{'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
+                PaletMetadata.Enrichment._checkForHelperMsg(self.age_band, dict, "{'Teenager': [13,19],'Twenties': [20,29],'Thirties': [30,39]}")
 
                 ageBandWhere = []
 

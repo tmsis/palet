@@ -618,7 +618,7 @@ class Paletable():
                 _states_.extend(state_cds)
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
         else:
-            PaletMetadata.Enrichment._checkForHelperMsg(type(state_cds), list, "['NC','NY', 'FL']")
+            PaletMetadata.Enrichment._checkForHelperMsg(state_cds, list, "['NC','NY', 'FL']")
 
         return self
 
@@ -658,7 +658,7 @@ class Paletable():
         self.derived_by_type_group.append(CoverageType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['01', '02', '03']")
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
             self.filter_by_type.update({CoverageType: type})
 
         # return Enrollment(self._user_runids, self)
@@ -697,7 +697,7 @@ class Paletable():
         self.derived_by_type_group.append(EnrollmentType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['1', '2', '3']")
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['1', '2', '3']")
             self.filter_by_type.update({EnrollmentType: type})
 
         # return Enrollment(self.date_dimension.runIds, self)
@@ -736,7 +736,7 @@ class Paletable():
         self.derived_by_type_group.append(EligibilityType)
 
         if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type(types), list, "['01', '02', '03']")
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
             self.filter_by_type.update({EligibilityType: type})
 
         # return Enrollment(self.date_dimension.runIds, self)
@@ -771,7 +771,7 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-        PaletMetadata.Enrichment._checkForHelperMsg(type(bracket), list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
+        PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
             self.filter.update({PaletMetadata.Enrollment.identity.income: bracket})
