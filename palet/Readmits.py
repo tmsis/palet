@@ -89,7 +89,6 @@ class Readmits:
             ,msis_ident_num
             ,blg_prvdr_num
             ,admsn_dt
-            ,ptnt_stus_cd
         from (
             select distinct
                  svc_cat
@@ -97,7 +96,6 @@ class Readmits:
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
-                ,ptnt_stus_cd
             from
                 palet_readmits_edge_ip
         )
@@ -108,7 +106,6 @@ class Readmits:
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
-                ,ptnt_stus_cd
             from
                 palet_readmits_edge_lt
         )
@@ -118,7 +115,6 @@ class Readmits:
             ,msis_ident_num
             ,admsn_dt
             ,blg_prvdr_num
-            ,ptnt_stus_cd
         """
 
     # -------------------------------------------------------
@@ -133,38 +129,14 @@ class Readmits:
             ,e.msis_ident_num
             ,e.blg_prvdr_num
             ,case
-                when ((lt.srvc_bgnng_dt <= e.admsn_dt) and (ip.dschrg_dt <= lt.srvc_endg_dt)
-                        and
-                        lag( e.ptnt_stus_cd not in ('30', null))
-                                    over( partition by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num
-                                        order by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num )) then 1
-                when ((e.admsn_dt <= lt.srvc_bgnng_dt) and (lt.srvc_bgnng_dt <= ip.dschrg_dt)
-                       and
-                       lag( e.ptnt_stus_cd not in ('30', null))
-                                    over( partition by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num
-                                        order by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num )) then 1
-                when ((e.admsn_dt <= lt.srvc_endg_dt) and (lt.srvc_endg_dt <= ip.dschrg_dt)
-                      and
-                      lag( e.ptnt_stus_cd not in ('30', null))
-                                    over( partition by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num
-                                        order by
-                                            e.submtg_state_cd
-                                           ,e.msis_ident_num )) then 1
+                when ((lt.srvc_bgnng_dt <= e.admsn_dt) and (ip.dschrg_dt <= lt.srvc_endg_dt)) then 1
+                when ((e.admsn_dt <= lt.srvc_bgnng_dt) and (lt.srvc_bgnng_dt <= ip.dschrg_dt)) then 1
+                when ((e.admsn_dt <= lt.srvc_endg_dt) and (lt.srvc_endg_dt <= ip.dschrg_dt)) then 1
                 else 0 end as overlap
 
             ,e.admsn_dt as admit
             ,coalesce(ip.dschrg_dt, lt.dschrg_dt, lt.srvc_endg_dt) as discharge
-            ,e.ptnt_stus_cd
+            ,ip.ptnt_stus_cd
         from
             palet_readmits_edge as e
         left join
@@ -188,7 +160,7 @@ class Readmits:
             ,e.admsn_dt
             ,lt.dschrg_dt
             ,ip.dschrg_dt
-            ,e.ptnt_stus_cd
+            ,ip.ptnt_stus_cd
         order by
             e.submtg_state_cd
             ,e.msis_ident_num
@@ -224,6 +196,13 @@ class Readmits:
                             submtg_state_cd
                             ,msis_ident_num
                     ), discharge) as lead_diff_days
+                    ,case when lag(ptnt_stus_cd in ('30', null))
+                                over( partition by
+                                    submtg_state_cd
+                                    ,msis_ident_num
+                                order by
+                                    submtg_state_cd
+                                    ,msis_ident_num) then 1 else 0 end as still_patient_flg
                     ,year(discharge) as year
                     ,month(discharge) as month
                     ,ptnt_stus_cd
@@ -254,7 +233,8 @@ class Readmits:
                     ,discharge
             )
             where
-                lead_diff_days > 1 and lead_diff_days <= { {0} }
+                lead_diff_days > 1 and lead_diff_days <= { {0} } and
+                still_patient_flg = 0
             group by
                 submtg_state_cd
                 ,msis_ident_num
