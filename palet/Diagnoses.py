@@ -109,7 +109,8 @@ class Diagnoses:
     @staticmethod
     def where(service_category: ServiceCategory, diagnoses: list, lookback: int = 6):
         """
-        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. Unlike the :meth:`~Diagnoses.Diagnoses.within`
+        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
+        Unlike the :meth:`~Diagnoses.Diagnoses.within`
         This method is specifically for filtering by a single chronic conditions.
         This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
 
@@ -177,7 +178,8 @@ class Diagnoses:
     @staticmethod
     def within(service_categories: list, diagnoses: list, lookback: int = 6):
         """
-        The static method within() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. Unlike the :meth:`~Diagnoses.Diagnoses.where`
+        The static method within() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
+        Unlike the :meth:`~Diagnoses.Diagnoses.where`
         This method is specifically for filtering by multiple chronic conditions.
         This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
 
