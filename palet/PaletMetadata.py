@@ -520,7 +520,8 @@ class PaletMetadata:
             }
 
     class Claims:
-        ptnt_stus_cd = {
+        ptnt_stus_cd = "ptnt_stus_cd"
+        patient_status_values = {
             "01": "Discharged to home/self-care (routine charge).",
             "02": "Discharged/transferred to other short term general hospital for inpatient care. ",
             "03": "Discharged/transferred to skilled nursing facility (SNF) with Medicare certification in anticipation of covered skilled care -- \
@@ -644,6 +645,7 @@ class PaletMetadata:
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
                 'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
+                'ptnt_stus_cd': PaletMetadata.Enrichment._buildPatientStatusColumn,
                 'isfirst': PaletMetadata.Enrichment._removeIsFirst
             }
 
@@ -753,6 +755,32 @@ class PaletMetadata:
             # self.palet.logger.debug('build our columns by looking for ethncty_cd')
             print("calling build race ethnicity")
             df['ethnicity'] = df.apply(lambda x: PaletMetadata.Enrichment._findEthnicityValueName(x), axis=1)
+
+            return df
+
+        # --------------------------------------------------------------------------------
+        #
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _findPatientStatusValues(x):
+            # self.palet.logger.debug('looking up the ethncty_cd value from our metadata')
+            # get this row's ref value from the column by name
+            y = x[PaletMetadata.Claims.ptnt_stus_cd]
+            # lookup label with value
+            return PaletMetadata.Claims.patient_status_values.get(y)
+
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _buildPatientStatusColumn(df: pd.DataFrame):
+            # self.palet.logger.debug('build our columns by looking for ethncty_cd')
+            print("calling build patient status column")
+            df['patient_status'] = df.apply(lambda x: PaletMetadata.Enrichment._findPatientStatusValues(x), axis=1)
 
             return df
 

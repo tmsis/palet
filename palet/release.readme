@@ -1,4 +1,8 @@
 PALET Library Release Notes
+Version 1.9.20220504
+*** All cause Readmits now allows for lookback and timeframe 
+*** When visible, patient status will now add a column with code to value conversion
+
 Version 1.8.20220428
 
 *** Fixed filtering for all by Groups to allow for list of values. i.e. ['01', '02', ... ,'10']
