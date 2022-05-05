@@ -748,7 +748,7 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
-    def having(self, constraint: Diagnoses):
+    def having(self, constraint):
         """
         The having function, allows user to filter Enrollment objects by chronic conidition diagnoses.
         The :meth:`~Diagnoses.Diagnoses.where` and :meth:`~Diagnoses.Diagnoses.within` from :class:`Diagnoses`.
@@ -843,7 +843,11 @@ class Enrollment(Paletable):
             z = f"""
                 select
                     counter,
-                    {self._getByGroup()}{self._getDerivedTypeSelections()}{self._getAggregateGroup()}{self._selectTimeunit()}{self._select_indicators()}
+                    {self._getByGroup()}
+                    {self._getDerivedTypeSelections()}
+                    {self._getAggregateGroup()}
+                    {self._selectTimeunit()}
+                    {self._select_indicators()}
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
 
