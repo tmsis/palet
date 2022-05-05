@@ -657,9 +657,9 @@ class Paletable():
         self.palet.logger.info('adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
-        if type is not None:
+        if types is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
-            self.filter_by_type.update({CoverageType: type})
+            self.filter_by_type.update({CoverageType: types})
 
         # return Enrollment(self._user_runids, self)
         return self
@@ -696,9 +696,9 @@ class Paletable():
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EnrollmentType)
 
-        if type is not None:
+        if types is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['1', '2', '3']")
-            self.filter_by_type.update({EnrollmentType: type})
+            self.filter_by_type.update({EnrollmentType: types})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
@@ -735,9 +735,9 @@ class Paletable():
         self.palet.logger.info('adding EligibilityType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
-        if type is not None:
+        if types is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
-            self.filter_by_type.update({EligibilityType: type})
+            self.filter_by_type.update({EligibilityType: types})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
