@@ -21,6 +21,31 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
+    def __init__(self):
+        self.join_sql = ''
+        self.callback = None
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def sql(self):
+        return self.join_sql
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def __str__(self):
+        return self.sql()
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     palet_readmits_edge_ip = f"""
         create or replace temporary view palet_readmits_edge_ip as
         select distinct
@@ -173,84 +198,8 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    # def _sql():
-    #     palet_readmits = f"""
-    #         select
-    #             submtg_state_cd
-    #             ,msis_ident_num
-    #             ,year
-    #             ,month
-    #             ,min(1) as indicator
-    #             ,ptnt_stus_cd
-    #         from (
-    #             select
-    #                 submtg_state_cd
-    #                 ,msis_ident_num
-    #                 ,admit
-    #                 ,discharge
-    #                 ,datediff(lead(admit) over (
-    #                     partition by
-    #                         submtg_state_cd
-    #                         ,msis_ident_num
-    #                     order by
-    #                         submtg_state_cd
-    #                         ,msis_ident_num
-    #                 ), discharge) as lead_diff_days
-    #                 ,case when lag(ptnt_stus_cd in ('30', null))
-    #                             over( partition by
-    #                                 submtg_state_cd
-    #                                 ,msis_ident_num
-    #                             order by
-    #                                 submtg_state_cd
-    #                                 ,msis_ident_num) then 1 else 0 end as still_patient_flg
-    #                 ,year(discharge) as year
-    #                 ,month(discharge) as month
-    #                 ,ptnt_stus_cd
-    #             from (
-    #                 select
-    #                     submtg_state_cd
-    #                     ,msis_ident_num
-    #                     ,admit
-    #                     ,max(discharge) as discharge
-    #                     ,ptnt_stus_cd
-    #                 from
-    #                     palet_readmits_edge_x_ip_lt
-    #                 group by
-    #                     submtg_state_cd
-    #                     ,msis_ident_num
-    #                     ,admit
-    #                     ,ptnt_stus_cd
-    #                 order by
-    #                     submtg_state_cd
-    #                     ,msis_ident_num
-    #                     ,admit
-    #                     ,discharge
-    #             )
-    #             order by
-    #                 submtg_state_cd
-    #                 ,msis_ident_num
-    #                 ,admit
-    #                 ,discharge
-    #         )
-    #         where
-    #             lead_diff_days > 1 and lead_diff_days <= { {0} } and
-    #             still_patient_flg = 0
-    #         group by
-    #             submtg_state_cd
-    #             ,msis_ident_num
-    #             ,ptnt_stus_cd
-    #             ,year
-    #             ,month
-    #     """
-    #     return palet_readmits
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
     palet_readmits_t = """
-        create or replace temporary view palet_readmits_t as 
+        create or replace temporary view palet_readmits_t as
         select
             submtg_state_cd
             ,msis_ident_num
@@ -311,28 +260,36 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    def _sql():
-        # palet_readmits = """
-        # select 
-        #     submtg_state_cd
-        #     ,year
-        #     ,month
-        #     ,sum(is_admit) as admits
-        #     ,sum(is_readmit) as readmits
-        #     ,sum(is_readmit) / sum(is_admit) as readmit_rate
-        # from
-        #     palet_readmits_t
-        # group by
-        #     submtg_state_cd
-        #     ,year
-        #     ,month
-        # order by
-        #     submtg_state_cd
-        #     ,year
-        #     ,month
-        # """
-        palet_readmits = "select * from palet_readmits_t"
-        return palet_readmits    
+    # def _sql():
+    # palet_readmits = """
+    # select
+    #     submtg_state_cd
+    #     ,year
+    #     ,month
+    #     ,sum(is_admit) as admits
+    #     ,sum(is_readmit) as readmits
+    #     ,sum(is_readmit) / sum(is_admit) as readmit_rate
+    # from
+    #     palet_readmits_t
+    # group by
+    #     submtg_state_cd
+    #     ,year
+    #     ,month
+    # order by
+    #     submtg_state_cd
+    #     ,year
+    #     ,month
+    # """
+    # palet_readmits = "select * from palet_readmits_t"
+    # return palet_readmits
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def calculate_rate(self):
+        return 'blah'
 
     # -------------------------------------------------------
     #
@@ -354,11 +311,17 @@ class Readmits:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        _snippet = Readmits._sql()
+        _snippet = "select * from palet_readmits_t"
         z = '(' + _snippet.format(str(days)) + ')'
 
-        return f"""{z} as {alias}
+        sql = f"""{z} as {alias}
             on     aa.submtg_state_cd = {alias}.submtg_state_cd
                and aa.msis_ident_num = {alias}.msis_ident_num
                and aa.de_fil_dt  = {alias}.year
                and month = {alias}.month"""
+
+        o = Readmits()
+        o.join_sql = sql
+        o.callback = o.calculate_rate
+
+        return o

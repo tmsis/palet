@@ -57,6 +57,7 @@ class Paletable():
 
         self.preprocesses = []
         self.postprocesses = []
+        self.calculations = []
 
         self.markers = {}
         self.having_constraints = []

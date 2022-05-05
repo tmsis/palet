@@ -718,6 +718,23 @@ class Enrollment(Paletable):
     #
     #
     # ---------------------------------------------------------------------------------
+    def _do_calculations(self):
+        calculations = []
+        for cb in self.calculations:
+            calculations.append(cb())
+
+        if len(calculations) > 0:
+            return '\n\t\t\t'.join(calculations)
+        else:
+            return ''
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _groupby_indicators(self):
         groupby = []
         for key, _val in self.markers.items():
@@ -786,6 +803,9 @@ class Enrollment(Paletable):
         """
         if constraint not in self.having_constraints:
             # self.palet.logger.debug('')
+
+            self.calculations.append(constraint.callback)
+
             self.having_constraints.append(constraint)
 
         return self
@@ -848,9 +868,9 @@ class Enrollment(Paletable):
                     {self._getAggregateGroup()}
                     {self._selectTimeunit()}
                     {self._select_indicators()}
+                    {self._do_calculations()}
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
-
                 from (
                     select
                         {self._getByGroupWithAlias()}
