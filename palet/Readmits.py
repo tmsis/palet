@@ -289,7 +289,12 @@ class Readmits:
     #
     # -------------------------------------------------------
     def calculate_rate(self):
-        return 'blah'
+        calculate_rate = """
+        sum(is_admit) as admits
+        ,sum(is_readmit) as readmits
+        ,sum(is_readmit) / sum(is_admit) as readmit_rate
+        """
+        return calculate_rate
 
     # -------------------------------------------------------
     #
