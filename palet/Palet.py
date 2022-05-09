@@ -27,7 +27,7 @@ class Palet:
     """
     __instance = None
     PERFORMANCE = 15
-    RELEASE = 100
+    RELEASE = 11
 
     def __new__(cls):
         from datetime import datetime
@@ -202,10 +202,10 @@ class Palet:
 
         self.logger = logging.getLogger('palet_log')
         self.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(Palet.RELEASE)
 
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        ch.setLevel(Palet.RELEASE)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)
