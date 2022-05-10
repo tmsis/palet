@@ -323,7 +323,7 @@ class Enrollment(Paletable):
                         sum(case when aa.chip_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
                         12, { {11} }
                         sum(case when aa.mdcd_enrlmt_days_12 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)e
+                        sum(case when aa.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)
                         ) as (month, { {12} } mdcd_enrollment, chip_enrollment)"""
         }
 
