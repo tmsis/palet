@@ -1,4 +1,7 @@
 PALET Library Release Notes
+Version 1.9.20220511
+*** Improved speed of elibigility by reducing unneeded run_ids when filtering by byYear
+
 Version 1.9.20220504
 *** All cause Readmits now allows for lookback and timeframe 
 *** When visible, patient status will now add a column with code to value conversion
