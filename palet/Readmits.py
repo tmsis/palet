@@ -24,6 +24,7 @@ class Readmits:
     def __init__(self):
         self.join_sql = ''
         self.callback = None
+        self.alias = None
 
     # -------------------------------------------------------
     #
@@ -289,10 +290,10 @@ class Readmits:
     #
     # -------------------------------------------------------
     def calculate_rate(self):
-        calculate_rate = """
-        sum(is_admit) as admits
-        ,sum(is_readmit) as readmits
-        ,sum(is_readmit) / sum(is_admit) as readmit_rate
+        calculate_rate = f"""
+        sum({self.alias}.is_admit) as admits,
+        sum({self.alias}.is_readmit) as readmits,
+        sum({self.alias}.is_readmit) / sum({self.alias}.is_admit) as readmit_rate,
         """
         return calculate_rate
 
@@ -327,6 +328,7 @@ class Readmits:
 
         o = Readmits()
         o.join_sql = sql
+        o.alias = alias
         o.callback = o.calculate_rate
 
         return o

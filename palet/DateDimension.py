@@ -22,9 +22,9 @@ class DateDimension:
     """
 
     # -----------------------------------------------------------------------
-    #
+    # 
     # -----------------------------------------------------------------------
-    def __init__(self, as_of_date: date = None, runIds: list = None):
+    def __init__(self, as_of_date: date = None, runIds: list = None, years: list = None, months: list = None):
         z = """
             select distinct
                 fil_4th_node_txt,
@@ -55,6 +55,8 @@ class DateDimension:
                 rptg_prd
             ;
         """
+        self.months = months
+        self.years = years
         spark = SparkSession.getActiveSession()
         if spark is not None:
             spark_df = spark.sql(z)
@@ -75,6 +77,10 @@ class DateDimension:
             df['month'].fillna(1, inplace=True)
             df['dt_yearmon'] = df.apply(lambda x: date(x['year'], int(x['month']), 1), axis=1)
             self.df = df
+            if years is not None:
+                self.df = self.df[self.df['year'].isin(years)]           
+            if months is not None:
+                self.df = self.df[self.df['month'].isin(months)] 
 
         else:
             self.df = None
@@ -83,7 +89,6 @@ class DateDimension:
             as_of_date = datetime.now().replace(day=1).date()
 
         self.as_of_date = as_of_date
-
         self.runIds = runIds
 
     # -----------------------------------------------------------------------

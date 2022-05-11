@@ -824,7 +824,9 @@ class Paletable():
         self.timeunit = 'year'
 
         if year is not None:
-            self.filter.update({PaletMetadata.Enrollment.fileDate: year})
+            self.date_dimension = DateDimension(years=year, months = self.date_dimension.months)
+
+            # self.filter.update({PaletMetadata.Enrollment.fileDate: year})
 
         return self
 
@@ -862,7 +864,10 @@ class Paletable():
 
         self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
-        self._outersql.update({"month": month})
+        self._outersql.update({"month": month}) # need Matt's explanation
+
+        if month is not None:
+            self.date_dimension = DateDimension(years=self.date_dimension.years, months=month)
 
         return self
 
