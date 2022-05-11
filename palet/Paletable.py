@@ -562,6 +562,11 @@ class Paletable():
 
         return self
 
+    def bySpecialtyGroup(self, **constraints):
+        for constraint, val in constraints:
+            self._addByGroup(PaletMetadata.Specialty.ud_const.get(constraint))
+            self.filter.update({PaletMetadata.Specialty.ud_const.get(constraint): val})
+
     # ---------------------------------------------------------------------------------
     #
     #
@@ -873,7 +878,7 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     def _selectTimeunit(self):
-        if self.timeunit == 'year':
+        if self.timeunit in ('year', 'partial_year'):
             return "\tde_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
             return """

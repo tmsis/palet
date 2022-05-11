@@ -55,7 +55,9 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
-    def __init__(self, service_categories: list, diagnoses: list, service_category: ServiceCategory = None):
+    def __init__(self, service_categories: list = [], diagnoses: list = [], service_category: ServiceCategory = None):
+        self.join_sql = ''
+        self.callback = None
 
         self.service_categories = service_categories
         self.diagnoses = diagnoses
@@ -67,7 +69,10 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     def sql(self):
-        return Diagnoses.within(self.service_categories, self.diagnoses)
+        if len(self.service_categories) > 0:
+            return Diagnoses.within(self.service_categories, self.diagnoses).join_sql
+        else:
+            return Diagnoses.where(self.service_category, self.diagnoses).join_sql
 
     # -------------------------------------------------------
     #
@@ -76,6 +81,16 @@ class Diagnoses:
     # -------------------------------------------------------
     def __str__(self):
         return self.sql()
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def calculate_rate(self):
+        calculate_rate = """
+        """
+        return calculate_rate
 
     # -------------------------------------------------------
     #
@@ -152,7 +167,7 @@ class Diagnoses:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        return f"""
+        sql = f"""
             (
                 select distinct
                     submtg_state_cd,
@@ -169,6 +184,12 @@ class Diagnoses:
                 on aa.submtg_state_cd = {alias}.submtg_state_cd and
                    aa.msis_ident_num = {alias}.msis_ident_num
         """
+
+        o = Diagnoses(diagnoses=diagnoses, service_category=service_category)
+        o.join_sql = sql
+        o.callback = o.calculate_rate
+
+        return o
 
     # -------------------------------------------------------
     #
@@ -241,35 +262,43 @@ class Diagnoses:
 
         capture = []
 
-        # TODO: { self.date_dimension.relevant_runids('BSE', 6) }
+        if type(service_categories) is str:
+            service_categories = [service_categories]
+            # service_category = PaletMetadata.Member.service_category.get(service_categories)
 
         for svc in service_categories:
-
-            service_category = svc[0]
+            service = svc[0]
+            service_num = svc[1]
 
             capture.append(f"""
                 select distinct
                     submtg_state_cd,
                     msis_ident_num,
                     min(1) as indicator,
-                    count(distinct {Diagnoses.link_key[service_category]}) as m
+                    count(distinct {Diagnoses.link_key[service]}) as m
                 from
-                    taf.{ PaletMetadata.Member.service_category.get(service_category) }
+                    taf.{ PaletMetadata.Member.service_category.get(service) }
                 where
-                    da_run_id in ( { Diagnoses._getRunIds(service_category, lookback) } )
+                    da_run_id in ( { Diagnoses._getRunIds(service, lookback) } )
                     and (
-                        { Diagnoses._doWhere(service_category, diagnoses) }
+                        { Diagnoses._doWhere(service, diagnoses) }
                     )
                 group by
                     submtg_state_cd,
                     msis_ident_num
                 having
-                    m >= {svc[1]}
+                    m >= { service_num }
 
             """)
 
         z = '(' + '\n union all  \n'.join(capture) + ')'
 
-        return f"""{z} as {alias}
+        sql = f"""{z} as {alias}
             on aa.submtg_state_cd = {alias}.submtg_state_cd and
                aa.msis_ident_num = {alias}.msis_ident_num"""
+
+        o = Diagnoses(service_categories, diagnoses=diagnoses)
+        o.join_sql = sql
+        o.callback = o.calculate_rate
+
+        return o

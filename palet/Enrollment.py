@@ -183,6 +183,23 @@ class Enrollment(Paletable):
                         sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end),
                         sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end)
                     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
+            'partial_year': f"""
+                'Partial Year' as counter,
+                stack(1,
+                    1, { {13} }
+                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+                                and aa.de_fil_dt % 400 = 0
+                                    and aa.mdcd_enrlmt_days_yr between 1 and 366
+                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+                                and aa.de_fil_dt % 400 != 0
+                                    and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
+                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+                                and aa.de_fil_dt % 400 = 0
+                                    and aa.chip_enrlmt_days_yr between 1 and 366
+                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+                                and aa.de_fil_dt % 400 != 0
+                                    and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
+                ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
                     'In Month' as counter,
                     stack(12,
@@ -348,7 +365,9 @@ class Enrollment(Paletable):
 
                 'full': "1=1",
 
-                'partial': '1=1'
+                'partial': '1=1',
+
+                'partial_year': '1=1'
 
         }
 
@@ -361,7 +380,9 @@ class Enrollment(Paletable):
 
             'full': "1=1",
 
-            'partial': '1=1'
+            'partial': '1=1',
+
+            'partial_year': '1=1'
         }
 
     # ---------------------------------------------------------------------------------
@@ -645,7 +666,7 @@ class Enrollment(Paletable):
             Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where`
             as a parameter to filter by chronic condition:
 
-            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
+            >>> api = Enrollment().byMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
 
             Return DataFrame:
 
