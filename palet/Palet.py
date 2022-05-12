@@ -202,10 +202,10 @@ class Palet:
 
         self.logger = logging.getLogger('palet_log')
         self.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-        self.logger.setLevel(Palet.RELEASE)
+        self.logger.setLevel(logging.INFO)
 
         ch = logging.StreamHandler()
-        ch.setLevel(Palet.RELEASE)
+        ch.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)

@@ -114,11 +114,15 @@ class Enrollment(Paletable):
 
         self.palet = Palet.getInstance()
         self.palet.clearAliasStack()
+
         self.timeunit = period
+
         self._marker_cache = []
         self._groupby_cache = []
+
         self._outersql = {}
         self._sql = None
+
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -548,7 +552,7 @@ class Enrollment(Paletable):
         filter = filters[self.timeunit]
         _stmt_list = []
 
-        if self._outersql is not None:
+        if len(self._outersql) > 0:
             for key in self._outersql:
                 vals = self._outersql[key]
                 if vals is not None:
@@ -825,7 +829,7 @@ class Enrollment(Paletable):
         if constraint not in self.having_constraints:
             # self.palet.logger.debug('')
 
-            self.calculations.append(constraint.callback)
+            # self.calculations.append(constraint.callback)
 
             self.having_constraints.append(constraint)
 
@@ -844,6 +848,34 @@ class Enrollment(Paletable):
             contraints += 'inner join ' + str(i)
 
         return contraints
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def calculate(self, paletable):
+
+        if paletable not in self.calculations:
+            # self.palet.logger.debug('')
+
+            self.calculations.append(paletable.callback)
+            self.yearmon_joins.append(paletable.join_sql)
+
+        return self
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _joinsOnYearMon(self):
+
+        return '\n'.join(self.yearmon_joins)
 
     # ---------------------------------------------------------------------------------
     #
@@ -918,7 +950,10 @@ class Enrollment(Paletable):
                         {self._getDerivedByTypeGroup()}
                         aa.de_fil_dt
                         {self._groupby_markers()}
-                )
+                ) as bb
+
+                { self._joinsOnYearMon() }
+
                 where
                     {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)}
                 group by
