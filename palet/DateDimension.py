@@ -24,7 +24,10 @@ class DateDimension:
     # -----------------------------------------------------------------------
     # 
     # -----------------------------------------------------------------------
-    def __init__(self, as_of_date: date = None, runIds: list = None, years: list = None, months: list = None):
+    __instance = None
+
+    def __new__(cls, as_of_date: date = None, runIds: list = None, years: list = None, months: list = None):
+        cls.__instance = super().__new__(cls)
         z = """
             select distinct
                 fil_4th_node_txt,
@@ -55,8 +58,8 @@ class DateDimension:
                 rptg_prd
             ;
         """
-        self.months = months
-        self.years = years
+        cls.months = months
+        cls.years = years
         spark = SparkSession.getActiveSession()
         if spark is not None:
             spark_df = spark.sql(z)
@@ -76,21 +79,38 @@ class DateDimension:
             df['month'] = pd.to_numeric(df['mm'])
             df['month'].fillna(1, inplace=True)
             df['dt_yearmon'] = df.apply(lambda x: date(x['year'], int(x['month']), 1), axis=1)
-            self.df = df
+            cls.df = df
             if years is not None:
-                self.df = self.df[self.df['year'].isin(years)]           
+                cls.df = cls.df[cls.df['year'].isin(years)]           
             if months is not None:
-                self.df = self.df[self.df['month'].isin(months)] 
+                cls.df = cls.df[cls.df['month'].isin(months)] 
 
         else:
-            self.df = None
+            cls.df = None
 
         if as_of_date is None:
             as_of_date = datetime.now().replace(day=1).date()
 
-        self.as_of_date = as_of_date
-        self.runIds = runIds
+        cls.as_of_date = as_of_date
+        cls.runIds = runIds
 
+    # DateDimension Singleton
+    @staticmethod
+    def getInstance():
+        """ Static access method. """
+        if DateDimension.__instance is None:
+            DateDimension()
+            __newDateDimension = DateDimension.getInstance()
+            __newDateDimension.logger.debug("return DateDimension instance " + str(__newDateDimension))
+        return DateDimension.__instance
+
+    def __init__(self):
+        """ Virtual private constructor. """
+        if DateDimension.__instance is not None:
+            raise Exception("This class is a singleton! Use getInstance()")
+        else:
+            DateDimension.__instance = self
+            
     # -----------------------------------------------------------------------
     #
     # -----------------------------------------------------------------------
