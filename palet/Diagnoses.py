@@ -87,10 +87,8 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
-    def calculate_rate(self):
-        calculate_rate = """
-        """
-        return calculate_rate
+    def calculated_fields(self):
+        return ''  # noop
 
     # -------------------------------------------------------
     #
@@ -187,7 +185,7 @@ class Diagnoses:
 
         o = Diagnoses(diagnoses=diagnoses, service_category=service_category)
         o.join_sql = sql
-        o.callback = o.calculate_rate
+        o.callback = o.calculated_fields
 
         return o
 
@@ -299,6 +297,6 @@ class Diagnoses:
 
         o = Diagnoses(service_categories, diagnoses=diagnoses)
         o.join_sql = sql
-        o.callback = o.calculate_rate
+        o.callback = o.calculated_fields
 
         return o

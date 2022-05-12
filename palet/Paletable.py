@@ -57,6 +57,8 @@ class Paletable():
 
         self.preprocesses = []
         self.postprocesses = []
+
+        self.yearmon_joins = []
         self.calculations = []
 
         self.markers = {}
@@ -869,9 +871,9 @@ class Paletable():
 
         self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
-        self._outersql.update({"month": month}) # need Matt's explanation
 
         if month is not None:
+            self._outersql.update({"month": month}) # need Matt's explanation
             self.date_dimension = DateDimension(years=self.date_dimension.years, months=month)
 
         return self

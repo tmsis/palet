@@ -261,34 +261,6 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    # def _sql():
-    # palet_readmits = """
-    # select
-    #     submtg_state_cd
-    #     ,year
-    #     ,month
-    #     ,sum(is_admit) as admits
-    #     ,sum(is_readmit) as readmits
-    #     ,sum(is_readmit) / sum(is_admit) as readmit_rate
-    # from
-    #     palet_readmits_t
-    # group by
-    #     submtg_state_cd
-    #     ,year
-    #     ,month
-    # order by
-    #     submtg_state_cd
-    #     ,year
-    #     ,month
-    # """
-    # palet_readmits = "select * from palet_readmits_t"
-    # return palet_readmits
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
     def calculate_rate(self):
         calculate_rate = f"""
         sum({self.alias}.is_admit) as admits,
@@ -317,14 +289,39 @@ class Readmits:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        _snippet = "select * from palet_readmits_t"
+        _snippet = f"""
+            select
+                submtg_state_cd
+                ,year
+                ,month
+                ,sum(is_admit) as is_admit
+                ,sum(is_readmit) as is_readmit
+            from
+                palet_readmits_t
+            group by
+                submtg_state_cd
+                ,year
+                ,month
+            order by
+                submtg_state_cd
+                ,year
+                ,month
+            """
+
         z = '(' + _snippet.format(str(days)) + ')'
 
-        sql = f"""{z} as {alias}
-            on     aa.submtg_state_cd = {alias}.submtg_state_cd
-               and aa.msis_ident_num = {alias}.msis_ident_num
-               and aa.de_fil_dt  = {alias}.year
-               and month = {alias}.month"""
+        # sql = f"""{z} as {alias}
+        #     on     aa.submtg_state_cd = {alias}.submtg_state_cd
+        #        and aa.msis_ident_num = {alias}.msis_ident_num
+        #        and aa.de_fil_dt  = {alias}.year
+        #        and month = {alias}.month"""
+
+        sql = f"""
+            left join
+                {z} as {alias}
+                on      bb.submtg_state_cd = {alias}.submtg_state_cd
+                    and bb.de_fil_dt  = {alias}.year
+                    and bb.month = {alias}.month"""
 
         o = Readmits()
         o.join_sql = sql
