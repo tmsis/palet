@@ -10,7 +10,7 @@ from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 import pandas as pd
-from datetime import date, datetime, timedelta
+from datetime import date
 
 
 class Enrollment(Paletable):
@@ -396,21 +396,14 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def _getDerivedTypeSelections(self):
-        from palet.EnrollmentType import EnrollmentType
-        from palet.CoverageType import CoverageType
-        from palet.EligibilityType import EligibilityType
+        derived_types = []
 
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
-            for column in self.derived_by_type_group:
-                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-                    return EnrollmentType.alias + ',\n'
+            for bytype in self.derived_by_type_group:
+                derived_types.append("bb." + bytype.alias)
 
-                elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
-                    return CoverageType.alias + ',\n'
-
-                elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
-                    return EligibilityType.alias + ',\n'
+            return ",\n".join(derived_types) + ","
 
         return ''
 

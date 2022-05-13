@@ -34,6 +34,7 @@ class Paletable():
 
         >>> e.fetch()
 
+
     """
 
     # Initialize the comann variables here.
