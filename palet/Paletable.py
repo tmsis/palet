@@ -9,7 +9,7 @@ import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
-from datetime import date, datetime, timedelta
+from datetime import date
 
 class Paletable():
     """
@@ -831,7 +831,7 @@ class Paletable():
         self.timeunit = 'year'
 
         if year is not None:
-            self.date_dimension = DateDimension(years=year, months = self.date_dimension.months)
+            self.date_dimension = DateDimension(years=year, months=self.date_dimension.months)
 
             # self.filter.update({PaletMetadata.Enrollment.fileDate: year})
 
@@ -873,7 +873,7 @@ class Paletable():
         self.timeunit = 'month'
 
         if month is not None:
-            self._outersql.update({"month": month}) # need Matt's explanation
+            self._outersql.update({"month": month})  # need Matt's explanation
             self.date_dimension = DateDimension(years=self.date_dimension.years, months=month)
 
         return self
