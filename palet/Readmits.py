@@ -22,6 +22,7 @@ class Readmits:
     #
     # -------------------------------------------------------
     def __init__(self):
+        self.days = 30
         self.join_sql = ''
         self.callback = None
         self.alias = None
@@ -206,7 +207,7 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_t = """
+        self.palet_readmits_t = f"""
             create or replace temporary view palet_readmits_t as
             select
                 submtg_state_cd
@@ -215,7 +216,7 @@ class Readmits:
                 ,month
                 ,count(distinct msis_ident_num) as is_admit
                 ,sum(lead_diff_days) as m
-                ,case when (min(lead_diff_days) > 1 and min(lead_diff_days) <= 30) then count(distinct msis_ident_num) else 0 end as is_readmit
+                ,case when (min(lead_diff_days) > 1 and min(lead_diff_days) <= {self.days}) then count(distinct msis_ident_num) else 0 end as is_readmit
             from (
                 select
                     submtg_state_cd
@@ -286,6 +287,7 @@ class Readmits:
 
         o = Readmits()
         o.init()
+        o.days = days
 
         spark = SparkSession.getActiveSession()
         if spark is not None:
@@ -299,26 +301,25 @@ class Readmits:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        _snippet = f"""
-            select
-                submtg_state_cd
-                ,year
-                ,month
-                ,sum(is_admit) as is_admit
-                ,sum(is_readmit) as is_readmit
-            from
-                palet_readmits_t
-            group by
-                submtg_state_cd
-                ,year
-                ,month
-            order by
-                submtg_state_cd
-                ,year
-                ,month
+        z = """(
+                select
+                    submtg_state_cd
+                    ,year
+                    ,month
+                    ,sum(is_admit) as is_admit
+                    ,sum(is_readmit) as is_readmit
+                from
+                    palet_readmits_t
+                group by
+                    submtg_state_cd
+                    ,year
+                    ,month
+                order by
+                    submtg_state_cd
+                    ,year
+                    ,month
+                )
             """
-
-        z = '(' + _snippet.format(str(days)) + ')'
 
         # sql = f"""{z} as {alias}
         #     on     aa.submtg_state_cd = {alias}.submtg_state_cd

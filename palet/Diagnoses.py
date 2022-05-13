@@ -55,13 +55,13 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
-    def __init__(self, service_categories: list = [], diagnoses: list = [], service_category: ServiceCategory = None):
+    def __init__(self, service_categories: list = [], diagnoses: list = []):
         self.join_sql = ''
         self.callback = None
+        self.alias = None
 
         self.service_categories = service_categories
         self.diagnoses = diagnoses
-        self.service_category = service_category
 
     # -------------------------------------------------------
     #
@@ -69,10 +69,7 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     def sql(self):
-        if len(self.service_categories) > 0:
-            return Diagnoses.within(self.service_categories, self.diagnoses).join_sql
-        else:
-            return Diagnoses.where(self.service_category, self.diagnoses).join_sql
+        return self.join_sql
 
     # -------------------------------------------------------
     #
@@ -183,7 +180,7 @@ class Diagnoses:
                    aa.msis_ident_num = {alias}.msis_ident_num
         """
 
-        o = Diagnoses(diagnoses=diagnoses, service_category=service_category)
+        o = Diagnoses([service_category], diagnoses=diagnoses)
         o.join_sql = sql
         o.callback = o.calculated_fields
 
@@ -262,7 +259,6 @@ class Diagnoses:
 
         if type(service_categories) is str:
             service_categories = [service_categories]
-            # service_category = PaletMetadata.Member.service_category.get(service_categories)
 
         for svc in service_categories:
             service = svc[0]
@@ -297,6 +293,7 @@ class Diagnoses:
 
         o = Diagnoses(service_categories, diagnoses=diagnoses)
         o.join_sql = sql
+        o.alias = alias
         o.callback = o.calculated_fields
 
         return o
