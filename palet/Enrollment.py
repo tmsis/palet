@@ -10,6 +10,7 @@ from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
 from palet.Paletable import Paletable
 import pandas as pd
+from datetime import date, datetime, timedelta
 
 
 class Enrollment(Paletable):
@@ -101,9 +102,9 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, paletable: Paletable = None, period: str = "month"):
+    def __init__(self, asOf: date = None, runIds: list = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
-        super().__init__(runIds)
+        super().__init__(asOf=asOf, runIds=runIds)
 
         if (paletable is not None):
             self.by_group = paletable.by_group
@@ -916,10 +917,10 @@ class Enrollment(Paletable):
             z = f"""
                 select
                     counter,
-                    {self._getByGroup()}
+                    {self._getByGroupWithAlias('bb')}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
-                    {self._selectTimeunit()}
+                    {self._selectTimeunit('bb')}
                     {self._select_indicators()}
                     {self._do_calculations()}
                     sum(mdcd_enrollment) as mdcd_enrollment,
@@ -937,7 +938,7 @@ class Enrollment(Paletable):
                         { self._apply_constraints() }
                         { self._apply_markers() }
                     where
-                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
+                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE')} ) and
                         {self._getByTimeunitCull(Enrollment.timeunit.cull)} and
                         {self._defineWhereClause()}
                     group by
@@ -958,17 +959,17 @@ class Enrollment(Paletable):
                     {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)}
                 group by
                     counter,
-                    {self._getByGroup()}
+                    {self._getByGroupWithAlias('bb')}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
-                    {self._groupTimeunit()}
+                    {self._groupTimeunit('bb')}
                 order by
-                    {self._getByGroup()}
+                    {self._getByGroupWithAlias('bb')}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
-                    {self._groupTimeunit()}
+                    {self._groupTimeunit('bb')}
             """
 
             self._addPostProcess(self._percentChange)

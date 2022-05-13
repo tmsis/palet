@@ -9,7 +9,7 @@ import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
-
+from datetime import date, datetime, timedelta
 
 class Paletable():
     """
@@ -43,7 +43,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def __init__(self, runIds: list = None):
+    def __init__(self, asOf: date = None, runIds: list = None):
 
         self.timeunit = None
         self.by_group = []
@@ -53,7 +53,7 @@ class Paletable():
         self.derived_by_type_group = []
         self.aggregate_group = []
 
-        self.date_dimension = DateDimension(runIds=runIds)
+        self.date_dimension = DateDimension(asOf=asOf, runIds=runIds)
 
         self.preprocesses = []
         self.postprocesses = []
@@ -209,13 +209,13 @@ class Paletable():
     #       properly for the dynamic sql generation
     #
     # ---------------------------------------------------------------------------------
-    def _getByGroupWithAlias(self):
+    def _getByGroupWithAlias(self, alias: str = 'aa'):
         self.palet.logger.debug('Forming SQL by Groups')
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
             for column in self.by_group:
-                z += "aa." + column + new_line_comma
+                z += f"{alias}." + column + new_line_comma
             return f"{z}"
         else:
             return ''
@@ -884,13 +884,18 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _selectTimeunit(self):
+    def _selectTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
         if self.timeunit in ('year', 'partial_year'):
-            return "\tde_fil_dt as year,"
+            return f"{a}de_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                    de_fil_dt as year,
-                    month,\n"""
+            return f"""
+                {a}de_fil_dt as year,
+                {a}month,
+                """
 
     # ---------------------------------------------------------------------------------
     #
@@ -898,13 +903,17 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _groupTimeunit(self):
+    def _groupTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
         if self.timeunit == 'year':
-            return "de_fil_dt"
+            return f"{a}de_fil_dt"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                de_fil_dt,
-                month
+            return f"""
+                {a}de_fil_dt,
+                {a}month
                 """
 
     def _sumByTypeScenario(self, df: pd.DataFrame):
