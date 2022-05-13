@@ -445,6 +445,8 @@ class Enrollment(Paletable):
         return []
 
     # ---------------------------------------------------------------------------------
+    #
+    #
     # Used in _percentChange to enure marked columns for mdcd_pct and chip_pct are included
     # in the sort and order commands.
     # ---------------------------------------------------------------------------------
@@ -455,74 +457,85 @@ class Enrollment(Paletable):
         return indicators
 
     # ---------------------------------------------------------------------------------
+    #
+    #
     # _getTimeunitBreakdown
     # This function is used to dynamically generate the SQL statement by returning the
     # selected timeunit. e.g. byMonth() or byYear()
+    #
+    #
     # ---------------------------------------------------------------------------------
     def _getTimeUnitBreakdown(self):
-        from palet.EnrollmentType import EnrollmentType
-        from palet.CoverageType import CoverageType
-        from palet.EligibilityType import EligibilityType
+        # from palet.EnrollmentType import EnrollmentType
+        # from palet.CoverageType import CoverageType
+        # from palet.EligibilityType import EligibilityType
 
         breakdown = Enrollment.timeunit.breakdown[self.timeunit]
 
+        series_00 = []
+        series_01 = []
+        series_02 = []
+        series_03 = []
+        series_04 = []
+        series_05 = []
+        series_06 = []
+        series_07 = []
+        series_08 = []
+        series_09 = []
+        series_10 = []
+        series_11 = []
+        aliases = []
+        aggregates = []
+
         if (len(self.derived_by_type_group)) > 0:
             for column in self.derived_by_type_group:
-                if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-                    return breakdown.format(
-                        'aa.' + EnrollmentType.cols[0] + ',',
-                        'aa.' + EnrollmentType.cols[1] + ',',
-                        'aa.' + EnrollmentType.cols[2] + ',',
-                        'aa.' + EnrollmentType.cols[3] + ',',
-                        'aa.' + EnrollmentType.cols[4] + ',',
-                        'aa.' + EnrollmentType.cols[5] + ',',
-                        'aa.' + EnrollmentType.cols[6] + ',',
-                        'aa.' + EnrollmentType.cols[7] + ',',
-                        'aa.' + EnrollmentType.cols[8] + ',',
-                        'aa.' + EnrollmentType.cols[9] + ',',
-                        'aa.' + EnrollmentType.cols[10] + ',',
-                        'aa.' + EnrollmentType.cols[11] + ',',
-                        EnrollmentType.alias + ',',
-                        EnrollmentType.aggregate('aa') + ','
-                        )
 
-                elif str(column) == "<class 'palet.CoverageType.CoverageType'>":
-                    return breakdown.format(
-                        'aa.' + CoverageType.cols[0] + ',',
-                        'aa.' + CoverageType.cols[1] + ',',
-                        'aa.' + CoverageType.cols[2] + ',',
-                        'aa.' + CoverageType.cols[3] + ',',
-                        'aa.' + CoverageType.cols[4] + ',',
-                        'aa.' + CoverageType.cols[5] + ',',
-                        'aa.' + CoverageType.cols[6] + ',',
-                        'aa.' + CoverageType.cols[7] + ',',
-                        'aa.' + CoverageType.cols[8] + ',',
-                        'aa.' + CoverageType.cols[9] + ',',
-                        'aa.' + CoverageType.cols[10] + ',',
-                        'aa.' + CoverageType.cols[11] + ',',
-                        CoverageType.alias + ',',
-                        CoverageType.aggregate('aa') + ','
-                        )
-                elif str(column) == "<class 'palet.EligibilityType.EligibilityType'>":
-                    return breakdown.format(
-                        'aa.' + EligibilityType.cols[0] + ',',
-                        'aa.' + EligibilityType.cols[1] + ',',
-                        'aa.' + EligibilityType.cols[2] + ',',
-                        'aa.' + EligibilityType.cols[3] + ',',
-                        'aa.' + EligibilityType.cols[4] + ',',
-                        'aa.' + EligibilityType.cols[5] + ',',
-                        'aa.' + EligibilityType.cols[6] + ',',
-                        'aa.' + EligibilityType.cols[7] + ',',
-                        'aa.' + EligibilityType.cols[8] + ',',
-                        'aa.' + EligibilityType.cols[9] + ',',
-                        'aa.' + EligibilityType.cols[10] + ',',
-                        'aa.' + EligibilityType.cols[11] + ',',
-                        EligibilityType.alias + ',',
-                        EligibilityType.aggregate('aa') + ','
-                        )
+                # <class 'palet.EnrollmentType.EnrollmentType'>
+                # <class 'palet.EligibilityType.EligibilityType'>
+                # <class 'palet.CoverageType.CoverageType'>
+                series_00.append('aa.{0}'.format(column.cols[0]))
+                series_01.append('aa.{0}'.format(column.cols[1]))
+                series_02.append('aa.{0}'.format(column.cols[2]))
+                series_03.append('aa.{0}'.format(column.cols[3]))
+                series_04.append('aa.{0}'.format(column.cols[4]))
+                series_05.append('aa.{0}'.format(column.cols[5]))
+                series_06.append('aa.{0}'.format(column.cols[6]))
+                series_07.append('aa.{0}'.format(column.cols[7]))
+                series_08.append('aa.{0}'.format(column.cols[8]))
+                series_09.append('aa.{0}'.format(column.cols[9]))
+                series_10.append('aa.{0}'.format(column.cols[10]))
+                series_11.append('aa.{0}'.format(column.cols[11]))
+
+                aliases.append(column.alias)
+                aggregates.append(column.aggregate('aa'))
+
+            z = breakdown.format(
+                 ', '.join(series_00) + ',',
+                 ', '.join(series_01) + ',',
+                 ', '.join(series_02) + ',',
+                 ', '.join(series_03) + ',',
+                 ', '.join(series_04) + ',',
+                 ', '.join(series_05) + ',',
+                 ', '.join(series_06) + ',',
+                 ', '.join(series_07) + ',',
+                 ', '.join(series_08) + ',',
+                 ', '.join(series_09) + ',',
+                 ', '.join(series_10) + ',',
+                 ', '.join(series_11) + ',',
+                 ', '.join(aliases) + ',',
+                 ', '.join(aggregates) + ',')
+
+            return z
 
         return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '', '')
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self, cull_type: dict):
         from palet.EnrollmentType import EnrollmentType
         from palet.CoverageType import CoverageType
