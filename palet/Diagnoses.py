@@ -44,10 +44,13 @@ class Diagnoses:
                       'dgns_2_cd'
                       ]
 
+    prescription = [' 0 ']
+
     link_key = {
         ServiceCategory.inpatient: 'ip_link_key',
         ServiceCategory.other_services: 'ot_link_key',
-        ServiceCategory.long_term: 'lt_link_key'
+        ServiceCategory.long_term: 'lt_link_key',
+        ServiceCategory.prescription: 'rx_link_key'
     }
 
     # -------------------------------------------------------
