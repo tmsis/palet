@@ -14,7 +14,7 @@ from palet.DateDimension import DateDimension
 #
 #
 # -------------------------------------------------------
-class Readmits:
+class Cost:
 
     # -------------------------------------------------------
     #
@@ -22,7 +22,6 @@ class Readmits:
     #
     # -------------------------------------------------------
     def __init__(self):
-        self.days = 30
         self.join_sql = ''
         self.callback = None
         self.alias = None
@@ -55,8 +54,8 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_edge_ip = f"""
-            create or replace temporary view palet_readmits_edge_ip as
+        self.palet_admits_edge_ip = f"""
+            create or replace temporary view palet_admits_edge_ip as
             select distinct
                 'IP' as svc_cat
                 ,submtg_state_cd
@@ -65,6 +64,7 @@ class Readmits:
                 ,blg_prvdr_num
                 ,coalesce(dschrg_dt, srvc_endg_dt_drvd) as dschrg_dt
                 ,ptnt_stus_cd
+                ,tot_alowd_amt
             from
                 taf.taf_iph
             where
@@ -83,8 +83,8 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_edge_lt = f"""
-            create or replace temporary view palet_readmits_edge_lt as
+        self.palet_admits_edge_lt = f"""
+            create or replace temporary view palet_admits_edge_lt as
             select distinct
                 'LT' as svc_cat
                 ,submtg_state_cd
@@ -95,6 +95,7 @@ class Readmits:
                 ,srvc_bgnng_dt
                 ,srvc_endg_dt
                 ,ptnt_stus_cd
+                ,tot_alowd_amt
             from
                 taf.taf_lth
             where
@@ -115,14 +116,15 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_edge = """
-            create or replace temporary view palet_readmits_edge as
+        self.palet_admits_edge = """
+            create or replace temporary view palet_admits_edge as
             select distinct
                  svc_cat
                 ,submtg_state_cd
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
+                ,tot_alowd_amt
             from (
                 select distinct
                      svc_cat
@@ -130,8 +132,9 @@ class Readmits:
                     ,msis_ident_num
                     ,blg_prvdr_num
                     ,admsn_dt
+                    ,tot_alowd_amt
                 from
-                    palet_readmits_edge_ip
+                    palet_admits_edge_ip
             )
             union all (
                 select distinct
@@ -140,8 +143,9 @@ class Readmits:
                     ,msis_ident_num
                     ,blg_prvdr_num
                     ,admsn_dt
+                    ,tot_alowd_amt
                 from
-                    palet_readmits_edge_lt
+                    palet_admits_edge_lt
             )
             order by
                  svc_cat
@@ -156,8 +160,8 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_edge_x_ip_lt = """
-            create or replace temporary view palet_readmits_edge_x_ip_lt as
+        self.palet_admits_edge_x_ip_lt = """
+            create or replace temporary view palet_admits_edge_x_ip_lt as
             select distinct
                  e.submtg_state_cd
                 ,e.msis_ident_num
@@ -170,21 +174,22 @@ class Readmits:
                 ,e.admsn_dt as admit
                 ,coalesce(ip.dschrg_dt, lt.dschrg_dt, lt.srvc_endg_dt) as discharge
                 ,coalesce(ip.ptnt_stus_cd, lt.ptnt_stus_cd) as ptnt_stus_cd
+                ,(coalesce(ip.tot_alowd_amt,0) + coalesce(lt.tot_alowd_amt,0)) as tot_alowd_amt
             from
-                palet_readmits_edge as e
+                palet_admits_edge as e
             left join
-                palet_readmits_edge_ip as ip
+                palet_admits_edge_ip as ip
                 on      e.msis_ident_num = ip.msis_ident_num
                     and e.blg_prvdr_num = ip.blg_prvdr_num
                     and e.admsn_dt = ip.admsn_dt
             left join
-                palet_readmits_edge_lt as lt
+                palet_admits_edge_lt as lt
                 on
                         e.msis_ident_num = lt.msis_ident_num
                     and e.blg_prvdr_num = lt.blg_prvdr_num
                     and e.admsn_dt = lt.admsn_dt
             order by
-                e.submtg_state_cd
+                 e.submtg_state_cd
                 ,e.msis_ident_num
                 ,admit
                 ,discharge
@@ -195,16 +200,17 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_discharge = """
-            create or replace temporary view palet_readmits_discharge as
+        self.palet_admits_discharge = """
+            create or replace temporary view palet_admits_discharge as
             select
                  submtg_state_cd
                 ,msis_ident_num
                 ,admit
                 ,max(discharge) as discharge
                 ,ptnt_stus_cd
+                ,sum(tot_alowd_amt) as tot_alowd_amt
             from
-                palet_readmits_edge_x_ip_lt
+                palet_admits_edge_x_ip_lt
             group by
                  submtg_state_cd
                 ,msis_ident_num
@@ -222,8 +228,8 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_segments = """
-            create or replace temporary view palet_readmits_segments as
+        self.palet_admits_segments = """
+            create or replace temporary view palet_admits_segments as
             select
                  submtg_state_cd
                 ,msis_ident_num
@@ -274,7 +280,7 @@ class Readmits:
                 ,ptnt_stus_cd
                 ,tot_alowd_amt
             from
-                palet_readmits_discharge
+                palet_admits_discharge
             order by
                  submtg_state_cd
                 ,msis_ident_num
@@ -287,8 +293,8 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_continuity = """
-            create or replace temporary view palet_readmits_continuity as
+        self.palet_admits_continuity = """
+            create or replace temporary view palet_admits_continuity as
             select
                  submtg_state_cd
                 ,msis_ident_num
@@ -314,7 +320,7 @@ class Readmits:
                     else discharge end as discharge
                     ,tot_alowd_amt
             from
-                palet_readmits_segments
+                palet_admits_segments
             order by
                  submtg_state_cd
                 ,msis_ident_num
@@ -327,29 +333,24 @@ class Readmits:
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits = f"""
-            create or replace temporary view palet_readmits as
-            select distinct 
-                 submtg_state_cd
-                ,msis_ident_num
-                ,year(admit) as year
-                ,month(admit) as month
-                ,1 as admit_ind
-                ,case when (datediff(lead(admit) over (
-                    partition by
-                        submtg_state_cd
-                        ,msis_ident_num
-                    order by
-                        submtg_state_cd
-                        ,msis_ident_num
-                ), discharge) <= 30) then 1 else 0 end as readmit_ind
-            from 
-                palet_readmits_continuity
+        self.palet_admits = """
+            create or replace temporary view palet_admits as
+            select
+                submtg_state_cd,
+                msis_ident_num,
+                admit,
+                min(1) as units,
+                sum(tot_alowd_amt) as tot_alowd_amt
+            from
+                palet_admits_continuity
+            group by
+                submtg_state_cd,
+                msis_ident_num,
+                admit
             order by
                 submtg_state_cd,
                 msis_ident_num,
-                year,
-                month
+                admit
         """
 
     # -------------------------------------------------------
@@ -357,13 +358,14 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    def calculate_rate(self):
-        calculate_rate = f"""
-        sum({self.alias}.is_admit) as admits,
-        sum({self.alias}.is_readmit) as readmits,
-        sum({self.alias}.is_readmit) / sum({self.alias}.is_admit) as readmit_rate,
-        """
-        return calculate_rate
+    def calculate(self):
+
+        pmpm = f"""
+            sum({self.alias}.allowed) / sum(bb.mdcd_enrollment) as mdcd_pmpm,
+            sum({self.alias}.allowed) / sum(bb.chip_enrollment) as chip_pmpm,
+            """
+
+        return pmpm
 
     # -------------------------------------------------------
     #
@@ -371,52 +373,45 @@ class Readmits:
     #
     # -------------------------------------------------------
     @staticmethod
-    def allcause(days):
+    def inpatient():
 
-        o = Readmits()
+        o = Cost()
         o.init()
-        o.days = days
 
         spark = SparkSession.getActiveSession()
         if spark is not None:
 
-            spark.sql(o.palet_readmits_edge_ip)
-            spark.sql(o.palet_readmits_edge_lt)
-            spark.sql(o.palet_readmits_edge)
-            spark.sql(o.palet_readmits_edge_x_ip_lt)
-            spark.sql(o.palet_readmits_discharge)
-            spark.sql(o.palet_readmits_segments)
-            spark.sql(o.palet_readmits_continuity)
-            spark.sql(o.palet_readmits)
+            spark.sql(o.palet_admits_edge_ip)
+            spark.sql(o.palet_admits_edge_lt)
+            spark.sql(o.palet_admits_edge)
+            spark.sql(o.palet_admits_edge_x_ip_lt)
+            spark.sql(o.palet_admits_discharge)
+            spark.sql(o.palet_admits_segments)
+            spark.sql(o.palet_admits_continuity)
+            spark.sql(o.palet_admits)
 
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
         z = """(
                 select
-                    submtg_state_cd
-                    ,year
-                    ,month
-                    ,sum(readmit_ind) as is_admit
-                    ,sum(admit_ind) as is_readmit
+                    submtg_state_cd,
+                    year(admit) as year,
+                    month(admit) as month,
+                    sum(units) as units,
+                    sum(tot_alowd_amt) as allowed
                 from
-                    palet_readmitss
+                    palet_admits
                 group by
-                    submtg_state_cd
-                    ,year
-                    ,month
+                    submtg_state_cd,
+                    year,
+                    month
                 order by
-                    submtg_state_cd
-                    ,year
-                    ,month
+                    submtg_state_cd,
+                    year,
+                    month
                 )
             """
-
-        # sql = f"""{z} as {alias}
-        #     on     aa.submtg_state_cd = {alias}.submtg_state_cd
-        #        and aa.msis_ident_num = {alias}.msis_ident_num
-        #        and aa.de_fil_dt  = {alias}.year
-        #        and month = {alias}.month"""
 
         sql = f"""
             left join
