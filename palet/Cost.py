@@ -25,6 +25,7 @@ class Cost:
         self.join_sql = ''
         self.callback = None
         self.alias = None
+        self.date_dimension = DateDimension.getInstance()
 
     # -------------------------------------------------------
     #
@@ -68,7 +69,7 @@ class Cost:
             from
                 taf.taf_iph
             where
-                da_run_id in ( {  DateDimension().relevant_runids('IPH') } )
+                da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
                 and clm_type_cd in (1, 3)
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
@@ -99,7 +100,7 @@ class Cost:
             from
                 taf.taf_lth
             where
-                da_run_id in ( { DateDimension().relevant_runids('LTH') } )
+                da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
                 and clm_type_cd in (1, 3)
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
@@ -295,7 +296,7 @@ class Cost:
         # -------------------------------------------------------
         self.palet_admits_continuity = """
             create or replace temporary view palet_admits_continuity as
-            select
+            select distinct
                  submtg_state_cd
                 ,msis_ident_num
                 ,case when carry = 1 then min(admit) over (
@@ -353,6 +354,30 @@ class Cost:
                 admit
         """
 
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_admits_summary = """
+            select
+                submtg_state_cd,
+                year(admit) as year,
+                month(admit) as month,
+                sum(units) as units,
+                sum(tot_alowd_amt) as allowed
+            from
+                palet_admits
+            group by
+                submtg_state_cd,
+                year,
+                month
+            order by
+                submtg_state_cd,
+                year,
+                month
+        """
+
     # -------------------------------------------------------
     #
     #
@@ -373,9 +398,11 @@ class Cost:
     #
     # -------------------------------------------------------
     @staticmethod
-    def inpatient():
+    def inpatient(date_dimension: DateDimension = None):
 
         o = Cost()
+        if date_dimension is not None:
+            o.date_dimension = date_dimension
         o.init()
 
         spark = SparkSession.getActiveSession()
@@ -393,35 +420,15 @@ class Cost:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        z = """(
-                select
-                    submtg_state_cd,
-                    year(admit) as year,
-                    month(admit) as month,
-                    sum(units) as units,
-                    sum(tot_alowd_amt) as allowed
-                from
-                    palet_admits
-                group by
-                    submtg_state_cd,
-                    year,
-                    month
-                order by
-                    submtg_state_cd,
-                    year,
-                    month
-                )
-            """
-
         sql = f"""
             left join
-                {z} as {alias}
+                ({o.palet_admits_summary}) as {alias}
                 on      bb.submtg_state_cd = {alias}.submtg_state_cd
                     and bb.de_fil_dt  = {alias}.year
                     and bb.month = {alias}.month"""
 
         o.join_sql = sql
         o.alias = alias
-        o.callback = o.calculate_rate
+        o.callback = o.calculate
 
         return o

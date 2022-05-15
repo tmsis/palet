@@ -26,6 +26,7 @@ class Readmits:
         self.join_sql = ''
         self.callback = None
         self.alias = None
+        self.date_dimension = DateDimension.getInstance()
 
     # -------------------------------------------------------
     #
@@ -68,7 +69,7 @@ class Readmits:
             from
                 taf.taf_iph
             where
-                da_run_id in ( {  DateDimension().relevant_runids('IPH') } )
+                da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
                 and clm_type_cd in (1, 3)
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
@@ -98,7 +99,7 @@ class Readmits:
             from
                 taf.taf_lth
             where
-                da_run_id in ( { DateDimension().relevant_runids('LTH') } )
+                da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
                 and clm_type_cd in (1, 3)
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
@@ -184,7 +185,7 @@ class Readmits:
                     and e.blg_prvdr_num = lt.blg_prvdr_num
                     and e.admsn_dt = lt.admsn_dt
             order by
-                e.submtg_state_cd
+                 e.submtg_state_cd
                 ,e.msis_ident_num
                 ,admit
                 ,discharge
@@ -272,7 +273,6 @@ class Readmits:
                         ,msis_ident_num
                 ), discharge) as lead_diff_days
                 ,ptnt_stus_cd
-                ,tot_alowd_amt
             from
                 palet_readmits_discharge
             order by
@@ -289,7 +289,7 @@ class Readmits:
         # -------------------------------------------------------
         self.palet_readmits_continuity = """
             create or replace temporary view palet_readmits_continuity as
-            select
+            select distinct
                  submtg_state_cd
                 ,msis_ident_num
                 ,case when carry = 1 then min(admit) over (
@@ -312,7 +312,6 @@ class Readmits:
                         ,msis_ident_num
                         ,discharge desc)
                     else discharge end as discharge
-                    ,tot_alowd_amt
             from
                 palet_readmits_segments
             order by
@@ -329,7 +328,7 @@ class Readmits:
         # -------------------------------------------------------
         self.palet_readmits = f"""
             create or replace temporary view palet_readmits as
-            select distinct 
+            select distinct
                  submtg_state_cd
                 ,msis_ident_num
                 ,year(admit) as year
@@ -342,14 +341,39 @@ class Readmits:
                     order by
                         submtg_state_cd
                         ,msis_ident_num
-                ), discharge) <= 30) then 1 else 0 end as readmit_ind
-            from 
+                ), discharge) <= {self.days}) then 1 else 0 end as readmit_ind
+            from
                 palet_readmits_continuity
             order by
                 submtg_state_cd,
                 msis_ident_num,
                 year,
                 month
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_summary = f"""
+            select
+                 submtg_state_cd
+                ,year
+                ,month
+                ,sum(readmit_ind) as has_readmit
+                ,sum(admit_ind) as has_admit
+                ,sum(readmit_ind) / sum(admit_ind) as readmit_rate
+            from
+                palet_readmits
+            group by
+                 submtg_state_cd
+                ,year
+                ,month
+            order by
+                 submtg_state_cd
+                ,year
+                ,month
         """
 
     # -------------------------------------------------------
@@ -359,9 +383,9 @@ class Readmits:
     # -------------------------------------------------------
     def calculate_rate(self):
         calculate_rate = f"""
-        sum({self.alias}.is_admit) as admits,
-        sum({self.alias}.is_readmit) as readmits,
-        sum({self.alias}.is_readmit) / sum({self.alias}.is_admit) as readmit_rate,
+        sum({self.alias}.has_readmit) as readmits,
+        sum({self.alias}.has_admit) as admits,
+        sum({self.alias}.has_readmit) / sum({self.alias}.has_admit) as readmit_rate,
         """
         return calculate_rate
 
@@ -371,9 +395,11 @@ class Readmits:
     #
     # -------------------------------------------------------
     @staticmethod
-    def allcause(days):
+    def allcause(days, date_dimension: DateDimension = None):
 
         o = Readmits()
+        if date_dimension is not None:
+            o.date_dimension = date_dimension
         o.init()
         o.days = days
 
@@ -392,26 +418,6 @@ class Readmits:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        z = """(
-                select
-                    submtg_state_cd
-                    ,year
-                    ,month
-                    ,sum(readmit_ind) as is_admit
-                    ,sum(admit_ind) as is_readmit
-                from
-                    palet_readmitss
-                group by
-                    submtg_state_cd
-                    ,year
-                    ,month
-                order by
-                    submtg_state_cd
-                    ,year
-                    ,month
-                )
-            """
-
         # sql = f"""{z} as {alias}
         #     on     aa.submtg_state_cd = {alias}.submtg_state_cd
         #        and aa.msis_ident_num = {alias}.msis_ident_num
@@ -420,7 +426,7 @@ class Readmits:
 
         sql = f"""
             left join
-                {z} as {alias}
+                ({o.palet_readmits_summary}) as {alias}
                 on      bb.submtg_state_cd = {alias}.submtg_state_cd
                     and bb.de_fil_dt  = {alias}.year
                     and bb.month = {alias}.month"""
