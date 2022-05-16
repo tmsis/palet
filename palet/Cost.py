@@ -386,6 +386,7 @@ class Cost:
     def calculate(self):
 
         pmpm = f"""
+            sum({self.alias}.allowed) as total_allowed_amt,
             sum({self.alias}.allowed) / sum(bb.mdcd_enrollment) as mdcd_pmpm,
             sum({self.alias}.allowed) / sum(bb.chip_enrollment) as chip_pmpm,
             """
