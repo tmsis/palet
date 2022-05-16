@@ -27,7 +27,7 @@ class Palet:
     """
     __instance = None
     PERFORMANCE = 15
-    RELEASE = 100
+    RELEASE = 11
 
     def __new__(cls):
         from datetime import datetime
@@ -375,6 +375,10 @@ class Palet:
             import pickle
             aliases: dict = pickle.load(filename, 'rb')
             return aliases
+
+        @staticmethod
+        def sql_formatter():
+            pass
 
 
 # -------------------------------------------------------------------------------------

@@ -35,6 +35,7 @@ class PaletMetadata:
         fileDate = 'DE_FIL_DT'
         type = 'chip_cd_01'
         derived_enrollment_field = 'enrollment_type'
+        month = 'month'
 
         chip_cd_mon = ['chip_cd_01',
                        'chip_cd_02',
@@ -518,6 +519,70 @@ class PaletMetadata:
             '80': "Integrated Care for Dual Eligibles"
             }
 
+    class Claims:
+        ptnt_stus_cd = "ptnt_stus_cd"
+        patient_status_values = {
+            "01": "Discharged to home/self-care (routine charge).",
+            "02": "Discharged/transferred to other short term general hospital for inpatient care. ",
+            "03": "Discharged/transferred to skilled nursing facility (SNF) with Medicare certification in anticipation of covered skilled care -- \
+                  (For hospitals with an approved swing bed arrangement, use Code 61 swing bed. For reporting discharges/transfers \
+                  to a noncertified SNF, the hospital must use Code 04 - ICF. ",
+            "04": "Discharged/transferred to intermediate care facility (ICF). ",
+            "05": "Discharged/transferred to another type of institution for inpatient care (including distinct parts). ",
+            "06": "Discharged/transferred to home care of organized home health service organization. ",
+            "07": "Left against medical advice or discontinued care. ",
+            "08": "Discharged/transferred to home under care of a home IV drug therapy provider. ",
+            "09": "Admitted as an inpatient to this hospital. In situations where a patient is admitted before midnight of the third day \
+                  following the day of an outpatient service, the outpatient services are considered inpatient. ",
+            "20": "Expired (patient did not recover).",
+            "21": "Discharged/transferred to court/law enforcement.",
+            "30": "Still patient. ",
+            "40": "Expired at home (hospice claims only). ",
+            "41": "Expired in a medical facility such as hospital, SNF, ICF, or freestanding hospice. (Hospice claims only). ",
+            "42": "Expired - place unknown (Hospice claims only). ",
+            "43": "Discharged/transferred to a federal hospital. ",
+            "50": "Discharged/transferred to a Hospice - home. ",
+            "51": "Discharged/transferred to a Hospice - medical facility. ",
+            "61": "Discharged/transferred within this institution to a hospital-based Medicare approved swing bed. ",
+            "62": "Discharged/transferred to an inpatient rehabilitation facility including distinct parts units of a hospital.",
+            "63": "Discharged/transferred to a long term care hospital. ",
+            "64": "Discharged/transferred to a nursing facility certified under Medicaid but not under Medicare. ",
+            "65": "Discharged/Transferred to a psychiatric hospital or psychiatric distinct unit of a hospital \
+                  (these types of hospitals were pulled from patient/discharge status code '05' and given their own code). ",
+            "66": "Discharged/transferred to a Critical Access Hospital (CAH) ",
+            "69": "Discharged/transferred to a designated disaster alternative care site (starting 10/2013; applies only to particular MS-DRGs*). ",
+            "70": "Discharged/transferred to another type of health care institution not defined elsewhere in code list. ",
+            "71": "Discharged/transferred/referred to another institution for outpatient services as specified by the discharge plan of care (eff. 9/01) \
+                  (discontinued effective 10/1/05)",
+            "72": "Discharged/transferred/referred to this institution for outpatient services as specified by the discharge plan of care (eff. 9/01) \
+                  (discontinued effective 10/1/05) The following codes apply only to particular MS-DRGs*, and were new in 10/2013:",
+            "81": "Discharged to home or self-care with a planned acute care hospital inpatient readmission. ",
+            "82": "Discharged/transferred to a short term general hospital for inpatient care with a planned acute care hospital inpatient readmission. ",
+            "83": "Discharged/transferred to a skilled nursing facility (SNF) with Medicare certification with a planned \
+                  acute care hospital inpatient readmission. ",
+            "84": "Discharged/transferred to a facility that provides custodial or supportive care with a planned acute care hospital inpatient readmission. ",
+            "85": "Discharged/transferred to a designated cancer center or children's hospital with a planned acute care hospital inpatient readmission. ",
+            "86": "Discharged/transferred to home under care of organized home health service organization with a planned \
+                  acute care hospital inpatient readmission. ",
+            "87": "Discharged/transferred to court/law enforcement with a planned acute care hospital inpatient readmission. ",
+            "88": "Discharged/transferred to a federal health care facility with a planned acute care hospital inpatient readmission. ",
+            "89": "Discharged/transferred to a hospital-based Medicare approved swing bed with a planned acute care hospital inpatient readmission. ",
+            "90": "Discharged/transferred to an inpatient rehabilitation facility (IRF) including rehabilitation distinct part units of a hospital with a planned \
+                  acute care hospital inpatient readmission. ",
+            "91": "Discharged/transferred to a Medicare certified long term care hospital (LTCH) with a planned acute care hospital inpatient readmission. ",
+            "92": "Discharged/transferred to a nursing facility certified under Medicaid but not certified under Medicare with a planned \
+                  acute care hospital inpatient readmission. ",
+            "93": "Discharged/transferred to a psychiatric distinct part unit of a hospital with a planned acute care hospital inpatient readmission. ",
+            "94": "Discharged/transferred to a critical access hospital (CAH) with a planned acute care hospital inpatient readmission.",
+            "95": "Discharged/transferred to another type of health care institution not defined elsewhere in this code list with a planned \
+                  acute care hospital inpatient readmission. Null/missing : source value is missing or unknown *MS-DRG codes where \
+                  additional codes were available in October 2013 ",
+            "280": "(Acute Myocardial Infarction, Discharged Alive with MCC) ",
+            "281": "(Acute Myocardial Infarction, Discharged Alive with CC)",
+            "282": "(Acute Myocardial Infarction, Discharged Alive without CC/MCC) ",
+            "789": "(Neonates, Died or Transferred to Another Acute Care Facility)"
+        }
+
     class Member():
         """
         The Member class is a subclass of PaletMetadata. This class primaryily assigns more readable
@@ -531,7 +596,15 @@ class PaletMetadata:
         service_category = {
             ServiceCategory.inpatient: "data_anltcs_taf_iph_vw",
             ServiceCategory.long_term: "data_anltcs_taf_lth_vw",
-            ServiceCategory.other_services: "data_anltcs_taf_oth_vw"
+            ServiceCategory.other_services: "data_anltcs_taf_oth_vw",
+            ServiceCategory.prescription: "data_anltcs_taf_rxh_vw"
+        }
+
+        reverse_service_category = {
+            "data_anltcs_taf_iph_vw": ServiceCategory.inpatient,
+            "data_anltcs_taf_lth_vw": ServiceCategory.long_term,
+            "data_anltcs_taf_oth_vw": ServiceCategory.other_services,
+            "data_anltcs_taf_rxh_vw": ServiceCategory.prescription
         }
 
         run_id_file = {
@@ -541,10 +614,21 @@ class PaletMetadata:
             ServiceCategory.prescription: 'RXH'
         }
 
+    class Specialty():
+        ud_const = {
+            "gender": "GNDR_CD",
+            "age": "age_num",
+            "group_cd": "elgblty_grp_cd",
+            "restricted_cd": "rstrctd_bnfts_cd",
+            "year": "year",
+            "month": "month"
+
+        }
+
     class Enrichment():
         """
         The Enrichment class is responsible for decorating and enhancing DataFrames created by PALET. This class consists of a series of backend
-        functions that build out additional columns, include user defined values, and more. 
+        functions that build out additional columns, include user defined values, and more.
 
         Note:
             Enrichment is not directly interacted with by analysts and consists solely of back end functions. See the source code for more information.
@@ -563,9 +647,9 @@ class PaletMetadata:
         @staticmethod
         def _checkForHelperMsg(field, field_type, value_example: str):
 
-            if type(field) != field_type:
-                PaletMetadata.Enrichment._getPaletObj().logger.warn(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
-                                                                               + " e.g. " + value_example)
+            if type(field) != field_type and field is not None:
+                PaletMetadata.Enrichment._getPaletObj().logger.error(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
+                                                                                + " e.g. " + value_example)
                 return ",'n/a' as " + str(field)
 
         def getDefinedColumns(self):
@@ -580,6 +664,7 @@ class PaletMetadata:
                 'incm_cd': PaletMetadata.Enrichment._buildIncomeColumn,
                 'age_band': PaletMetadata.Enrichment._removeAgeBandNotFound,
                 'coverage_type': PaletMetadata.Enrichment._buildValueColumn,
+                'ptnt_stus_cd': PaletMetadata.Enrichment._buildPatientStatusColumn,
                 'isfirst': PaletMetadata.Enrichment._removeIsFirst
             }
 
@@ -689,6 +774,32 @@ class PaletMetadata:
             # self.palet.logger.debug('build our columns by looking for ethncty_cd')
             print("calling build race ethnicity")
             df['ethnicity'] = df.apply(lambda x: PaletMetadata.Enrichment._findEthnicityValueName(x), axis=1)
+
+            return df
+
+        # --------------------------------------------------------------------------------
+        #
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _findPatientStatusValues(x):
+            # self.palet.logger.debug('looking up the ethncty_cd value from our metadata')
+            # get this row's ref value from the column by name
+            y = x[PaletMetadata.Claims.ptnt_stus_cd]
+            # lookup label with value
+            return PaletMetadata.Claims.patient_status_values.get(y)
+
+        # ---------------------------------------------------------------------------------
+        #
+        #
+        #
+        #
+        # ---------------------------------------------------------------------------------
+        def _buildPatientStatusColumn(df: pd.DataFrame):
+            # self.palet.logger.debug('build our columns by looking for ethncty_cd')
+            print("calling build patient status column")
+            df['patient_status'] = df.apply(lambda x: PaletMetadata.Enrichment._findPatientStatusValues(x), axis=1)
 
             return df
 

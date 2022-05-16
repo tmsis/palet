@@ -245,7 +245,7 @@ class Eligibility(Paletable):
                     from
                         taf.taf_ann_de_base as aa
                     where
-                        da_run_id in ( {self.date_dimension.relevant_runids('BSE', 1)} )
+                        da_run_id in ( {self.date_dimension.relevant_runids('BSE')} )
                     group by
                         submtg_state_cd,
                         de_fil_dt,
@@ -281,7 +281,7 @@ class Eligibility(Paletable):
                         from
                             taf.taf_ann_de_base as aa
                         where
-                            aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE', 6)} ) and
+                            aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE')} ) and
                             {self._defineWhereClause()}
                         group by
                             {self._getByGroupWithAlias()}

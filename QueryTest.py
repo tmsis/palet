@@ -2,13 +2,8 @@
 # use it as you will.
 # TODO: Refactor to have automated testing for breakage
 
-from palet.Coverage import Coverage
-from palet.Eligibility import Eligibility
-from palet.Trend import Trend
 from palet.Enrollment import Enrollment
-# from palet.State import State
-from palet.Palet import Palet
-from palet.PaletMetadata import PaletMetadata
+
 
 # print(PaletMetadata.Enrollment.raceEthnicity.race_ethncty_flag[1])
 # # t = Trend().byMonth()
@@ -28,6 +23,6 @@ from palet.PaletMetadata import PaletMetadata
 
 # print(StateHelper.displayValues())
 # .byState('37').byEthnicity('01').byAgeRange('18-21').byGender('F')
-
-api = Coverage().byType()
-api.sql()
+api = Enrollment()
+api = Enrollment().byCoverageType(['01']).byYear(['2019']).byMonth(['04'])
+print(api.sql())

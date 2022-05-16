@@ -44,10 +44,13 @@ class Diagnoses:
                       'dgns_2_cd'
                       ]
 
+    prescription = [' 0 ']
+
     link_key = {
         ServiceCategory.inpatient: 'ip_link_key',
         ServiceCategory.other_services: 'ot_link_key',
-        ServiceCategory.long_term: 'lt_link_key'
+        ServiceCategory.long_term: 'lt_link_key',
+        ServiceCategory.prescription: 'rx_link_key'
     }
 
     # -------------------------------------------------------
@@ -55,11 +58,13 @@ class Diagnoses:
     #
     #
     # -------------------------------------------------------
-    def __init__(self, service_categories: list, diagnoses: list, service_category: ServiceCategory = None):
+    def __init__(self, service_categories: list = [], diagnoses: list = []):
+        self.join_sql = ''
+        self.callback = None
+        self.alias = None
 
         self.service_categories = service_categories
         self.diagnoses = diagnoses
-        self.service_category = service_category
 
     # -------------------------------------------------------
     #
@@ -67,7 +72,7 @@ class Diagnoses:
     #
     # -------------------------------------------------------
     def sql(self):
-        return Diagnoses.within(self.service_categories, self.diagnoses)
+        return self.join_sql
 
     # -------------------------------------------------------
     #
@@ -76,6 +81,14 @@ class Diagnoses:
     # -------------------------------------------------------
     def __str__(self):
         return self.sql()
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def calculated_fields(self):
+        return ''  # noop
 
     # -------------------------------------------------------
     #
@@ -109,7 +122,8 @@ class Diagnoses:
     @staticmethod
     def where(service_category: ServiceCategory, diagnoses: list, lookback: int = 6):
         """
-        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. Unlike the :meth:`~Diagnoses.Diagnoses.within`
+        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
+        Unlike the :meth:`~Diagnoses.Diagnoses.within`
         This method is specifically for filtering by a single chronic conditions.
         This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
 
@@ -151,7 +165,7 @@ class Diagnoses:
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        return f"""
+        sql = f"""
             (
                 select distinct
                     submtg_state_cd,
@@ -169,6 +183,12 @@ class Diagnoses:
                    aa.msis_ident_num = {alias}.msis_ident_num
         """
 
+        o = Diagnoses([service_category], diagnoses=diagnoses)
+        o.join_sql = sql
+        o.callback = o.calculated_fields
+
+        return o
+
     # -------------------------------------------------------
     #
     #
@@ -177,7 +197,8 @@ class Diagnoses:
     @staticmethod
     def within(service_categories: list, diagnoses: list, lookback: int = 6):
         """
-        The static method within() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. Unlike the :meth:`~Diagnoses.Diagnoses.where`
+        The static method within() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`.
+        Unlike the :meth:`~Diagnoses.Diagnoses.where`
         This method is specifically for filtering by multiple chronic conditions.
         This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
 
@@ -239,35 +260,43 @@ class Diagnoses:
 
         capture = []
 
-        # TODO: { self.date_dimension.relevant_runids('BSE', 6) }
+        if type(service_categories) is str:
+            service_categories = [service_categories]
 
         for svc in service_categories:
-
-            service_category = svc[0]
+            service = svc[0]
+            service_num = svc[1]
 
             capture.append(f"""
                 select distinct
                     submtg_state_cd,
                     msis_ident_num,
                     min(1) as indicator,
-                    count(distinct {Diagnoses.link_key[service_category]}) as m
+                    count(distinct {Diagnoses.link_key[service]}) as m
                 from
-                    taf.{ PaletMetadata.Member.service_category.get(service_category) }
+                    taf.{ PaletMetadata.Member.service_category.get(service) }
                 where
-                    da_run_id in ( { Diagnoses._getRunIds(service_category, lookback) } )
+                    da_run_id in ( { Diagnoses._getRunIds(service, lookback) } )
                     and (
-                        { Diagnoses._doWhere(service_category, diagnoses) }
+                        { Diagnoses._doWhere(service, diagnoses) }
                     )
                 group by
                     submtg_state_cd,
                     msis_ident_num
                 having
-                    m >= {svc[1]}
+                    m >= { service_num }
 
             """)
 
         z = '(' + '\n union all  \n'.join(capture) + ')'
 
-        return f"""{z} as {alias}
+        sql = f"""{z} as {alias}
             on aa.submtg_state_cd = {alias}.submtg_state_cd and
-               aa.msis_ident_num = {alias}.msis_ident_num"""
+               aa.msis_ident_num = {alias}.msis_ident_num """
+
+        o = Diagnoses(service_categories, diagnoses=diagnoses)
+        o.join_sql = sql
+        o.alias = alias
+        o.callback = o.calculated_fields
+
+        return o

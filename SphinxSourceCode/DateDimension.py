@@ -22,7 +22,7 @@ class DateDimension:
     # -----------------------------------------------------------------------
     #
     # -----------------------------------------------------------------------
-    def __init__(self, as_of_date: date = None, runIds: list = None):
+    def __init__(self, asOf: date = None, runIds: list = None):
         z = """
             select distinct
                 fil_4th_node_txt,
@@ -77,10 +77,10 @@ class DateDimension:
         else:
             self.df = None
 
-        if as_of_date is None:
-            as_of_date = datetime.now().replace(day=1).date()
+        if asOf is None:
+            asOf = datetime.now().replace(day=1).date()
 
-        self.as_of_date = as_of_date
+        self.asOf = asOf
 
         self.runIds = runIds
 
@@ -109,7 +109,7 @@ class DateDimension:
             >>> DateDimension().relevant_runids('BSE', 6)
         """
 
-        dt = self.as_of_date
+        dt = self.asOf
 
         if taf_file_type == 'BSE':
             if self.runIds is not None:
@@ -119,7 +119,7 @@ class DateDimension:
             dt = dt - relativedelta(months=lookback)
 
         if self.df is not None:
-            rids = self.df[(self.df['dt_yearmon'] >= dt) & (self.df['dt_yearmon'] <= self.as_of_date) &
+            rids = self.df[(self.df['dt_yearmon'] >= dt) & (self.df['dt_yearmon'] <= self.asOf) &
                                                            (self.df['fil_4th_node_txt'] == taf_file_type)]['da_run_id']
 
         else:

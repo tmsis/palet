@@ -9,6 +9,7 @@ import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
 from palet.PaletMetadata import PaletMetadata
+from datetime import date
 
 
 class Paletable():
@@ -33,6 +34,7 @@ class Paletable():
 
         >>> e.fetch()
 
+
     """
 
     # Initialize the comann variables here.
@@ -43,7 +45,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def __init__(self, runIds: list = None):
+    def __init__(self, asOf: date = None, runIds: list = None):
 
         self.timeunit = None
         self.by_group = []
@@ -53,13 +55,17 @@ class Paletable():
         self.derived_by_type_group = []
         self.aggregate_group = []
 
-        self.date_dimension = DateDimension(runIds=runIds)
+        self.date_dimension = DateDimension(asOf=asOf, runIds=runIds)
 
         self.preprocesses = []
         self.postprocesses = []
 
+        self.yearmon_joins = []
+        self.calculations = []
+
         self.markers = {}
         self.having_constraints = []
+        self._outersql = {}
         self._sql = None
 
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
@@ -205,13 +211,13 @@ class Paletable():
     #       properly for the dynamic sql generation
     #
     # ---------------------------------------------------------------------------------
-    def _getByGroupWithAlias(self):
+    def _getByGroupWithAlias(self, alias: str = 'aa'):
         self.palet.logger.debug('Forming SQL by Groups')
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
             for column in self.by_group:
-                z += "aa." + column + new_line_comma
+                z += f"{alias}." + column + new_line_comma
             return f"{z}"
         else:
             return ''
@@ -252,42 +258,20 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def _defineWhereClause(self):
         self.palet.logger.debug('defining our where clause based on api calls')
-        clause = ""
         where = []
-        range_stmt = ""
 
         if len(self.filter) > 0:
             for key in self.filter:
+                _in_stmt = []
+                _join = ""
 
                 # get the value(s) in case there are multiple
                 values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
 
-                # Check for multiple values here, space separator is default
-                if str(values).find(" ") > -1:
-                    splitRange = self._checkForMultiVarFilter(values)
-                    for value in splitRange:
-                        clause = ("aa." + key, value)
-                        where.append(' ((= '.join(clause))
-
-                # Check for multiples with , separator
-                elif str(values).find(",") > -1:
-                    splitVals = self._checkForMultiVarFilter(values, ",")
-                    for values in splitVals:
-                        # check for age ranges here with the - separator
-                        if str(values).find("-") > -1:
-                            splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "aa." + key + " between " + splitRange[0] + " and " + splitRange[1]
-                        # check for greater than; i.e. x+ equals >= x
-                        elif str(values).find("+") > -1:
-                            range_stmt = "aa." + key + " >= " + values.strip("+")
-                        # take the x+ and strip out the +
-                        else:
-                            range_stmt = values.join(",")
-                        where.append(' in (' + range_stmt + ')')
-
-                else:  # else parse the single value
-                    clause = ("aa." + key, self.filter[key])
-                    where.append(' = '.join(clause))
+                _join = ",".join(_in_stmt)
+                where.append('aa.' + key + ' in (' + _join + ')')
 
             return f"{' and '.join(where)}"
 
@@ -435,7 +419,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: ethnicity})
 
         return self
 
@@ -482,7 +466,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: ethnicity})
 
         return self
 
@@ -529,7 +513,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: ethnicity})
 
         return self
 
@@ -578,16 +562,21 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.gender: gender})
 
         return self
 
+    def bySpecialtyGroup(self, **constraints):
+        for constraint, val in constraints:
+            self._addByGroup(PaletMetadata.Specialty.ud_const.get(constraint))
+            self.filter.update({PaletMetadata.Specialty.ud_const.get(constraint): val})
+
     # ---------------------------------------------------------------------------------
     #
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_cd=None):
+    def byState(self, state_cds: list = None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -609,13 +598,18 @@ class Paletable():
 
             Focus in one state, for this example Alabama:
 
-            api = Enrollment().byState('01')
+            >>> api = Enrollment().byState(['01'])
+
+            or
+
+            >>> api = Enrollment().byState(['NC'])
 
             Return the object as DataFrame:
 
             >>> display(api.fetch())
 
         """
+        _states_ = []
 
         self.palet.logger.info('adding byState to the by Group')
         if self.timeunit not in ('full', 'year', 'partial'):
@@ -623,14 +617,18 @@ class Paletable():
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_cd is not None:
-            if type(state_cd) is not int:
+        if state_cds is not None and type(state_cds) is list:
+            if type(state_cds) is not int:
                 lkup = self.palet.st_fips
-                fips = lkup[lkup['STABBREV'] == state_cd]['FIPS']
-                state_fips = fips.iloc[0]
+                for state in state_cds:
+                    fips = lkup[lkup['STABBREV'] == state]['FIPS']
+                    state_fips = fips.iloc[0]
+                    _states_.append(state_fips)
             else:
-                state_fips = state_cd
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+                _states_.extend(state_cds)
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
+        else:
+            PaletMetadata.Enrichment._checkForHelperMsg(state_cds, list, "['NC','NY', 'FL']")
 
         return self
 
@@ -639,7 +637,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, type: list = None):
+    def byCoverageType(self, types: list = None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
@@ -669,9 +667,9 @@ class Paletable():
         self.palet.logger.info('adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
-            self.filter_by_type.update({CoverageType: type})
+        if types is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
+            self.filter_by_type.update({CoverageType: types})
 
         # return Enrollment(self._user_runids, self)
         return self
@@ -681,7 +679,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, type: list = None):
+    def byEnrollmentType(self, types: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -708,9 +706,9 @@ class Paletable():
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EnrollmentType)
 
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['1', '2', '3']")
-            self.filter_by_type.update({EnrollmentType: type})
+        if types is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['1', '2', '3']")
+            self.filter_by_type.update({EnrollmentType: types})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
@@ -720,7 +718,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, type: list = None):
+    def byEligibilityType(self, types: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -747,9 +745,9 @@ class Paletable():
         self.palet.logger.info('adding EligibilityType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
-            self.filter_by_type.update({EligibilityType: type})
+        if types is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
+            self.filter_by_type.update({EligibilityType: types})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
@@ -759,55 +757,8 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byMedicaidOnly(self, state_fips=None):
-        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects
-        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this
-        will add it as the next by group.
-
-        Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code.
-            default: `none`: Change counts to focus only on Medicaid.
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-
-        Example:
-            Create Paletable object:
-
-            >>> api = Enrollment().byMedicaidOnly()
-
-            Return Paletable object as a DataFrame:
-
-            >>> display(api.fetch())
-
-        """
-
-        self.palet.logger.info('adding byMedicaidOnly to the by Group')
-
-        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
-
-        if state_fips is not None:
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
-
-        for month in PaletMetadata.Enrollment.CHIP.half1:
-            for field in month:
-                if field in self.filter:
-                    del self.filter[field]
-                    del self.by_group[field]
-            for month in PaletMetadata.Enrollment.CHIP.half2:
-                for field in month:
-                    if field in self.filter:
-                        del self.filter[field]
-                        del self.by_group[field]
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
     # This function is just returning the straight data from the table
-    def byIncomeBracket(self, bracket=None):
+    def byIncomeBracket(self, bracket: list = None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -830,10 +781,10 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-
+        PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: bracket})
 
         return self
 
@@ -843,7 +794,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byYear(self, year: int = None, count: int = 1):
+    def byYear(self, year: list = None):
         """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
@@ -880,10 +831,11 @@ class Paletable():
         self.palet.logger.info('adding byYear to the by Group')
 
         self.timeunit = 'year'
-        self.timeunitvalue = year
 
         if year is not None:
-            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
+            self.date_dimension = DateDimension(years=year, months=self.date_dimension.months)
+
+            # self.filter.update({PaletMetadata.Enrollment.fileDate: year})
 
         return self
 
@@ -893,7 +845,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byMonth(self, month: int = None):
+    def byMonth(self, month: list = None):
         """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
@@ -917,10 +869,14 @@ class Paletable():
             >>> api = Enrollment().byMonth(12)
 
         """
+        # TODO: Fix best way to allow for multiple month and year
 
         self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
-        self.timeunitvalue = month
+
+        if month is not None:
+            self._outersql.update({"month": month})  # need Matt's explanation
+            self.date_dimension = DateDimension(years=self.date_dimension.years, months=month)
 
         return self
 
@@ -930,13 +886,17 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _selectTimeunit(self):
-        if self.timeunit == 'year':
-            return "de_fil_dt as year,"
+    def _selectTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
+        if self.timeunit in ('year', 'partial_year'):
+            return f"{a}de_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                de_fil_dt as year,
-                month,
+            return f"""
+                {a}de_fil_dt as year,
+                {a}month,
                 """
 
     # ---------------------------------------------------------------------------------
@@ -945,13 +905,17 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _groupTimeunit(self):
+    def _groupTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
         if self.timeunit == 'year':
-            return "de_fil_dt"
+            return f"{a}de_fil_dt"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                de_fil_dt,
-                month
+            return f"""
+                {a}de_fil_dt,
+                {a}month
                 """
 
     def _sumByTypeScenario(self, df: pd.DataFrame):
