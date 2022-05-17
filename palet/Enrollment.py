@@ -102,7 +102,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, asOf: date = None, runIds: list = None, paletable: Paletable = None, period: str = "month"):
+    def __init__(self, runIds: list = None,  asOf: date = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
         super().__init__(asOf=asOf, runIds=runIds)
 
@@ -381,13 +381,9 @@ class Enrollment(Paletable):
 
         outer_filter = {
             'year': """1=1""",
-
             'month': f"""({ {0} } in ({ {1} }))""",
-
             'full': "1=1",
-
             'partial': '1=1',
-
             'partial_year': '1=1'
         }
 
@@ -526,7 +522,8 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #
+    #  This function is used to dynamically generate the SQL where clause by returning the
+    #  selected timeunit. e.g. byMonth() or byYear()
     #
     #
     # ---------------------------------------------------------------------------------
@@ -552,9 +549,9 @@ class Enrollment(Paletable):
         return breakdown.format('1', '(1)')
 
     # ---------------------------------------------------------------------------------
-    # _getByTimeunitCull
-    # This function is used to dynamically generate the SQL where clause by returning the
-    # selected timeunit. e.g. byMonth() or byYear()
+    #
+    #
+    #
     # ---------------------------------------------------------------------------------
     def _getOuterSQLFilter(self, filters: dict):
         filter = filters[self.timeunit]

@@ -44,7 +44,7 @@ class Diagnoses:
                       'dgns_2_cd'
                       ]
 
-    prescription = [' 0 ']
+    prescription = ["' 0 '"]
 
     link_key = {
         ServiceCategory.inpatient: 'ip_link_key',
