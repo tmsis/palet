@@ -125,6 +125,8 @@ class Enrollment(Paletable):
         self._sql = None
         self.user_constraint = {}
 
+        self.alias = 'bb'
+
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
@@ -398,7 +400,7 @@ class Enrollment(Paletable):
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
             for bytype in self.derived_by_type_group:
-                derived_types.append("bb." + bytype.alias)
+                derived_types.append(f"{self.alias}.{bytype.alias}")
 
             return ",\n".join(derived_types) + ","
 
@@ -751,7 +753,7 @@ class Enrollment(Paletable):
     def _do_calculations(self):
         calculations = []
         for cb in self.calculations:
-            calculations.append(cb())
+            calculations.append(cb().format(parent=self.alias))
 
         if len(calculations) > 0:
             return '\n\t\t\t'.join(calculations)
@@ -867,7 +869,7 @@ class Enrollment(Paletable):
             # self.palet.logger.debug('')
 
             self.calculations.append(paletable.callback)
-            self.yearmon_joins.append(paletable.join_sql)
+            self.outer_joins.append(paletable.join_sql.format(parent=self.alias))
 
         return self
 
@@ -880,7 +882,11 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _joinsOnYearMon(self):
 
-        return '\n'.join(self.yearmon_joins)
+        outer_joins = ''
+        for j in self.outer_joins:
+            outer_joins += '\nleft join ' + str(j)
+
+        return outer_joins
 
     # ---------------------------------------------------------------------------------
     #
@@ -921,10 +927,10 @@ class Enrollment(Paletable):
             z = f"""
                 select
                     counter,
-                    {self._getByGroupWithAlias('bb')}
+                    {self._getByGroupWithAlias(self.alias)}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
-                    {self._selectTimeunit('bb')}
+                    {self._selectTimeunit(self.alias)}
                     {self._select_indicators()}
                     {self._do_calculations()}
                     {self._userDefinedSelect('outer')}
@@ -934,30 +940,35 @@ class Enrollment(Paletable):
                     select
                         {self._getByGroupWithAlias()}
                         aa.de_fil_dt,
-                        {self._select_markers()}
-                        {self._userDefinedSelect('inner')}
-                        {self._getTimeUnitBreakdown()}
-                        {PaletMetadata.Enrichment._renderAgeRange(self)}
+                        aa.submtg_state_cd,
+                        aa.msis_ident_num,
+                        { self._select_markers() }
+                        { self._userDefinedSelect('inner') }
+                        { self._getTimeUnitBreakdown() }
+                        { PaletMetadata.Enrichment._renderAgeRange(self) }
                     from
                         taf.taf_ann_de_base as aa
                         { self._apply_constraints() }
                         { self._apply_markers() }
                     where
-                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE')} ) and
-                        {self._getByTimeunitCull(Enrollment.timeunit.cull)}
+                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
+                        { self._getByTimeunitCull(Enrollment.timeunit.cull) } and
+                        { self._defineWhereClause() }
                     group by
-                        {self._getByGroupWithAlias()}
-                        {self._getDerivedByTypeGroup()}
-                        {self._userDefinedSelect('inner')}
-                        aa.de_fil_dt
-                        {self._groupby_markers()}
+                        { self._getByGroupWithAlias() }
+                        { self._getDerivedByTypeGroup() }
+                        aa.de_fil_dt,
+                        aa.submtg_state_cd,
+                        aa.msis_ident_num
+                        { self._groupby_markers() }
                     order by
-                        {self._getByGroupWithAlias()}
-                        {self._getDerivedByTypeGroup()}
-                        {self._userDefinedSelect('inner')}
-                        aa.de_fil_dt
-                        {self._groupby_markers()}
-                ) as bb
+                        { self._getByGroupWithAlias() }
+                        { self._getDerivedByTypeGroup() }
+                        aa.de_fil_dt,
+                        aa.submtg_state_cd,
+                        aa.msis_ident_num
+                        { self._groupby_markers() }
+                ) as {self.alias}
 
                 { self._joinsOnYearMon() }
 
@@ -967,19 +978,21 @@ class Enrollment(Paletable):
                     {self._userDefinedClause()}
                 group by
                     counter,
-                    {self._getByGroupWithAlias('bb')}
+                    {self._getByGroupWithAlias(self.alias)}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
+                    {self._groupTimeunit(self.alias)}
                     {self._userDefinedSelect('outer')}
-                    {self._groupTimeunit('bb')}
+                    {self._groupTimeunit(self.alias)}
                 order by
-                    {self._getByGroupWithAlias('bb')}
+                    {self._getByGroupWithAlias(self.alias)}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
+                    {self._groupTimeunit(self.alias)}
                     {self._userDefinedSelect('outer')}
-                    {self._groupTimeunit('bb')}
+                    {self._groupTimeunit(self.alias)}
             """
 
             self._addPostProcess(self._percentChange)

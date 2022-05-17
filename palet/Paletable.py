@@ -60,7 +60,8 @@ class Paletable():
         self.preprocesses = []
         self.postprocesses = []
 
-        self.yearmon_joins = []
+        self.outer_joins = []
+
         self.calculations = []
 
         self.markers = {}
@@ -279,6 +280,12 @@ class Paletable():
         else:
             return "1=1"
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _userDefinedClause(self):
         self.palet.logger.debug('checking for user defined where clause based on api calls')
         where = []
@@ -302,6 +309,12 @@ class Paletable():
         else:
             return "1=1"
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _userDefinedSelect(self, sql_type: str):
         self.palet.logger.debug('checking for user defined select variabes based on api calls')
 
@@ -315,7 +328,7 @@ class Paletable():
                     for field, val in PaletMetadata.Enrollment.common_fields.items():
                         # get the value(s) in case there are multiple
                         if constr.lower().find(field) >= 0:
-                            sel_fields.append("bb." + val)
+                            sel_fields.append(f"{self.alias}.{val}")
                 else:
                     for field, val in PaletMetadata.Enrollment.common_fields.items():
                         # get the value(s) in case there are multiple
@@ -796,7 +809,7 @@ class Paletable():
 
         if types is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
-            self.palet.logger.info("Types were sepcified. The query will use types and constaints will be ignored.")
+            self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
             self.filter_by_type.update({EligibilityType: types})
         elif constraint is not None:
             self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
