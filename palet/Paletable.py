@@ -339,7 +339,7 @@ class Paletable():
             return ',\n\t\t\t\t'.join(sel_fields) + ","
 
         else:
-            return
+            return ''
 
     # ---------------------------------------------------------------------------------
     #
@@ -1070,44 +1070,43 @@ class Paletable():
 
         try:
             sparkDF = session.sql(self._sql)
+            self._sql = None
+
+            if (sparkDF is not None):
+
+                for column in self.by_group:
+                    sparkDF = sparkDF.withColumn(column, sparkDF[column].cast(StringType()))
+
+            df = sparkDF.toPandas()
+
+            if df.empty is False:
+
+                for column in self.by_group:
+                    df[column] = df[column].astype(pd.StringDtype())
+                    df[column].fillna('-1', inplace=True)
+
+                # perform data post process
+                self.palet.logger.debug('Beginning call to run post-processes')
+                for pp in self.postprocesses:
+                    df = pp(df)
+
+                # perform data enrichments
+                if (sparkDF is not None):
+                    self.palet.logger.debug('Beginning call to run post-processes')
+                    for column in self.defined_columns:
+                        if column in df.columns:
+                            self.palet.logger.debug("Calling post-process " + column)
+                            col = self.defined_columns[column]
+                            df = col(df)
+
+                return df
+            else:
+                return print('No results')
         except ParseException:
             self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
         except AnalysisException:
             self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
             return
-
-        self._sql = None
-
-        if (sparkDF is not None):
-
-            for column in self.by_group:
-                sparkDF = sparkDF.withColumn(column, sparkDF[column].cast(StringType()))
-
-        df = sparkDF.toPandas()
-
-        if df.empty is False:
-
-            for column in self.by_group:
-                df[column] = df[column].astype(pd.StringDtype())
-                df[column].fillna('-1', inplace=True)
-
-            # perform data post process
-            self.palet.logger.debug('Beginning call to run post-processes')
-            for pp in self.postprocesses:
-                df = pp(df)
-
-            # perform data enrichments
-            if (sparkDF is not None):
-                self.palet.logger.debug('Beginning call to run post-processes')
-                for column in self.defined_columns:
-                    if column in df.columns:
-                        self.palet.logger.debug("Calling post-process " + column)
-                        col = self.defined_columns[column]
-                        df = col(df)
-
-            return df
-        else:
-            return print('No results')
 
     # ---------------------------------------------------------------------------------
     #
