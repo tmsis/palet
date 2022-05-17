@@ -60,7 +60,8 @@ class Paletable():
         self.preprocesses = []
         self.postprocesses = []
 
-        self.yearmon_joins = []
+        self.outer_joins = []
+
         self.calculations = []
 
         self.markers = {}

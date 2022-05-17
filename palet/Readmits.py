@@ -28,6 +28,8 @@ class Readmits:
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
 
+        self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
+
     # -------------------------------------------------------
     #
     #
@@ -70,7 +72,7 @@ class Readmits:
                 taf.taf_iph
             where
                 da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
-                and clm_type_cd in (1, 3)
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
                 msis_ident_num
@@ -100,10 +102,10 @@ class Readmits:
                 taf.taf_lth
             where
                 da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
-                and clm_type_cd in (1, 3)
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
-                submtg_state_cd
+                 submtg_state_cd
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,dschrg_dt
@@ -180,8 +182,7 @@ class Readmits:
                     and e.admsn_dt = ip.admsn_dt
             left join
                 palet_readmits_edge_lt as lt
-                on
-                        e.msis_ident_num = lt.msis_ident_num
+                on      e.msis_ident_num = lt.msis_ident_num
                     and e.blg_prvdr_num = lt.blg_prvdr_num
                     and e.admsn_dt = lt.admsn_dt
             order by
@@ -361,6 +362,7 @@ class Readmits:
                  submtg_state_cd
                 ,year
                 ,month
+                ,msis_ident_num
                 ,sum(readmit_ind) as has_readmit
                 ,sum(admit_ind) as has_admit
                 ,sum(readmit_ind) / sum(admit_ind) as readmit_rate
@@ -370,6 +372,7 @@ class Readmits:
                  submtg_state_cd
                 ,year
                 ,month
+                ,msis_ident_num
             order by
                  submtg_state_cd
                 ,year
@@ -381,11 +384,12 @@ class Readmits:
     #
     #
     # -------------------------------------------------------
-    def calculate_rate(self):
+    def calculate(self):
+
         calculate_rate = f"""
-        sum({self.alias}.has_readmit) as readmits,
-        sum({self.alias}.has_admit) as admits,
-        sum({self.alias}.has_readmit) / sum({self.alias}.has_admit) as readmit_rate,
+            sum({self.alias}.has_readmit) as readmits,
+            sum({self.alias}.has_admit) as admits,
+            sum({self.alias}.has_readmit) / sum({self.alias}.has_admit) as readmit_rate,
         """
         return calculate_rate
 
@@ -413,26 +417,20 @@ class Readmits:
             spark.sql(o.palet_readmits_discharge)
             spark.sql(o.palet_readmits_segments)
             spark.sql(o.palet_readmits_continuity)
-            spark.sql(o.palet_readmits)
+            # spark.sql(o.palet_readmits)
 
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
 
-        # sql = f"""{z} as {alias}
-        #     on     aa.submtg_state_cd = {alias}.submtg_state_cd
-        #        and aa.msis_ident_num = {alias}.msis_ident_num
-        #        and aa.de_fil_dt  = {alias}.year
-        #        and month = {alias}.month"""
-
         sql = f"""
-            left join
                 ({o.palet_readmits_summary}) as {alias}
-                on      bb.submtg_state_cd = {alias}.submtg_state_cd
-                    and bb.de_fil_dt  = {alias}.year
-                    and bb.month = {alias}.month"""
+                on      {{parent}}.submtg_state_cd = {alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt  = {alias}.year
+                    and {{parent}}.month = {alias}.month"""
 
         o.join_sql = sql
         o.alias = alias
-        o.callback = o.calculate_rate
+        o.callback = o.calculate
 
         return o

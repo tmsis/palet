@@ -27,6 +27,8 @@ class Cost:
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
 
+        self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
+
     # -------------------------------------------------------
     #
     #
@@ -65,15 +67,15 @@ class Cost:
                 ,blg_prvdr_num
                 ,coalesce(dschrg_dt, srvc_endg_dt_drvd) as dschrg_dt
                 ,ptnt_stus_cd
-                ,tot_alowd_amt
+                ,tot_mdcd_pd_amt as total_amount
             from
                 taf.taf_iph
             where
                 da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
-                and clm_type_cd in (1, 3)
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
-                msis_ident_num
+                 msis_ident_num
                 ,admsn_dt
                 ,blg_prvdr_num
                 ,dschrg_dt
@@ -96,15 +98,15 @@ class Cost:
                 ,srvc_bgnng_dt
                 ,srvc_endg_dt
                 ,ptnt_stus_cd
-                ,tot_alowd_amt
+                ,tot_mdcd_pd_amt as total_amount
             from
                 taf.taf_lth
             where
                 da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
-                and clm_type_cd in (1, 3)
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
-                submtg_state_cd
+                 submtg_state_cd
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,dschrg_dt
@@ -125,7 +127,7 @@ class Cost:
                 ,msis_ident_num
                 ,blg_prvdr_num
                 ,admsn_dt
-                ,tot_alowd_amt
+                ,total_amount
             from (
                 select distinct
                      svc_cat
@@ -133,7 +135,7 @@ class Cost:
                     ,msis_ident_num
                     ,blg_prvdr_num
                     ,admsn_dt
-                    ,tot_alowd_amt
+                    ,total_amount
                 from
                     palet_admits_edge_ip
             )
@@ -144,7 +146,7 @@ class Cost:
                     ,msis_ident_num
                     ,blg_prvdr_num
                     ,admsn_dt
-                    ,tot_alowd_amt
+                    ,total_amount
                 from
                     palet_admits_edge_lt
             )
@@ -175,7 +177,7 @@ class Cost:
                 ,e.admsn_dt as admit
                 ,coalesce(ip.dschrg_dt, lt.dschrg_dt, lt.srvc_endg_dt) as discharge
                 ,coalesce(ip.ptnt_stus_cd, lt.ptnt_stus_cd) as ptnt_stus_cd
-                ,(coalesce(ip.tot_alowd_amt,0) + coalesce(lt.tot_alowd_amt,0)) as tot_alowd_amt
+                ,(coalesce(ip.total_amount,0) + coalesce(lt.total_amount,0)) as total_amount
             from
                 palet_admits_edge as e
             left join
@@ -185,8 +187,7 @@ class Cost:
                     and e.admsn_dt = ip.admsn_dt
             left join
                 palet_admits_edge_lt as lt
-                on
-                        e.msis_ident_num = lt.msis_ident_num
+                on      e.msis_ident_num = lt.msis_ident_num
                     and e.blg_prvdr_num = lt.blg_prvdr_num
                     and e.admsn_dt = lt.admsn_dt
             order by
@@ -209,7 +210,7 @@ class Cost:
                 ,admit
                 ,max(discharge) as discharge
                 ,ptnt_stus_cd
-                ,sum(tot_alowd_amt) as tot_alowd_amt
+                ,sum(total_amount) as total_amount
             from
                 palet_admits_edge_x_ip_lt
             group by
@@ -279,7 +280,7 @@ class Cost:
                         ,msis_ident_num
                 ), discharge) as lead_diff_days
                 ,ptnt_stus_cd
-                ,tot_alowd_amt
+                ,total_amount
             from
                 palet_admits_discharge
             order by
@@ -319,7 +320,7 @@ class Cost:
                         ,msis_ident_num
                         ,discharge desc)
                     else discharge end as discharge
-                    ,tot_alowd_amt
+                ,total_amount
             from
                 palet_admits_segments
             order by
@@ -335,13 +336,14 @@ class Cost:
         #
         # -------------------------------------------------------
         self.palet_admits = """
-            create or replace temporary view palet_admits as
-            select
+            select distinct
                 submtg_state_cd,
+                year(admit) as year,
+                month(admit) as month,
                 msis_ident_num,
                 admit,
                 min(1) as units,
-                sum(tot_alowd_amt) as tot_alowd_amt
+                sum(total_amount) as total_amount
             from
                 palet_admits_continuity
             group by
@@ -359,23 +361,23 @@ class Cost:
         #
         #
         # -------------------------------------------------------
-        self.palet_admits_summary = """
+        self.palet_admits_summary = f"""
             select
-                submtg_state_cd,
-                year(admit) as year,
-                month(admit) as month,
-                sum(units) as units,
-                sum(tot_alowd_amt) as allowed
+                 submtg_state_cd
+                ,year
+                ,month
+                ,sum(units) as units
+                ,sum(total_amount) as total_amount
             from
-                palet_admits
+                ({ self.palet_admits })
             group by
-                submtg_state_cd,
-                year,
-                month
+                 submtg_state_cd
+                ,year
+                ,month
             order by
-                submtg_state_cd,
-                year,
-                month
+                 submtg_state_cd
+                ,year
+                ,month
         """
 
     # -------------------------------------------------------
@@ -386,9 +388,18 @@ class Cost:
     def calculate(self):
 
         pmpm = f"""
-            sum({self.alias}.allowed) as total_allowed_amt,
-            sum({self.alias}.allowed) / sum(bb.mdcd_enrollment) as mdcd_pmpm,
-            sum({self.alias}.allowed) / sum(bb.chip_enrollment) as chip_pmpm,
+            sum({self.alias}.total_amount) as total_total_amount_amt,
+            sum({self.alias}.total_amount) / sum({{parent}}.mdcd_enrollment) as mdcd_pmpm,
+            sum({self.alias}.total_amount) / sum({{parent}}.chip_enrollment) as chip_pmpm,
+
+            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.total_amount else 0 end) as mdcd_total_amount,
+            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.total_amount else 0 end) as chip_total_amount,
+
+            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.units else 0 end) as mdcd_units,
+            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.units else 0 end) as chip_units,
+
+            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.total_amount else 0 end) / sum({{parent}}.mdcd_enrollment) as mdcd_pmpm,
+            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.total_amount else 0 end) / sum({{parent}}.chip_enrollment) as chip_pmpm,
             """
 
         return pmpm
@@ -422,11 +433,11 @@ class Cost:
         alias = palet.reserveSQLAlias()
 
         sql = f"""
-            left join
-                ({o.palet_admits_summary}) as {alias}
-                on      bb.submtg_state_cd = {alias}.submtg_state_cd
-                    and bb.de_fil_dt  = {alias}.year
-                    and bb.month = {alias}.month"""
+                ({o.palet_admits}) as {alias}
+                on      {{parent}}.submtg_state_cd = {alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt  = {alias}.year
+                    and {{parent}}.month = {alias}.month"""
 
         o.join_sql = sql
         o.alias = alias
