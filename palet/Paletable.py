@@ -5,7 +5,6 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
-from logging import raiseExceptions
 import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
@@ -313,7 +312,7 @@ class Paletable():
                 constr: str = self.user_constraint.get(key)
 
                 if sql_type == "outer":
-                    for field, val in PaletMetadata.Enrollment.stack_fields.items():
+                    for field, val in PaletMetadata.Enrollment.common_fields.items():
                         # get the value(s) in case there are multiple
                         if constr.lower().find(field) >= 0:
                             sel_fields.append("bb." + val)
