@@ -5,6 +5,7 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
+from logging import raiseExceptions
 import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
@@ -68,6 +69,7 @@ class Paletable():
         self.having_constraints = []
         self._outersql = {}
         self._sql = None
+        self.user_constraint = {}
 
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
@@ -278,6 +280,66 @@ class Paletable():
 
         else:
             return "1=1"
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _userDefinedClause(self):
+        self.palet.logger.debug('checking for user defined where clause based on api calls')
+        where = []
+
+        if len(self.user_constraint) > 0:
+            for key in self.user_constraint:
+                _constr = []
+                _join = ""
+
+                # get the value(s) in case there are multiple
+                metaval: str = self.user_constraint[key]
+                for field, val in PaletMetadata.Enrollment.stack_fields.items():
+                    constr = metaval.replace(field, val)
+                _constr.append(constr)
+
+                _join = ",".join(_constr)
+                where.append(_join)
+
+            return f"{' and '.join(where)}"
+
+        else:
+            return "1=1"
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _userDefinedSelect(self, sql_type: str):
+        self.palet.logger.debug('checking for user defined select variabes based on api calls')
+
+        if len(self.user_constraint) > 0:
+            for key in self.user_constraint:
+                sel_fields = []
+
+                constr: str = self.user_constraint.get(key)
+
+                if sql_type == "outer":
+                    for field, val in PaletMetadata.Enrollment.stack_fields.items():
+                        # get the value(s) in case there are multiple
+                        if constr.lower().find(field) >= 0:
+                            sel_fields.append(f"{self.alias}.{val}")
+                else:
+                    for field, val in PaletMetadata.Enrollment.common_fields.items():
+                        # get the value(s) in case there are multiple
+                        if constr.lower().find(field) >= 0:
+                            sel_fields.append("aa." + val)
+
+            return ',\n\t\t\t\t'.join(sel_fields) + ","
+
+        else:
+            return
 
     # ---------------------------------------------------------------------------------
     #
@@ -719,7 +781,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, types: list = None):
+    def byEligibilityType(self, types: list = None, constraint: dict = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -748,7 +810,11 @@ class Paletable():
 
         if types is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
+            self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
             self.filter_by_type.update({EligibilityType: types})
+        elif constraint is not None:
+            self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
+            self.user_constraint.update(constraint)
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
@@ -911,7 +977,7 @@ class Paletable():
         if alias is not None:
             a = f"{alias}."
 
-        if self.timeunit == 'year':
+        if self.timeunit in ('year', 'partial_year'):
             return f"{a}de_fil_dt"
         elif self.timeunit in ('month', 'full', 'partial'):
             return f"""
@@ -996,12 +1062,19 @@ class Paletable():
         from pyspark.sql import SparkSession
         session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
+        from pyspark.sql.utils import AnalysisException, ParseException
 
         self._sql = self.sql(isFetch=True)
 
         self.palet.logger.debug('Fetching data - \n' + self._sql)
 
-        sparkDF = session.sql(self._sql)
+        try:
+            sparkDF = session.sql(self._sql)
+        except ParseException:
+            self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+        except AnalysisException:
+            self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+            return
 
         self._sql = None
 

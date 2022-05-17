@@ -123,6 +123,7 @@ class Enrollment(Paletable):
 
         self._outersql = {}
         self._sql = None
+        self.user_constraint = {}
 
         self.alias = 'bb'
 
@@ -190,23 +191,23 @@ class Enrollment(Paletable):
                         sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end),
                         sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end)
                     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
-            'partial_year': f"""
-                'Partial Year' as counter,
-                stack(1,
-                    1, { {13} }
-                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-                                and aa.de_fil_dt % 400 = 0
-                                    and aa.mdcd_enrlmt_days_yr between 1 and 366
-                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-                                and aa.de_fil_dt % 400 != 0
-                                    and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
-                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-                                and aa.de_fil_dt % 400 = 0
-                                    and aa.chip_enrlmt_days_yr between 1 and 366
-                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-                                and aa.de_fil_dt % 400 != 0
-                                    and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
-                ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
+            # 'partial_year': f"""
+            #     'Partial Year' as counter,
+            #     stack(1,
+            #         1, { {13} }
+            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+            #                     and aa.de_fil_dt % 400 = 0
+            #                         and aa.mdcd_enrlmt_days_yr between 1 and 366
+            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+            #                     and aa.de_fil_dt % 400 != 0
+            #                         and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
+            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+            #                     and aa.de_fil_dt % 400 = 0
+            #                         and aa.chip_enrlmt_days_yr between 1 and 366
+            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+            #                     and aa.de_fil_dt % 400 != 0
+            #                         and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
+            #     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
                     'In Month' as counter,
                     stack(12,
@@ -399,7 +400,7 @@ class Enrollment(Paletable):
         # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
             for bytype in self.derived_by_type_group:
-                derived_types.append("bb." + bytype.alias)
+                derived_types.append(f"{self.alias}.{bytype.alias}")
 
             return ",\n".join(derived_types) + ","
 
@@ -582,7 +583,7 @@ class Enrollment(Paletable):
 
         # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
 
-        if self.timeunit != 'year':
+        if self.timeunit in ('year', 'partial_year'):
 
             # Month-over-Month
             if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
@@ -932,6 +933,7 @@ class Enrollment(Paletable):
                     {self._selectTimeunit(self.alias)}
                     {self._select_indicators()}
                     {self._do_calculations()}
+                    {self._userDefinedSelect('outer')}
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
                 from (
@@ -941,6 +943,7 @@ class Enrollment(Paletable):
                         aa.submtg_state_cd,
                         aa.msis_ident_num,
                         { self._select_markers() }
+                        { self._userDefinedSelect('inner') }
                         { self._getTimeUnitBreakdown() }
                         { PaletMetadata.Enrichment._renderAgeRange(self) }
                     from
@@ -970,7 +973,9 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)}
+                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)} and
+                    {self._defineWhereClause()} and
+                    {self._userDefinedClause()}
                 group by
                     counter,
                     {self._getByGroupWithAlias(self.alias)}
@@ -978,11 +983,15 @@ class Enrollment(Paletable):
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
                     {self._groupTimeunit(self.alias)}
+                    {self._userDefinedSelect('outer')}
+                    {self._groupTimeunit(self.alias)}
                 order by
                     {self._getByGroupWithAlias(self.alias)}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
+                    {self._groupTimeunit(self.alias)}
+                    {self._userDefinedSelect('outer')}
                     {self._groupTimeunit(self.alias)}
             """
 
