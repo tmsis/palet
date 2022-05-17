@@ -123,6 +123,7 @@ class Enrollment(Paletable):
 
         self._outersql = {}
         self._sql = None
+        self.user_constraint = {}
 
         self.palet.logger.debug('Initializing Enrollment API')
 
@@ -188,23 +189,23 @@ class Enrollment(Paletable):
                         sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end),
                         sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end)
                     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
-            'partial_year': f"""
-                'Partial Year' as counter,
-                stack(1,
-                    1, { {13} }
-                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-                                and aa.de_fil_dt % 400 = 0
-                                    and aa.mdcd_enrlmt_days_yr between 1 and 366
-                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-                                and aa.de_fil_dt % 400 != 0
-                                    and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
-                        sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-                                and aa.de_fil_dt % 400 = 0
-                                    and aa.chip_enrlmt_days_yr between 1 and 366
-                            or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-                                and aa.de_fil_dt % 400 != 0
-                                    and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
-                ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
+            # 'partial_year': f"""
+            #     'Partial Year' as counter,
+            #     stack(1,
+            #         1, { {13} }
+            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+            #                     and aa.de_fil_dt % 400 = 0
+            #                         and aa.mdcd_enrlmt_days_yr between 1 and 366
+            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+            #                     and aa.de_fil_dt % 400 != 0
+            #                         and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
+            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
+            #                     and aa.de_fil_dt % 400 = 0
+            #                         and aa.chip_enrlmt_days_yr between 1 and 366
+            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
+            #                     and aa.de_fil_dt % 400 != 0
+            #                         and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
+            #     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
                     'In Month' as counter,
                     stack(12,
@@ -583,7 +584,7 @@ class Enrollment(Paletable):
 
         # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
 
-        if self.timeunit != 'year':
+        if self.timeunit in ('year', 'partial_year'):
 
             # Month-over-Month
             if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
@@ -929,6 +930,7 @@ class Enrollment(Paletable):
                     {self._selectTimeunit('bb')}
                     {self._select_indicators()}
                     {self._do_calculations()}
+                    {self._userDefinedSelect('outer')}
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
                 from (
@@ -936,25 +938,26 @@ class Enrollment(Paletable):
                         {self._getByGroupWithAlias()}
                         aa.de_fil_dt,
                         {self._select_markers()}
+                        {self._userDefinedSelect('inner')}
                         {self._getTimeUnitBreakdown()}
                         {PaletMetadata.Enrichment._renderAgeRange(self)}
-
                     from
                         taf.taf_ann_de_base as aa
                         { self._apply_constraints() }
                         { self._apply_markers() }
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE')} ) and
-                        {self._getByTimeunitCull(Enrollment.timeunit.cull)} and
-                        {self._defineWhereClause()}
+                        {self._getByTimeunitCull(Enrollment.timeunit.cull)}
                     group by
                         {self._getByGroupWithAlias()}
                         {self._getDerivedByTypeGroup()}
+                        {self._userDefinedSelect('inner')}
                         aa.de_fil_dt
                         {self._groupby_markers()}
                     order by
                         {self._getByGroupWithAlias()}
                         {self._getDerivedByTypeGroup()}
+                        {self._userDefinedSelect('inner')}
                         aa.de_fil_dt
                         {self._groupby_markers()}
                 ) as bb
@@ -962,19 +965,23 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)}
+                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)} and
+                    {self._defineWhereClause()} and
+                    {self._userDefinedClause()}
                 group by
                     counter,
                     {self._getByGroupWithAlias('bb')}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
+                    {self._userDefinedSelect('outer')}
                     {self._groupTimeunit('bb')}
                 order by
                     {self._getByGroupWithAlias('bb')}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
+                    {self._userDefinedSelect('outer')}
                     {self._groupTimeunit('bb')}
             """
 
