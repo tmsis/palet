@@ -319,21 +319,24 @@ class Paletable():
         self.palet.logger.debug('checking for user defined select variabes based on api calls')
 
         if len(self.user_constraint) > 0:
-            for key in self.user_constraint:
+            for key, case in self.user_constraint.items():
                 sel_fields = []
+                case_fields = []
 
                 constr: str = self.user_constraint.get(key)
 
-                if sql_type == "outer":
+                if sql_type == "inner":
                     for field, val in PaletMetadata.Enrollment.common_fields.items():
                         # get the value(s) in case there are multiple
                         if constr.lower().find(field) >= 0:
-                            sel_fields.append(f"{self.alias}.{val}")
+                            sel_fields.append(f"aa.{val}")  # TODO:
                 else:
-                    for field, val in PaletMetadata.Enrollment.common_fields.items():
+                    for field, metaval in PaletMetadata.Enrollment.common_fields.items():
+                        constr = case.replace(field, metaval)
                         # get the value(s) in case there are multiple
                         if constr.lower().find(field) >= 0:
-                            sel_fields.append("aa." + val)
+                            case_fields.append("case when " + constr + " then " + key + " end as defined_category")
+                    return ',\n\t\t\t\t'.join(case_fields) + ","
 
             return ',\n\t\t\t\t'.join(sel_fields) + ","
 
@@ -814,6 +817,11 @@ class Paletable():
         elif constraint is not None:
             self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
             self.user_constraint.update(constraint)
+            for field, val in PaletMetadata.Enrollment.common_fields.items():
+                # get the value(s) in case there are multiple
+                for _name, const in constraint.items():
+                    if const.lower().find(field) >= 0:
+                        self.by_group.append(val)
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
@@ -1058,10 +1066,10 @@ class Paletable():
 
             >>> display(api.byMonth().fetch())
         """
-        from pyspark.sql import SparkSession
-        session = SparkSession.getActiveSession()
         from pyspark.sql.types import StringType
         from pyspark.sql.utils import AnalysisException, ParseException
+        from pyspark.sql import SparkSession
+        session = SparkSession.getActiveSession()
 
         self._sql = self.sql(isFetch=True)
 
@@ -1069,10 +1077,11 @@ class Paletable():
 
         try:
             sparkDF = session.sql(self._sql)
-        except ParseException:
-            self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
-        except AnalysisException:
-            self.palet.logger.fatal("There was an error in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+        except ParseException as pe:
+            self.palet.logger.fatal("There was a " + pe.cause + " in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+            return
+        except AnalysisException as ae:
+            self.palet.logger.fatal("There was a " + ae.cause + " in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
             return
 
         self._sql = None

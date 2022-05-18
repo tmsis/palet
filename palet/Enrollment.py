@@ -983,15 +983,11 @@ class Enrollment(Paletable):
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
                     {self._groupTimeunit(self.alias)}
-                    {self._userDefinedSelect('outer')}
-                    {self._groupTimeunit(self.alias)}
                 order by
                     {self._getByGroupWithAlias(self.alias)}
                     {self._groupby_indicators()}
                     {self._getDerivedTypeSelections()}
                     {self._getAggregateGroup()}
-                    {self._groupTimeunit(self.alias)}
-                    {self._userDefinedSelect('outer')}
                     {self._groupTimeunit(self.alias)}
             """
 
