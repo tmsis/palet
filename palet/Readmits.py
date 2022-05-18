@@ -75,7 +75,7 @@ class Readmits:
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
             order by
-                msis_ident_num
+                 msis_ident_num
                 ,admsn_dt
                 ,blg_prvdr_num
                 ,dschrg_dt
@@ -404,6 +404,10 @@ class Readmits:
         o = Readmits()
         if date_dimension is not None:
             o.date_dimension = date_dimension
+
+        palet = Palet.getInstance()
+        alias = palet.reserveSQLAlias()
+        o.alias = alias
         o.init()
         o.days = days
 
@@ -417,20 +421,16 @@ class Readmits:
             spark.sql(o.palet_readmits_discharge)
             spark.sql(o.palet_readmits_segments)
             spark.sql(o.palet_readmits_continuity)
-            # spark.sql(o.palet_readmits)
-
-        palet = Palet.getInstance()
-        alias = palet.reserveSQLAlias()
+            spark.sql(o.palet_readmits)
 
         sql = f"""
                 ({o.palet_readmits_summary}) as {alias}
-                on      {{parent}}.submtg_state_cd = {alias}.submtg_state_cd
+                on      {{parent}}.with_submtg_state_cd = {alias}.submtg_state_cd
                     and {{parent}}.msis_ident_num = {alias}.msis_ident_num
                     and {{parent}}.de_fil_dt  = {alias}.year
                     and {{parent}}.month = {alias}.month"""
 
         o.join_sql = sql
-        o.alias = alias
         o.callback = o.calculate
 
         return o

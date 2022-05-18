@@ -926,20 +926,20 @@ class Enrollment(Paletable):
             z = f"""
                 select
                     counter,
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._selectTimeunit(self.alias)}
-                    {self._select_indicators()}
-                    {self._do_calculations()}
-                    {self._userDefinedSelect('outer')}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._selectTimeunit(self.alias) }
+                    { self._select_indicators() }
+                    { self._do_calculations() }
+                    { self._userDefinedSelect('outer') }
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
                 from (
                     select
-                        {self._getByGroupWithAlias()}
+                        { self._getByGroupWithAlias() }
                         aa.de_fil_dt,
-                        {Palet.joinable('aa.submtg_state_cd')},
+                        { Palet.joinable('aa.submtg_state_cd') },
                         aa.msis_ident_num,
                         { self._select_markers() }
                         { self._userDefinedSelect('inner') }
@@ -957,14 +957,14 @@ class Enrollment(Paletable):
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        {Palet.joinable('aa.submtg_state_cd', True)},
+                        { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
                         { self._groupby_markers() }
                     order by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        {Palet.joinable('aa.submtg_state_cd', True)},
+                        { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
                         { self._groupby_markers() }
                 ) as {self.alias}
@@ -972,22 +972,22 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)} and
-                    {self._defineWhereClause()} and
-                    {self._userDefinedClause()}
+                    { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
+                    { self._defineWhereClause() } and
+                    { self._userDefinedClause() }
                 group by
                     counter,
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._groupby_indicators()}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._groupTimeunit(self.alias)}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._groupby_indicators() }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._groupTimeunit(self.alias) }
                 order by
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._groupby_indicators()}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._groupTimeunit(self.alias)}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._groupby_indicators() }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._groupTimeunit(self.alias) }
             """
 
             self._addPostProcess(self._percentChange)

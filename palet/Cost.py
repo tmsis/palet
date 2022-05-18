@@ -408,7 +408,7 @@ class Cost:
         pmpm = f"""
 
             {self.mdcd_mm} as mdcd_mm,
-            {self.chip_mm} as mdcd_mm,
+            {self.chip_mm} as chip_mm,
 
             {self.mdcd_total_amount} as mdcd_total_amount,
             {self.chip_total_amount} as chip_total_amount,
@@ -460,7 +460,7 @@ class Cost:
 
         sql = f"""
                 ({o.palet_admits}) as {alias}
-                on      {{parent}}.submtg_state_cd = {alias}.submtg_state_cd
+                on      {{parent}}.with_submtg_state_cd = {alias}.submtg_state_cd
                     and {{parent}}.msis_ident_num = {alias}.msis_ident_num
                     and {{parent}}.de_fil_dt  = {alias}.year
                     and {{parent}}.month = {alias}.month"""
