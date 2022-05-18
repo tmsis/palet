@@ -939,7 +939,7 @@ class Enrollment(Paletable):
                     select
                         {self._getByGroupWithAlias()}
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        {Palet.joinable('aa.submtg_state_cd')},
                         aa.msis_ident_num,
                         { self._select_markers() }
                         { self._userDefinedSelect('inner') }
@@ -957,14 +957,14 @@ class Enrollment(Paletable):
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        {Palet.joinable('aa.submtg_state_cd', True)},
                         aa.msis_ident_num
                         { self._groupby_markers() }
                     order by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        {Palet.joinable('aa.submtg_state_cd', True)},
                         aa.msis_ident_num
                         { self._groupby_markers() }
                 ) as {self.alias}

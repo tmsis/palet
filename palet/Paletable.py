@@ -693,7 +693,7 @@ class Paletable():
                 _states_.extend(state_cds)
             self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
         else:
-            PaletMetadata.Enrichment._checkForHelperMsg(state_cds, list, "['NC','NY', 'FL']")
+            PaletMetadata.Enrichment._checkForHelperMsg(state_cds, list, "['NC','NY','FL']")
 
         return self
 

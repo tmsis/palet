@@ -380,6 +380,24 @@ class Cost:
                 ,month
         """
 
+        self.mdcd_mm = f"sum({{parent}}.mdcd_enrollment)"
+        self.chip_mm = f"sum({{parent}}.chip_enrollment)"
+
+        self.mdcd_total_amount = f"sum(case when {{parent}}.mdcd_enrollment > 0 then { self.alias }.total_amount else 0 end)"
+        self.chip_total_amount = f"sum(case when {{parent}}.chip_enrollment > 0 then { self.alias }.total_amount else 0 end)"
+
+        self.mdcd_pmpm = f"( { self.mdcd_total_amount } / { self.mdcd_mm } )"
+        self.chip_pmpm = f"( { self.chip_total_amount } / { self.chip_mm } )"
+
+        self.mdcd_units = f"sum(case when {{parent}}.mdcd_enrollment > 0 then { self.alias }.units else 0 end)"
+        self.chip_units = f"sum(case when {{parent}}.chip_enrollment > 0 then { self.alias }.units else 0 end)"
+
+        self.mdcd_util = f"( ( { self.mdcd_units } /  { self.mdcd_mm } ) * 12000 )"
+        self.chip_util = f"( ( { self.chip_units } /  { self.chip_mm } ) * 12000 )"
+
+        self.mdcd_cost = f"( { self.mdcd_pmpm } / ( { self.mdcd_util } / 12000 ) )"
+        self.chip_cost = f"( { self.chip_pmpm } / ( { self.chip_util } / 12000 ) )"
+
     # -------------------------------------------------------
     #
     #
@@ -388,18 +406,25 @@ class Cost:
     def calculate(self):
 
         pmpm = f"""
-            sum({self.alias}.total_amount) as total_total_amount_amt,
-            sum({self.alias}.total_amount) / sum({{parent}}.mdcd_enrollment) as mdcd_pmpm,
-            sum({self.alias}.total_amount) / sum({{parent}}.chip_enrollment) as chip_pmpm,
 
-            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.total_amount else 0 end) as mdcd_total_amount,
-            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.total_amount else 0 end) as chip_total_amount,
+            {self.mdcd_mm} as mdcd_mm,
+            {self.chip_mm} as mdcd_mm,
 
-            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.units else 0 end) as mdcd_units,
-            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.units else 0 end) as chip_units,
+            {self.mdcd_total_amount} as mdcd_total_amount,
+            {self.chip_total_amount} as chip_total_amount,
 
-            sum(case when {{parent}}.mdcd_enrollment > 0 then {self.alias}.total_amount else 0 end) / sum({{parent}}.mdcd_enrollment) as mdcd_pmpm,
-            sum(case when {{parent}}.chip_enrollment > 0 then {self.alias}.total_amount else 0 end) / sum({{parent}}.chip_enrollment) as chip_pmpm,
+            {self.mdcd_pmpm} as mdcd_pmpm,
+            {self.chip_pmpm} as chip_pmpm,
+
+            {self.mdcd_units} as mdcd_units,
+            {self.chip_units} as chip_units,
+
+            {self.mdcd_util} as mdcd_util,
+            {self.chip_util} as chip_util,
+
+            {self.mdcd_cost} as mdcd_cost,
+            {self.chip_cost} as chip_cost,
+
             """
 
         return pmpm
@@ -415,6 +440,10 @@ class Cost:
         o = Cost()
         if date_dimension is not None:
             o.date_dimension = date_dimension
+
+        palet = Palet.getInstance()
+        alias = palet.reserveSQLAlias()
+        o.alias = alias
         o.init()
 
         spark = SparkSession.getActiveSession()
@@ -429,9 +458,6 @@ class Cost:
             spark.sql(o.palet_admits_continuity)
             spark.sql(o.palet_admits)
 
-        palet = Palet.getInstance()
-        alias = palet.reserveSQLAlias()
-
         sql = f"""
                 ({o.palet_admits}) as {alias}
                 on      {{parent}}.submtg_state_cd = {alias}.submtg_state_cd
@@ -440,7 +466,6 @@ class Cost:
                     and {{parent}}.month = {alias}.month"""
 
         o.join_sql = sql
-        o.alias = alias
         o.callback = o.calculate
 
         return o
