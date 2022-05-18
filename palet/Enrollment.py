@@ -583,8 +583,7 @@ class Enrollment(Paletable):
 
         # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
 
-        if self.timeunit in ('year', 'partial_year'):
-
+        if self.timeunit != 'year':
             # Month-over-Month
             if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year', 'month'], ascending=True)

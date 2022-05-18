@@ -341,7 +341,7 @@ class Paletable():
             return ',\n\t\t\t\t'.join(sel_fields) + ","
 
         else:
-            return
+            return ''
 
     # ---------------------------------------------------------------------------------
     #
