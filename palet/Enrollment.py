@@ -126,6 +126,7 @@ class Enrollment(Paletable):
         self.user_constraint = {}
 
         self.alias = 'bb'
+        self.nested_alias = 'aa'
 
         self.palet.logger.debug('Initializing Enrollment API')
 
@@ -819,12 +820,10 @@ class Enrollment(Paletable):
             >>> display(api.fetch())
 
         """
+        from collections import defaultdict
+
         if constraint not in self.having_constraints:
-            # self.palet.logger.debug('')
-
-            # self.calculations.append(constraint.callback)
-
-            self.having_constraints.append(constraint)
+            self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
 
@@ -850,12 +849,13 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def calculate(self, paletable):
+        from collections import defaultdict
 
         if paletable not in self.calculations:
-            # self.palet.logger.debug('')
 
             self.calculations.append(paletable.callback)
-            self.outer_joins.append(paletable.join_sql.format(parent=self.alias))
+
+            self.outer_joins.append(paletable.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
 
         return self
 
@@ -913,20 +913,20 @@ class Enrollment(Paletable):
             z = f"""
                 select
                     counter,
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._selectTimeunit(self.alias)}
-                    {self._select_indicators()}
-                    {self._do_calculations()}
-                    {self._userDefinedSelect('outer')}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._selectTimeunit(self.alias) }
+                    { self._select_indicators() }
+                    { self._do_calculations() }
+                    { self._userDefinedSelect('outer') }
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
                 from (
                     select
-                        {self._getByGroupWithAlias()}
+                        { self._getByGroupWithAlias() }
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        { Palet.joinable('aa.submtg_state_cd') },
                         aa.msis_ident_num,
                         { self._select_markers() }
                         { self._userDefinedSelect('inner') }
@@ -944,14 +944,14 @@ class Enrollment(Paletable):
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
                         { self._groupby_markers() }
                     order by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
                         aa.de_fil_dt,
-                        aa.submtg_state_cd,
+                        { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
                         { self._groupby_markers() }
                 ) as {self.alias}
@@ -959,22 +959,22 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    {self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter)} and
-                    {self._defineWhereClause()} and
-                    {self._userDefinedClause()}
+                    { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
+                    { self._defineWhereClause() } and
+                    { self._userDefinedClause() }
                 group by
                     counter,
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._groupby_indicators()}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._groupTimeunit(self.alias)}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._groupby_indicators() }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._groupTimeunit(self.alias) }
                 order by
-                    {self._getByGroupWithAlias(self.alias)}
-                    {self._groupby_indicators()}
-                    {self._getDerivedTypeSelections()}
-                    {self._getAggregateGroup()}
-                    {self._groupTimeunit(self.alias)}
+                    { self._getByGroupWithAlias(self.alias) }
+                    { self._groupby_indicators() }
+                    { self._getDerivedTypeSelections() }
+                    { self._getAggregateGroup() }
+                    { self._groupTimeunit(self.alias) }
             """
 
             self._addPostProcess(self._percentChange)
