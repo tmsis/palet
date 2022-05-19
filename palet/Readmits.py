@@ -389,7 +389,7 @@ class Readmits():
         calculate_rate = f"""
             sum({self.alias}.has_readmit) as readmits,
             sum({self.alias}.has_admit) as admits,
-            sum({self.alias}.has_readmit) / sum({self.alias}.has_admit) as readmit_rate,
+            round(sum({self.alias}.has_readmit) / sum({self.alias}.has_admit), 2) as readmit_rate,
         """
         return calculate_rate
 

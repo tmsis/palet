@@ -395,8 +395,8 @@ class Cost():
         self.mdcd_util = f"( ( { self.mdcd_units } /  { self.mdcd_mm } ) * 12000 )"
         self.chip_util = f"( ( { self.chip_units } /  { self.chip_mm } ) * 12000 )"
 
-        self.mdcd_cost = f"( { self.mdcd_pmpm } / ( { self.mdcd_util } / 12000 ) )"
-        self.chip_cost = f"( { self.chip_pmpm } / ( { self.chip_util } / 12000 ) )"
+        self.mdcd_cost = f"( { self.mdcd_total_amount } / { self.mdcd_units } )"
+        self.chip_cost = f"( { self.chip_total_amount } / { self.chip_units } )"
 
     # -------------------------------------------------------
     #
@@ -405,25 +405,24 @@ class Cost():
     # -------------------------------------------------------
     def calculate(self):
 
+        # {self.mdcd_mm} as mdcd_mm,
+        # {self.chip_mm} as chip_mm,
+        # {self.mdcd_units} as mdcd_units,
+        # {self.chip_units} as chip_units,
+
         pmpm = f"""
 
-            {self.mdcd_mm} as mdcd_mm,
-            {self.chip_mm} as chip_mm,
+            round({self.mdcd_total_amount}, 2) as mdcd_total_amount,
+            round({self.chip_total_amount}, 2) as chip_total_amount,
 
-            {self.mdcd_total_amount} as mdcd_total_amount,
-            {self.chip_total_amount} as chip_total_amount,
+            round({self.mdcd_pmpm}, 2) as mdcd_pmpm,
+            round({self.chip_pmpm}, 2) as chip_pmpm,
 
-            {self.mdcd_pmpm} as mdcd_pmpm,
-            {self.chip_pmpm} as chip_pmpm,
+            round({self.mdcd_util}, 1) as mdcd_util,
+            round({self.chip_util}, 1) as chip_util,
 
-            {self.mdcd_units} as mdcd_units,
-            {self.chip_units} as chip_units,
-
-            {self.mdcd_util} as mdcd_util,
-            {self.chip_util} as chip_util,
-
-            {self.mdcd_cost} as mdcd_cost,
-            {self.chip_cost} as chip_cost,
+            round({self.mdcd_cost}, 2) as mdcd_cost,
+            round({self.chip_cost}, 2) as chip_cost,
 
         """
         return pmpm
