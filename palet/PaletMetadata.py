@@ -69,6 +69,14 @@ class PaletMetadata:
             "elgblty_grp_cd": "eligibility_type"
         }
 
+        @staticmethod
+        def all_common_fields():
+            all_fields = {}
+            all_fields.update(PaletMetadata.Enrollment.common_fields)
+            all_fields.update(PaletMetadata.Enrollment.stack_fields)
+
+            return all_fields
+
         def _findFullMonthEnrollments(df: pd.DataFrame):
             palet = PaletMetadata.Enrichment._getPaletObj()
             month = df['month']

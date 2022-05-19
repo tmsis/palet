@@ -5,6 +5,7 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
+from typing import overload
 import pandas as pd
 from palet.DateDimension import DateDimension
 from palet.Palet import Palet
@@ -297,9 +298,10 @@ class Paletable():
 
                 # get the value(s) in case there are multiple
                 metaval: str = self.user_constraint[key]
-                for field, val in PaletMetadata.Enrollment.stack_fields.items():
-                    constr = metaval.replace(field, val)
-                _constr.append(constr)
+                for constr in metaval:
+                    for field, val in PaletMetadata.Enrollment.stack_fields.items():
+                        constr = constr.replace(field, val)
+                    _constr.append(constr)
 
                 _join = ",".join(_constr)
                 where.append(_join)
@@ -323,22 +325,21 @@ class Paletable():
                 sel_fields = []
                 case_fields = []
 
-                constr: str = self.user_constraint.get(key)
-
                 if sql_type == "inner":
-                    for field, val in PaletMetadata.Enrollment.common_fields.items():
-                        # get the value(s) in case there are multiple
-                        if constr.lower().find(field) >= 0:
-                            sel_fields.append(f"aa.{val}")  # TODO:
-                else:
-                    for field, metaval in PaletMetadata.Enrollment.common_fields.items():
-                        constr = case.replace(field, metaval)
-                        # get the value(s) in case there are multiple
-                        if constr.lower().find(field) >= 0:
-                            case_fields.append("case when " + constr + " then " + key + " end as defined_category")
+                    for constr in case:
+                        for field, val in PaletMetadata.Enrollment.common_fields.items():
+                            # get the value(s) in case there are multiple
+                            if constr.lower().find(field) >= 0:
+                                sel_fields.append(f"aa.{val}")  # TODO:
+                else:   # TODO: Look at overloading this method because of this!
+                    all_fields = PaletMetadata.Enrollment.all_common_fields()
+                    for cond in case:
+                        for field, metaval in all_fields.items():
+                            cond = cond.replace(field, metaval)
+                        case_fields.append("case when " + cond + " then '" + key + "' end as defined_category")
                     return ',\n\t\t\t\t'.join(case_fields) + ","
 
-            return ',\n\t\t\t\t'.join(sel_fields) + ","
+            return ',\n\t\t\t\t'.join(set(sel_fields)) + ","
 
         else:
             return ''
@@ -781,9 +782,14 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     #
     #
-    #
+    # Stub method for byEligibilityType user entries overloading
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, types: list = None, constraint: dict = None):
+    @overload
+    def byEligibilityType(self, constraint: tuple = None) -> None: ...
+    @overload
+    def byEligibilityType(self, constraint: list = None) -> None: ...
+
+    def byEligibilityType(self, constraint):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -810,20 +816,23 @@ class Paletable():
         self.palet.logger.info('adding EligibilityType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
-        if types is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
-            self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
-            self.filter_by_type.update({EligibilityType: types})
-        elif constraint is not None:
-            self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
-            self.user_constraint.update(constraint)
-            for field, val in PaletMetadata.Enrollment.common_fields.items():
-                # get the value(s) in case there are multiple
-                for _name, const in constraint.items():
-                    if const.lower().find(field) >= 0:
-                        self.by_group.append(val)
+        if constraint is not None:
 
-        # return Enrollment(self.date_dimension.runIds, self)
+            if isinstance(constraint, list):
+                PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
+                self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
+                self.filter_by_type.update({EligibilityType: constraint})
+            elif isinstance(constraint, tuple):
+                self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
+
+                for constr in constraint:
+                    for key in constr:
+                        self.user_constraint.update({key: constr[key]})
+
+                for _field, val in PaletMetadata.Enrollment.common_fields.items():
+                    # get the value(s) in case there are multiple
+                    self.by_group.append(val)
+
         return self
 
     # ---------------------------------------------------------------------------------
@@ -1079,10 +1088,12 @@ class Paletable():
         try:
             sparkDF = session.sql(self._sql)
         except ParseException as pe:
-            self.palet.logger.fatal("There was a " + pe.cause + " in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+            self.palet.logger.fatal("There was a " + pe.cause + " in the sql query. Please review the syntax. \
+                                    To view the query being executed try 'print (api.sql())'")
             return
         except AnalysisException as ae:
-            self.palet.logger.fatal("There was a " + ae.cause + " in the sql query. Please review the syntax. To view the query being executed try 'print (api.sql())'")
+            self.palet.logger.fatal("There was a " + ae.cause + " in the sql query. Please review the syntax. \
+                                    To view the query being executed try 'print (api.sql())'")
             return
 
         self._sql = None
