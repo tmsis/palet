@@ -530,24 +530,11 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def _getByTimeunitCull(self, cull_type: dict):
-        from palet.EnrollmentType import EnrollmentType
-        from palet.CoverageType import CoverageType
-        from palet.EligibilityType import EligibilityType
-
         breakdown = cull_type[self.timeunit]
         for key in self.filter_by_type:
             _type = self.filter_by_type[key]
-            if str(key) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-                return breakdown.format(EnrollmentType.alias, key.filter(_type))
+            return breakdown.format(key.alias, key.filter(_type))
 
-            elif str(key) == "<class 'palet.CoverageType.CoverageType'>":
-                return breakdown.format(CoverageType.alias, key.filter(_type))
-
-            elif str(key) == "<class 'palet.EligibilityType.EligibilityType'>":
-                return breakdown.format(EligibilityType.alias, key.filter(_type))
-
-            else:
-                return "1=1"
         return breakdown.format('1', '(1)')
 
     # ---------------------------------------------------------------------------------
