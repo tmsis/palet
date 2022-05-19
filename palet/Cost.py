@@ -14,7 +14,7 @@ from palet.DateDimension import DateDimension
 #
 #
 # -------------------------------------------------------
-class Cost:
+class Cost():
 
     # -------------------------------------------------------
     #
@@ -425,9 +425,41 @@ class Cost:
             {self.mdcd_cost} as mdcd_cost,
             {self.chip_cost} as chip_cost,
 
-            """
-
+        """
         return pmpm
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def join_inner(self) -> str:
+
+        sql = f"""
+                ({self.palet_admits}) as {self.alias}
+                on
+                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt = {self.alias}.year"""
+
+        return sql
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def join_outer(self) -> str:
+
+        sql = f"""
+                ({self.palet_admits}) as {self.alias}
+                on
+                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt = {self.alias}.year
+                    and {{parent}}.month = {self.alias}.month"""
+
+        return sql
 
     # -------------------------------------------------------
     #
@@ -458,14 +490,6 @@ class Cost:
             spark.sql(o.palet_admits_continuity)
             spark.sql(o.palet_admits)
 
-        sql = f"""
-                ({o.palet_admits}) as {alias}
-                on      {{parent}}.with_submtg_state_cd = {alias}.submtg_state_cd
-                    and {{parent}}.msis_ident_num = {alias}.msis_ident_num
-                    and {{parent}}.de_fil_dt  = {alias}.year
-                    and {{parent}}.month = {alias}.month"""
-
-        o.join_sql = sql
         o.callback = o.calculate
 
         return o

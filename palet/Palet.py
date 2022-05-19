@@ -29,6 +29,8 @@ class Palet:
     PERFORMANCE = 15
     RELEASE = 11
 
+    augment = 'with_'
+
     def __new__(cls):
         from datetime import datetime
         cls.__instance = super().__new__(cls)
@@ -89,9 +91,9 @@ class Palet:
         if len(c) == 2:
             w = c[1]
         if by:
-            return f'with_{w}'
+            return f'{Palet.augment}{w}'
         else:
-            return f'{col} as with_{w}'
+            return f'{col} as {Palet.augment}{w}'
 
     # --------------------------------------------------------------------
     #

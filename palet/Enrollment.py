@@ -126,6 +126,7 @@ class Enrollment(Paletable):
         self.user_constraint = {}
 
         self.alias = 'bb'
+        self.nested_alias = 'aa'
 
         self.palet.logger.debug('Initializing Enrollment API')
 
@@ -832,12 +833,10 @@ class Enrollment(Paletable):
             >>> display(api.fetch())
 
         """
+        from collections import defaultdict
+
         if constraint not in self.having_constraints:
-            # self.palet.logger.debug('')
-
-            # self.calculations.append(constraint.callback)
-
-            self.having_constraints.append(constraint)
+            self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
 
@@ -863,12 +862,13 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def calculate(self, paletable):
+        from collections import defaultdict
 
         if paletable not in self.calculations:
-            # self.palet.logger.debug('')
 
             self.calculations.append(paletable.callback)
-            self.outer_joins.append(paletable.join_sql.format(parent=self.alias))
+
+            self.outer_joins.append(paletable.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
 
         return self
 
