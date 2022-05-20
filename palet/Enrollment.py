@@ -919,7 +919,7 @@ class Enrollment(Paletable):
                     { self._selectTimeunit(self.alias) }
                     { self._select_indicators() }
                     { self._do_calculations() }
-                    { self._userDefinedSelect('outer') }
+                    { self._userDefinedSelect('case') }
                     sum(mdcd_enrollment) as mdcd_enrollment,
                     sum(chip_enrollment) as chip_enrollment
                 from (
@@ -943,6 +943,7 @@ class Enrollment(Paletable):
                     group by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
+                        { self._userDefinedSelect('inner') }
                         aa.de_fil_dt,
                         { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
@@ -950,6 +951,7 @@ class Enrollment(Paletable):
                     order by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
+                        { self._userDefinedSelect('inner') }
                         aa.de_fil_dt,
                         { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
@@ -960,19 +962,20 @@ class Enrollment(Paletable):
 
                 where
                     { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
-                    { self._defineWhereClause(self.alias) } and
-                    { self._userDefinedClause() }
+                    { self._defineWhereClause(self.alias) }
                 group by
                     counter,
                     { self._getByGroupWithAlias(self.alias) }
                     { self._groupby_indicators() }
                     { self._getDerivedTypeSelections() }
+                    { self._userDefinedSelect('outer') }
                     { self._getAggregateGroup() }
                     { self._groupTimeunit(self.alias) }
                 order by
                     { self._getByGroupWithAlias(self.alias) }
                     { self._groupby_indicators() }
                     { self._getDerivedTypeSelections() }
+                    { self._userDefinedSelect('outer') }
                     { self._getAggregateGroup() }
                     { self._groupTimeunit(self.alias) }
             """

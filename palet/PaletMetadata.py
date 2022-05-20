@@ -618,13 +618,6 @@ class PaletMetadata:
             ServiceCategory.prescription: "data_anltcs_taf_rxh_vw"
         }
 
-        reverse_service_category = {
-            "data_anltcs_taf_iph_vw": ServiceCategory.inpatient,
-            "data_anltcs_taf_lth_vw": ServiceCategory.long_term,
-            "data_anltcs_taf_oth_vw": ServiceCategory.other_services,
-            "data_anltcs_taf_rxh_vw": ServiceCategory.prescription
-        }
-
         run_id_file = {
             ServiceCategory.inpatient: 'IPH',
             ServiceCategory.other_services: 'OTH',

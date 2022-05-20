@@ -306,7 +306,7 @@ class Paletable():
                 _join = ",".join(_constr)
                 where.append(_join)
 
-            return f"{' and '.join(where)}"
+            return f"{' or '.join(where)}"
 
         else:
             return "1=1"
@@ -321,23 +321,30 @@ class Paletable():
         self.palet.logger.debug('checking for user defined select variabes based on api calls')
 
         if len(self.user_constraint) > 0:
-            for key, case in self.user_constraint.items():
-                sel_fields = []
-                case_fields = []
+            sel_fields = []
+            alias_fmt = None
 
+            for key, case in self.user_constraint.items():
                 if sql_type == "inner":
                     for constr in case:
                         for field, val in PaletMetadata.Enrollment.common_fields.items():
                             # get the value(s) in case there are multiple
                             if constr.lower().find(field) >= 0:
-                                sel_fields.append(f"aa.{val}")  # TODO:
+                                sel_fields.append(f"{self.nested_alias}.{val}")  # TODO:
+                elif sql_type == "outer":
+                    for constr in case:
+                        for field, val in PaletMetadata.Enrollment.common_fields.items():
+                            # get the value(s) in case there are multiple
+                            if constr.lower().find(field) >= 0:
+                                sel_fields.append(f"{self.alias}.{val}")  # TODO:
+
                 else:   # TODO: Look at overloading this method because of this!
                     all_fields = PaletMetadata.Enrollment.all_common_fields()
                     for cond in case:
                         for field, metaval in all_fields.items():
                             cond = cond.replace(field, metaval)
-                        case_fields.append("case when " + cond + " then '" + key + "' end as defined_category")
-                    return ',\n\t\t\t\t'.join(case_fields) + ","
+                        alias_fmt = cond.format(alias=self.alias)
+                        sel_fields.append("case when " + alias_fmt + " then '" + key + "' end as defined_category")
 
             return ',\n\t\t\t\t'.join(set(sel_fields)) + ","
 
@@ -368,6 +375,13 @@ class Paletable():
             if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
             else float('NaN')
             for x in range(len(df))]
+
+    def _update_user_constraints(self, constraints):
+        for list_constr in constraints:
+            for item in list_constr:
+                self.user_constraint.update(item)
+
+        return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -632,11 +646,6 @@ class Paletable():
 
         return self
 
-    def bySpecialtyGroup(self, **constraints):
-        for constraint, val in constraints:
-            self._addByGroup(PaletMetadata.Specialty.ud_const.get(constraint))
-            self.filter.update({PaletMetadata.Specialty.ud_const.get(constraint): val})
-
     # ---------------------------------------------------------------------------------
     #
     #
@@ -822,6 +831,7 @@ class Paletable():
                 PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
                 self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
                 self.filter_by_type.update({EligibilityType: constraint})
+                self._update_user_constraints(constraint)
             elif isinstance(constraint, tuple):
                 self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
 
