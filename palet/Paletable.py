@@ -259,7 +259,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _defineWhereClause(self):
+    def _defineWhereClause(self, alias: str):
         self.palet.logger.debug('defining our where clause based on api calls')
         where = []
 
@@ -274,7 +274,7 @@ class Paletable():
                     _in_stmt.append(f"'{val}'")
 
                 _join = ",".join(_in_stmt)
-                where.append('aa.' + key + ' in (' + _join + ')')
+                where.append(alias + '.' + key + ' in (' + _join + ')')
 
             return f"{' and '.join(where)}"
 
