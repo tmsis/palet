@@ -323,6 +323,7 @@ class Paletable():
         if len(self.user_constraint) > 0:
             sel_fields = []
             alias_fmt = None
+            returnval = ''
 
             for key, case in self.user_constraint.items():
                 if sql_type == "inner":
@@ -331,22 +332,24 @@ class Paletable():
                             # get the value(s) in case there are multiple
                             if constr.lower().find(field) >= 0:
                                 sel_fields.append(f"{self.nested_alias}.{val}")  # TODO:
+                        returnval = ',\n\t\t\t\t'.join(set(sel_fields)) + ","
                 elif sql_type == "outer":
                     for constr in case:
                         for field, val in PaletMetadata.Enrollment.common_fields.items():
                             # get the value(s) in case there are multiple
                             if constr.lower().find(field) >= 0:
                                 sel_fields.append(f"{self.alias}.{val}")  # TODO:
-
+                        returnval = ',\n\t\t\t\t'.join(set(sel_fields)) + ","
                 else:   # TODO: Look at overloading this method because of this!
                     all_fields = PaletMetadata.Enrollment.all_common_fields()
                     for cond in case:
                         for field, metaval in all_fields.items():
                             cond = cond.replace(field, metaval)
                         alias_fmt = cond.format(alias=self.alias)
-                        sel_fields.append("case when " + alias_fmt + " then '" + key + "' end as defined_category")
+                        sel_fields.append("when " + alias_fmt + " then '" + key + "'")
+                    returnval = 'case ' + '\n\t\t\t\t'.join(set(sel_fields)) + ' end as defined_category,'
 
-            return ',\n\t\t\t\t'.join(set(sel_fields)) + ","
+            return returnval
 
         else:
             return ''
