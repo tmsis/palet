@@ -659,7 +659,7 @@ class Paletable():
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by a single State using FIPS code.
+            state_fips:`list, (optional)`: Filter by a single State or multiple states using FIPS code. Note brackets around state or states is required.
             default: `none`: Filter the Paletable object by all states and territories.
 
         Returns:
@@ -721,7 +721,7 @@ class Paletable():
             correspond to coverage_type in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual coverage type using coverage code.
+            type:`list, (optional)`: Filter by an individual coverage type or multiple coverage types using coverage code. Brackets are required. 
             default: `none`: Filter by all available coverage types.
 
         Returns:
@@ -763,7 +763,7 @@ class Paletable():
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            type:`list, (optional)`: Filter by an individual enrollment type or multiple enrollment types using enrollment type code. Brackets are required. 
             default: `none`: Filter by all available enrollment types
 
         Returns:
@@ -814,7 +814,7 @@ class Paletable():
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            type:`list, (optional)`: Filter by an individual eligibility type or multiple eligibilty types using eligibility type code. Brackets are required. 
             default: `none`: Filter by all available enrollment types
 
         Returns:
@@ -823,7 +823,7 @@ class Paletable():
         Example:
             Create Paletable object:
 
-            >>> api = Enrollment().byEnrollmentType()
+            >>> api = Enrollment().byEligibilityType()
 
             Return Paletable object as a DataFrame:
 
@@ -901,8 +901,7 @@ class Paletable():
         """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
-            year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
-            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1.
+            year:`list, (optional)`: Filter by year using the year or years in numerical format. Input is list, brackets are required even when looking at one year.
             default: `none`: Filter object by all states and territories available.
 
         Returns:
@@ -919,11 +918,7 @@ class Paletable():
 
             Create Paletable object filtering by 2019 and 2020:
 
-            >>> api = Enrollment().byYear(2019, 1)
-
-            Or alternatively:
-
-            >>> api = api = Enrollment().byYear(2020, -1)
+            >>> api = Enrollment().byYear([2019, 2020])
 
             Return object as a DataFrame:
 
@@ -952,7 +947,7 @@ class Paletable():
         """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
-            month:`int, (optional)`: Filter by a specific month using the month in numerical format.
+            month:`list, (optional)`: Filter by a specific month or months using the month(s) in numerical format. Input is list, brackets are required even when looking at one month.
             default: `none`: Filter object by all available months.
 
         Returns:
