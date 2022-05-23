@@ -374,8 +374,8 @@ class Paletable():
     def _buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
         self.palet.logger.debug('master function to create pctChange columns based on column passed')
         df[resultColumnName] = [
-            round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
-            if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+            round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x - colIntPosition]) - 1), 3)
+            if x != 0 and df[columnNameToCalc].iat[x - 1] > 0 and df['isfirst'].iat[x] != 1
             else float('NaN')
             for x in range(len(df))]
 
@@ -797,11 +797,18 @@ class Paletable():
     # Stub method for byEligibilityType user entries overloading
     # ---------------------------------------------------------------------------------
     @overload
-    def byEligibilityType(self, constraint: tuple = None) -> None: ...
-    @overload
-    def byEligibilityType(self, constraint: list = None) -> None: ...
+    def byEligibilityType(self, constraint: tuple = None) -> None:
+        ...
 
-    def byEligibilityType(self, constraint):
+    @overload
+    def byEligibilityType(self, constraint: list = None) -> None:
+        ...
+
+    @overload
+    def byEligibilityType(self) -> None:
+        ...
+
+    def byEligibilityType(self, constraint=None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
