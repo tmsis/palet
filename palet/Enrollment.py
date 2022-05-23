@@ -679,8 +679,12 @@ class Enrollment(Paletable):
             >>> display(api.fetch())
 
         """
+        from collections import defaultdict
 
         self.markers[marker] = condition
+
+        self.outer_joins.append(condition.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
+
         return self
 
     # ---------------------------------------------------------------------------------
@@ -706,10 +710,9 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _select_markers(self):
         indicators = []
-        _marker_cache = self.palet.getSQLAliasStack()
         for key, _val in self.markers.items():
-            alias = _marker_cache.pop()
-            indicators.append(f"{alias}.indicator as {key},")
+
+            indicators.append(f"{_val.alias}.indicator as {key},")
 
         return '\n\t\t\t'.join(indicators)
 
@@ -723,7 +726,8 @@ class Enrollment(Paletable):
     def _select_indicators(self):
         indicators = []
         for key, _val in self.markers.items():
-            indicators.append(f"coalesce({key}, 0) as {key},")
+
+            indicators.append(f"coalesce({_val.alias}.indicator, 0) as {key},")
 
         if len(indicators) > 0:
             return '\n\t\t\t'.join(indicators)
@@ -770,10 +774,8 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     def _groupby_markers(self):
         groupby = []
-        _groupby_cache = self.palet.getSQLAliasStack()
         for _key, _val in self.markers.items():
-            alias = _groupby_cache.pop()
-            groupby.append(f",{alias}.indicator")
+            groupby.append(f",{_val.alias}.indicator")
 
         return '\n\t\t'.join(groupby)
 
@@ -837,7 +839,7 @@ class Enrollment(Paletable):
     def _apply_constraints(self):
         contraints = ''
         for i in self.having_constraints:
-            contraints += 'inner join ' + str(i)
+            contraints += '\ninner join ' + str(i)
 
         return contraints
 
@@ -928,14 +930,12 @@ class Enrollment(Paletable):
                         aa.de_fil_dt,
                         { Palet.joinable('aa.submtg_state_cd') },
                         aa.msis_ident_num,
-                        { self._select_markers() }
                         { self._userDefinedSelect('inner') }
                         { self._getTimeUnitBreakdown() }
                         { PaletMetadata.Enrichment._renderAgeRange(self) }
                     from
                         taf.taf_ann_de_base as aa
                         { self._apply_constraints() }
-                        { self._apply_markers() }
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
                         { self._getByTimeunitCull(Enrollment.timeunit.cull) } and
@@ -947,7 +947,6 @@ class Enrollment(Paletable):
                         aa.de_fil_dt,
                         { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
-                        { self._groupby_markers() }
                     order by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
@@ -955,7 +954,6 @@ class Enrollment(Paletable):
                         aa.de_fil_dt,
                         { Palet.joinable('aa.submtg_state_cd', True) },
                         aa.msis_ident_num
-                        { self._groupby_markers() }
                 ) as {self.alias}
 
                 { self._joinsOnYearMon() }
