@@ -59,6 +59,24 @@ class PaletMetadata:
                 '4': 'Eligible for Medicaid & Seperate CHIP'
             }
 
+        common_fields = {
+            "gndr_cd": "gndr_cd",
+            "age_num": "age_num",
+        }
+
+        stack_fields = {
+            "rstrctd_bnfts_cd": "rstrctd_bnfts_cd",
+            "elgblty_grp_cd": "eligibility_type"
+        }
+
+        @staticmethod
+        def all_common_fields():
+            all_fields = {}
+            all_fields.update(PaletMetadata.Enrollment.common_fields)
+            all_fields.update(PaletMetadata.Enrollment.stack_fields)
+
+            return all_fields
+
         def _findFullMonthEnrollments(df: pd.DataFrame):
             palet = PaletMetadata.Enrichment._getPaletObj()
             month = df['month']
@@ -600,29 +618,11 @@ class PaletMetadata:
             ServiceCategory.prescription: "data_anltcs_taf_rxh_vw"
         }
 
-        reverse_service_category = {
-            "data_anltcs_taf_iph_vw": ServiceCategory.inpatient,
-            "data_anltcs_taf_lth_vw": ServiceCategory.long_term,
-            "data_anltcs_taf_oth_vw": ServiceCategory.other_services,
-            "data_anltcs_taf_rxh_vw": ServiceCategory.prescription
-        }
-
         run_id_file = {
             ServiceCategory.inpatient: 'IPH',
             ServiceCategory.other_services: 'OTH',
             ServiceCategory.long_term: 'LTH',
             ServiceCategory.prescription: 'RXH'
-        }
-
-    class Specialty():
-        ud_const = {
-            "gender": "GNDR_CD",
-            "age": "age_num",
-            "group_cd": "elgblty_grp_cd",
-            "restricted_cd": "rstrctd_bnfts_cd",
-            "year": "year",
-            "month": "month"
-
         }
 
     class Enrichment():
