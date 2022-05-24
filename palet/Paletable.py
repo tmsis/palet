@@ -301,9 +301,10 @@ class Paletable():
                 for constr in metaval:
                     for field, val in PaletMetadata.Enrollment.stack_fields.items():
                         constr = constr.replace(field, val)
+                        constr = constr.format(alias=self.alias)
                     _constr.append(constr)
 
-                _join = ",".join(_constr)
+                _join = " or ".join(_constr)
                 where.append(_join)
 
             return f"{' or '.join(where)}"
@@ -340,7 +341,7 @@ class Paletable():
                             if constr.lower().find(field) >= 0:
                                 sel_fields.append(f"{self.alias}.{val}")  # TODO:
                         returnval = ',\n\t\t\t\t'.join(set(sel_fields)) + ","
-                else:   # TODO: Look at overloading this method because of this!
+                elif sql_type == "case":
                     all_fields = PaletMetadata.Enrollment.all_common_fields()
                     for cond in case:
                         for field, metaval in all_fields.items():
@@ -348,6 +349,8 @@ class Paletable():
                         alias_fmt = cond.format(alias=self.alias)
                         sel_fields.append("when " + alias_fmt + " then '" + key + "'")
                     returnval = 'case ' + '\n\t\t\t\t'.join(set(sel_fields)) + ' end as defined_category,'
+                else:
+                    return ""
 
             return returnval
 

@@ -102,7 +102,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None,  asOf: date = None, paletable: Paletable = None, period: str = "month"):
+    def __init__(self, runIds: list = None, asOf: date = None, paletable: Paletable = None, period: str = "month"):
         # print('Initializing Enrollment API')
         super().__init__(asOf=asOf, runIds=runIds)
 
@@ -354,29 +354,30 @@ class Enrollment(Paletable):
         }
 
         cull = {
-                'year': """(
-                    (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0))""",
+            'year': """(
+                (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0)
+            )""",
 
-                'month': """(
-                    ((aa.mdcd_enrlmt_days_01 > 0) or (aa.chip_enrlmt_days_01 > 0)) or
-                    ((aa.mdcd_enrlmt_days_02 > 0) or (aa.chip_enrlmt_days_02 > 0)) or
-                    ((aa.mdcd_enrlmt_days_03 > 0) or (aa.chip_enrlmt_days_03 > 0)) or
-                    ((aa.mdcd_enrlmt_days_04 > 0) or (aa.chip_enrlmt_days_04 > 0)) or
-                    ((aa.mdcd_enrlmt_days_05 > 0) or (aa.chip_enrlmt_days_05 > 0)) or
-                    ((aa.mdcd_enrlmt_days_06 > 0) or (aa.chip_enrlmt_days_06 > 0)) or
-                    ((aa.mdcd_enrlmt_days_07 > 0) or (aa.chip_enrlmt_days_07 > 0)) or
-                    ((aa.mdcd_enrlmt_days_08 > 0) or (aa.chip_enrlmt_days_08 > 0)) or
-                    ((aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0)) or
-                    ((aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0)) or
-                    ((aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0)) or
-                    ((aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0))
-                )""",
+            'month': """(
+                ((aa.mdcd_enrlmt_days_01 > 0) or (aa.chip_enrlmt_days_01 > 0)) or
+                ((aa.mdcd_enrlmt_days_02 > 0) or (aa.chip_enrlmt_days_02 > 0)) or
+                ((aa.mdcd_enrlmt_days_03 > 0) or (aa.chip_enrlmt_days_03 > 0)) or
+                ((aa.mdcd_enrlmt_days_04 > 0) or (aa.chip_enrlmt_days_04 > 0)) or
+                ((aa.mdcd_enrlmt_days_05 > 0) or (aa.chip_enrlmt_days_05 > 0)) or
+                ((aa.mdcd_enrlmt_days_06 > 0) or (aa.chip_enrlmt_days_06 > 0)) or
+                ((aa.mdcd_enrlmt_days_07 > 0) or (aa.chip_enrlmt_days_07 > 0)) or
+                ((aa.mdcd_enrlmt_days_08 > 0) or (aa.chip_enrlmt_days_08 > 0)) or
+                ((aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0)) or
+                ((aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0)) or
+                ((aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0)) or
+                ((aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0))
+            )""",
 
-                'full': "1=1",
+            'full': "1=1",
 
-                'partial': '1=1',
+            'partial': '1=1',
 
-                'partial_year': '1=1'
+            'partial_year': '1=1'
 
         }
 
@@ -503,20 +504,20 @@ class Enrollment(Paletable):
                 aggregates.append(column.aggregate('aa'))
 
             z = breakdown.format(
-                 ', '.join(series_00) + ',',
-                 ', '.join(series_01) + ',',
-                 ', '.join(series_02) + ',',
-                 ', '.join(series_03) + ',',
-                 ', '.join(series_04) + ',',
-                 ', '.join(series_05) + ',',
-                 ', '.join(series_06) + ',',
-                 ', '.join(series_07) + ',',
-                 ', '.join(series_08) + ',',
-                 ', '.join(series_09) + ',',
-                 ', '.join(series_10) + ',',
-                 ', '.join(series_11) + ',',
-                 ', '.join(aliases) + ',',
-                 ', '.join(aggregates) + ',')
+                ', '.join(series_00) + ',',
+                ', '.join(series_01) + ',',
+                ', '.join(series_02) + ',',
+                ', '.join(series_03) + ',',
+                ', '.join(series_04) + ',',
+                ', '.join(series_05) + ',',
+                ', '.join(series_06) + ',',
+                ', '.join(series_07) + ',',
+                ', '.join(series_08) + ',',
+                ', '.join(series_09) + ',',
+                ', '.join(series_10) + ',',
+                ', '.join(series_11) + ',',
+                ', '.join(aliases) + ',',
+                ', '.join(aggregates) + ',')
 
             return z
 
@@ -962,7 +963,8 @@ class Enrollment(Paletable):
 
                 where
                     { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
-                    { self._defineWhereClause(self.alias) }
+                    { self._defineWhereClause(self.alias) } and
+                    { self._userDefinedClause() }
                 group by
                     counter,
                     { self._getByGroupWithAlias(self.alias) }
