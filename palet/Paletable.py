@@ -845,12 +845,9 @@ class Paletable():
                 self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
                 self.filter_by_type.update({EligibilityType: constraint})
                 self._update_user_constraints(constraint)
-            elif isinstance(constraint, tuple):
+            elif isinstance(constraint, dict):
                 self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
-
-                for constr in constraint:
-                    for key in constr:
-                        self.user_constraint.update({key: constr[key]})
+                self.user_constraint.update(constraint)
 
                 for _field, val in PaletMetadata.Enrollment.common_fields.items():
                     # get the value(s) in case there are multiple
