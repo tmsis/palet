@@ -1,5 +1,5 @@
 """
-The flagship class the Palet lirbary is built around. This class provides the frame work for other classes in the library.
+The flagship class the Palet library is built around. This class provides the frame work for other classes in the library.
 The Palet module contains the Palet class, the Utils subclass (short for utilities), and attributes for initialization, loading
 metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from
 the Paletable module inherit from Palet as well.
@@ -398,9 +398,10 @@ class Palet:
             aliases: dict = pickle.load(filename, 'rb')
             return aliases
 
-        @staticmethod
-        def sql_formatter():
-            pass
+        # @staticmethod
+        # def sqlparse(z: str):
+        #     z = sqlparse.format(z, indent_tabs=False, indent_width=1, reindent_aligned=True, keyword_case="upper", comma_first=True)
+        #     return z
 
 
 # -------------------------------------------------------------------------------------
