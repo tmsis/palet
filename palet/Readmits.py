@@ -1,3 +1,9 @@
+"""
+PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary 
+readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital 
+then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below. 
+"""
+
 # -------------------------------------------------------
 #
 #
@@ -15,6 +21,44 @@ from palet.DateDimension import DateDimension
 #
 # -------------------------------------------------------
 class Readmits():
+    """
+    The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` from the Enrollment module
+    or :meth:`~Readmits.Readmits.calculate` from this module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned,
+    the :meth:`~Readmits.Readmits.allcause` method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension`
+    object associated with the Readmits class. Examples of how to use this module are visible below.
+
+    Note:
+        Enrollment().having(Readmits.allcause(30)) filters an enrollment query so counts only include readmits.
+        Enrollment().calculate(Readmits.allcause(30)) returns a standard enrollment query and appends columns with counts for readmits as well as a readmit rate.
+
+    Examples:
+        Import Enrollment and Readmits from PALET:
+
+        >>> from palet.Enrollment import Enrollment
+
+        >>> from palet.Readmits import Readmits
+
+        Create a Paletable object for Readmits using having()
+
+        >>> having = Enrollment().having(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+        Create a Paletable object for Readmits using calculate()
+
+        >>> having = Enrollment().calculate(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+    """
 
     # -------------------------------------------------------
     #
@@ -385,6 +429,14 @@ class Readmits():
     #
     # -------------------------------------------------------
     def calculate(self):
+        """
+        The calculate function is a backend method of Readmits. This function calculates the readmit rate and appends it to the dataframe
+        the user creates. The readmit rate is the sum of readmissions in a given time period over the sum of enrollment in a given time
+        period. 
+
+        Note:
+            This is a backend function which the user does not directly interact with. 
+        """
 
         calculate_rate = f"""
             sum({self.alias}.has_readmit) as readmits,
@@ -432,7 +484,7 @@ class Readmits():
     #
     # -------------------------------------------------------
     @staticmethod
-    def allcause(days, date_dimension: DateDimension = None):
+    def allcause(days = 30, date_dimension: DateDimension = None):
 
         o = Readmits()
         if date_dimension is not None:
