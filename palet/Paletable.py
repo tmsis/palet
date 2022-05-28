@@ -305,7 +305,7 @@ class Paletable():
                     _constr.append(constr)
 
                 _join = " or ".join(_constr)
-                where.append(_join)
+            where.append(_join)
 
             return f"{' or '.join(where)}"
 
@@ -724,7 +724,7 @@ class Paletable():
             correspond to coverage_type in PaletMetadata.
 
         Args:
-            type:`list, (optional)`: Filter by an individual coverage type or multiple coverage types using coverage code. Brackets are required. 
+            type:`list, (optional)`: Filter by an individual coverage type or multiple coverage types using coverage code. Brackets are required.
             default: `none`: Filter by all available coverage types.
 
         Returns:
@@ -766,7 +766,7 @@ class Paletable():
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`list, (optional)`: Filter by an individual enrollment type or multiple enrollment types using enrollment type code. Brackets are required. 
+            type:`list, (optional)`: Filter by an individual enrollment type or multiple enrollment types using enrollment type code. Brackets are required.
             default: `none`: Filter by all available enrollment types
 
         Returns:
@@ -796,29 +796,58 @@ class Paletable():
 
     # ---------------------------------------------------------------------------------
     #
-    #
     # Stub method for byEligibilityType user entries overloading
     # ---------------------------------------------------------------------------------
     @overload
-    def byEligibilityType(self, constraint: tuple = None) -> None:
-        ...
-
-    @overload
-    def byEligibilityType(self, constraint: list = None) -> None:
-        ...
-
-    @overload
-    def byEligibilityType(self) -> None:
-        ...
-
-    def byEligibilityType(self, constraint=None):
+    def byEligibilityType(self, constraint: dict = None) -> None:
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`list, (optional)`: Filter by an individual eligibility type or multiple eligibilty types using eligibility type code. Brackets are required. 
+            type:`dict, (optional)`: Filter by one or more user specified constraints in dict format.
+
             default: `none`: Filter by all available enrollment types
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+
+            Filter by special Eligibility Types:
+
+            >>> api = Enrollment().byEligibilityType([EligibilityType.BlindAndDisabled, EligibilityType.Aged])
+
+            or
+
+            Filter by user defined group(s)
+
+            >>> api = Enrollment().byEligibilityType(constraint={"Pregnant": ["(bb.age_num <= 59 or bb.age_num is null) and (bb.GNDR_CD='F'
+                                                                                or bb.GNDR_CD is null) and bb.eligibility_type
+                                                                                in ('67','68','05','53')"]})
+
+        Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
+        correspond to chip_cd in PaletMetadata.
+
+        Args:
+            type:`list, (optional)`: Filter by one or more eligibilty types using eligibility type code or special groups within EligilibilityType.
+                                     Brackets are required.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Filter by user defined group(s)
+
+            >>> api = Enrollment().byEligibilityType([EligibilityType.BlindAndDisabled, EligibilityType.Aged])
+
+            or
+
+            >>> api = Enrollment().byEligibilityType(['01', '02', '03']) 
+
+        Args:
+            default: `none`:No filter / show all available enrollment types
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -830,9 +859,18 @@ class Paletable():
 
             Return Paletable object as a DataFrame:
 
-            >>> display(api.fetch())
+            >>> display(api.fetch())"""                                                                                   
+        ...
 
-        """
+    @overload
+    def byEligibilityType(self, constraint: list = None) -> None:
+        ...
+
+    @overload
+    def byEligibilityType(self) -> None:
+        ...
+
+    def byEligibilityType(self, constraint=None):
         from palet.EligibilityType import EligibilityType
 
         self.palet.logger.info('adding EligibilityType to the by Group')
@@ -844,7 +882,8 @@ class Paletable():
                 PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
                 self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
                 self.filter_by_type.update({EligibilityType: constraint})
-                self._update_user_constraints(constraint)
+                if type(constraint[0]) is tuple:
+                    self._update_user_constraints(constraint)
             elif isinstance(constraint, dict):
                 self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
                 self.user_constraint.update(constraint)

@@ -535,7 +535,7 @@ class Enrollment(Paletable):
         breakdown = cull_type[self.timeunit]
         for key in self.filter_by_type:
             _type = self.filter_by_type[key]
-            return breakdown.format(key.alias, key.filter(_type))
+            return breakdown.format(key.alias, key.filter(self, _type))
 
         return breakdown.format('1', '(1)')
 
