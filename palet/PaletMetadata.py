@@ -51,13 +51,13 @@ class PaletMetadata:
                        'chip_cd_12']
 
         chip_cd = {
-                'null': 'Unknown',
-                '0': 'Not Eligible',
-                '1': 'Eligible for Medicaid',
-                '2': 'Eligible for Medicaid & Medicaid Expansion CHIP',
-                '3': 'Eligible for Seperate Title XXI CHIP',
-                '4': 'Eligible for Medicaid & Seperate CHIP'
-            }
+            'null': 'Unknown',
+            '0': 'Not Eligible',
+            '1': 'Eligible for Medicaid',
+            '2': 'Eligible for Medicaid & Medicaid Expansion CHIP',
+            '3': 'Eligible for Seperate Title XXI CHIP',
+            '4': 'Eligible for Medicaid & Seperate CHIP'
+        }
 
         common_fields = {
             "gndr_cd": "gndr_cd",
@@ -282,19 +282,19 @@ class PaletMetadata:
                 Dec = 'chip_enrlmt_days_12'
 
                 enrollment = {
-                        '01':  "chip_enrlmt_days_01",
-                        '02':  "chip_enrlmt_days_02",
-                        '03':  "chip_enrlmt_days_03",
-                        '04':  "chip_enrlmt_days_04",
-                        '05':  "chip_enrlmt_days_05",
-                        '06':  "chip_enrlmt_days_06",
-                        '07':  "chip_enrlmt_days_07",
-                        '08':  "chip_enrlmt_days_08",
-                        '09':  "chip_enrlmt_days_09",
-                        '10':  "chipenrlmt_days_10",
-                        '11':  "chip_enrlmt_days_11",
-                        '12':  "chip_enrlmt_days_12"
-                    }
+                    '01': "chip_enrlmt_days_01",
+                    '02': "chip_enrlmt_days_02",
+                    '03': "chip_enrlmt_days_03",
+                    '04': "chip_enrlmt_days_04",
+                    '05': "chip_enrlmt_days_05",
+                    '06': "chip_enrlmt_days_06",
+                    '07': "chip_enrlmt_days_07",
+                    '08': "chip_enrlmt_days_08",
+                    '09': "chip_enrlmt_days_09",
+                    '10': "chipenrlmt_days_10",
+                    '11': "chip_enrlmt_days_11",
+                    '12': "chip_enrlmt_days_12"
+                }
 
         class Medicaid:
             """
@@ -328,15 +328,15 @@ class PaletMetadata:
                 Dec = 'mdcd_enrlmt_days_12'
 
                 enrollment = {
-                    '01':  "mdcd_enrlmt_days_01",
-                    '02':  "mdcd_enrlmt_days_02",
-                    '03':  "mdcd_enrlmt_days_03",
-                    '04':  "mdcd_enrlmt_days_04",
-                    '05':  "mdcd_enrlmt_days_05",
-                    '06':  "mdcd_enrlmt_days_06",
-                    '07':  "mdcd_enrlmt_days_07",
-                    '08':  "mdcd_enrlmt_days_08",
-                    '09':  "mdcd_enrlmt_days_09",
+                    '01': "mdcd_enrlmt_days_01",
+                    '02': "mdcd_enrlmt_days_02",
+                    '03': "mdcd_enrlmt_days_03",
+                    '04': "mdcd_enrlmt_days_04",
+                    '05': "mdcd_enrlmt_days_05",
+                    '06': "mdcd_enrlmt_days_06",
+                    '07': "mdcd_enrlmt_days_07",
+                    '08': "mdcd_enrlmt_days_08",
+                    '09': "mdcd_enrlmt_days_09",
                     '10': "mdcd_enrlmt_days_10",
                     '11': "mdcd_enrlmt_days_11",
                     '12': "mdcd_enrlmt_days_12"
@@ -535,7 +535,7 @@ class PaletMetadata:
             '60': "Accountable Care Organization",
             '70': "Health/Medical Home (retired value)",
             '80': "Integrated Care for Dual Eligibles"
-            }
+        }
 
     class Claims:
         ptnt_stus_cd = "ptnt_stus_cd"
@@ -648,8 +648,7 @@ class PaletMetadata:
         def _checkForHelperMsg(field, field_type, value_example: str):
 
             if type(field) != field_type and field is not None:
-                PaletMetadata.Enrichment._getPaletObj().logger.error(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type)
-                                                                                + " e.g. " + value_example)
+                PaletMetadata.Enrichment._getPaletObj().logger.error(str(field) + " is not a valid value. Please enter in the form of a " + str(field_type) + " e.g. " + value_example)
                 return ",'n/a' as " + str(field)
 
         def getDefinedColumns(self):
