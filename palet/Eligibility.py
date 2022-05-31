@@ -282,7 +282,7 @@ class Eligibility(Paletable):
                             taf.taf_ann_de_base as aa
                         where
                             aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE')} ) and
-                            {self._defineWhereClause('aa')}
+                            {self._sqlFilterWhereClause('aa')}
                         group by
                             {self._getByGroupWithAlias()}
                             {self._getDerivedByTypeGroup()}

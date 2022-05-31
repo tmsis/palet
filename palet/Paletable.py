@@ -259,7 +259,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _defineWhereClause(self, alias: str):
+    def _sqlFilterWhereClause(self, alias: str):
         self.palet.logger.debug('defining our where clause based on api calls')
         where = []
 
@@ -287,7 +287,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _userDefinedClause(self):
+    def _derivedTypesWhereClause(self):
         self.palet.logger.debug('checking for user defined where clause based on api calls')
         where = []
 
