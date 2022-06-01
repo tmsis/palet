@@ -757,7 +757,6 @@ class Paletable():
             PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
             self.filter_by_type.update({CoverageType: constraint})
 
-        # return Enrollment(self._user_runids, self)
         return self
 
     # ---------------------------------------------------------------------------------
@@ -796,7 +795,6 @@ class Paletable():
             PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['1', '2', '3']")
             self.filter_by_type.update({EnrollmentType: constraint})
 
-        # return Enrollment(self.date_dimension.runIds, self)
         return self
 
     # ---------------------------------------------------------------------------------
