@@ -37,6 +37,10 @@ class PaletMetadata:
         derived_enrollment_field = 'enrollment_type'
         month = 'month'
 
+        derived_columns = ['coverage_type',
+                           'eligibility_type',
+                           'enrollment_type']
+
         chip_cd_mon = ['chip_cd_01',
                        'chip_cd_02',
                        'chip_cd_03',

@@ -259,12 +259,14 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _sqlFilterWhereClause(self, alias: str):
+    def _sqlFilterWhereClause(self, alias: str, sqlloc: str = "outer"):
         self.palet.logger.debug('defining our where clause based on api calls')
         where = []
 
         if len(self.filter) > 0:
             for key in self.filter:
+                if sqlloc == "inner" and key in PaletMetadata.Enrollment.derived_columns:
+                    continue
                 _in_stmt = []
                 _join = ""
 
@@ -718,7 +720,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, types: list = None):
+    def byCoverageType(self, constraint: list = None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
@@ -748,9 +750,9 @@ class Paletable():
         self.palet.logger.info('adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
-        if types is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['01', '02', '03']")
-            self.filter_by_type.update({CoverageType: types})
+        if constraint is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
+            self.filter_by_type.update({CoverageType: constraint})
 
         # return Enrollment(self._user_runids, self)
         return self
@@ -760,7 +762,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, types: list = None):
+    def byEnrollmentType(self, constraint: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
@@ -787,9 +789,9 @@ class Paletable():
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EnrollmentType)
 
-        if types is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(types, list, "['1', '2', '3']")
-            self.filter_by_type.update({EnrollmentType: types})
+        if constraint is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['1', '2', '3']")
+            self.filter_by_type.update({EnrollmentType: constraint})
 
         # return Enrollment(self.date_dimension.runIds, self)
         return self
