@@ -278,7 +278,10 @@ class Paletable():
                 _join = ",".join(_in_stmt)
                 where.append(alias + '.' + key + ' in (' + _join + ')')
 
-            return f"{' and '.join(where)}"
+            if len(where) > 0:
+                return f"{' and '.join(where)}"
+            else:
+                return "1=1"
 
         else:
             return "1=1"
