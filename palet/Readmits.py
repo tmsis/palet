@@ -1,3 +1,9 @@
+"""
+PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary 
+readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital 
+then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below. 
+"""
+
 # -------------------------------------------------------
 #
 #
@@ -15,6 +21,45 @@ from palet.DateDimension import DateDimension
 #
 # -------------------------------------------------------
 class Readmits():
+    """
+    The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` from the Enrollment module
+    or :meth:`~Readmits.Readmits.calculate` from this module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned,
+    the :meth:`~Readmits.Readmits.allcause` method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension`
+    object associated with the Readmits class. Examples of how to use this module are visible below.
+
+    Note:
+        Enrollment().having(Readmits.allcause(30)) filters an enrollment query so counts only include readmits.
+        Enrollment().calculate(Readmits.allcause(30)) returns a standard enrollment query and appends columns with counts for readmits as well as a readmit rate.
+
+    Examples:
+
+        Import Enrollment and Readmits from PALET:
+
+        >>> from palet.Enrollment import Enrollment
+
+        >>> from palet.Readmits import Readmits
+
+        Create a Paletable object for Readmits using having()
+
+        >>> having = Enrollment().having(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+        Create a Paletable object for Readmits using calculate()
+
+        >>> having = Enrollment().calculate(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+    """
 
     # -------------------------------------------------------
     #
@@ -27,6 +72,7 @@ class Readmits():
         self.callback = None
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
+        self.filter = {}
 
         self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
 
@@ -74,6 +120,7 @@ class Readmits():
                 da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  msis_ident_num
                 ,admsn_dt
@@ -104,6 +151,7 @@ class Readmits():
                 da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  submtg_state_cd
                 ,msis_ident_num
@@ -385,6 +433,28 @@ class Readmits():
     #
     # -------------------------------------------------------
     def calculate(self):
+        """
+        The calculate function can be used in place of :meth:`~Enrollment.Enrollment.having` from the enrollment class. Where having()
+        simply filters the the enrollee counts to reflect enrollees who experience readmits during the given period, calculate() appends
+        columns to the DataFrame that count the number of admits, the number of readmits, and the readmit rate for that time period.
+
+        Note:
+            When using either calculate() or :meth:`~Enrollment.Enrollment.having` for readmits, :meth:`~Readmits.Readmits.allcause` is required.
+
+        Args:
+            self: `Readmit object, required`: Included the Readmit object as well as :meth:`~Readmits.Readmits.allcause`.
+
+        Returns:
+            Joins the sql query from :class:`Enrollment` with the query from Readmits.
+
+        Example:
+            Import Enrollment and Readmits from PALET:
+
+            >>> from palet.Enrollment import Enrollment
+
+            >>> from palet.Readmits import Readmits            
+
+        """
 
         calculate_rate = f"""
             sum({self.alias}.has_readmit) as readmits,
@@ -398,7 +468,63 @@ class Readmits():
     #
     #
     # -------------------------------------------------------
+    def apply_filters(self):        
+        where = []
+
+        if len(self.filter) > 0:
+            for key in self.filter:
+                _in_stmt = []
+                _join = ""
+                if key not in ['SUBMTG_STATE_CD']:
+                    continue
+
+                # get the value(s) in case there are multiple
+                values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
+
+                _join = ",".join(_in_stmt)
+                where.append(key + ' in (' + _join + ')')
+
+            if len(where) > 0:
+                return f"and {' and '.join(where)}"
+
+        else:
+            return ''
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def prepare(self):
+
+        self.palet_readmits_edge_ip = self.palet_readmits_edge_ip.format(self.apply_filters())
+        self.palet_readmits_edge_lt = self.palet_readmits_edge_lt.format(self.apply_filters())
+
+        prep = [
+            self.palet_readmits_edge_ip,
+            self.palet_readmits_edge_lt,
+            self.palet_readmits_edge,
+            self.palet_readmits_edge_x_ip_lt,
+            self.palet_readmits_discharge,
+            self.palet_readmits_segments,
+            self.palet_readmits_continuity,
+            self.palet_readmits]
+
+        spark = SparkSession.getActiveSession()
+        if spark is not None:
+            for i in prep:
+                spark.sql(i)
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def join_inner(self) -> str:
+
+        self.prepare()
 
         sql = f"""
                 ({self.palet_readmits_summary}) as {self.alias}
@@ -415,6 +541,8 @@ class Readmits():
     #
     # -------------------------------------------------------
     def join_outer(self) -> str:
+
+        self.prepare()
 
         sql = f"""
                 ({self.palet_readmits_summary}) as {self.alias}
@@ -443,18 +571,6 @@ class Readmits():
         o.alias = alias
         o.init()
         o.days = days
-
-        spark = SparkSession.getActiveSession()
-        if spark is not None:
-
-            spark.sql(o.palet_readmits_edge_ip)
-            spark.sql(o.palet_readmits_edge_lt)
-            spark.sql(o.palet_readmits_edge)
-            spark.sql(o.palet_readmits_edge_x_ip_lt)
-            spark.sql(o.palet_readmits_discharge)
-            spark.sql(o.palet_readmits_segments)
-            spark.sql(o.palet_readmits_continuity)
-            spark.sql(o.palet_readmits)
 
         o.callback = o.calculate
 

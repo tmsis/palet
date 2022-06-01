@@ -826,6 +826,7 @@ class Enrollment(Paletable):
         from collections import defaultdict
 
         if constraint not in self.having_constraints:
+            constraint.filter = self.filter
             self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
@@ -855,6 +856,7 @@ class Enrollment(Paletable):
         from collections import defaultdict
 
         if paletable not in self.calculations:
+            paletable.filter = self.filter
 
             self.calculations.append(paletable.callback)
 
