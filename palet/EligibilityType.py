@@ -85,7 +85,7 @@ class EligibilityType():
                     for val in constr:
                         strlist = constr[val]
                         for i in strlist:
-                            if type(i) is str:  # TODO:
+                            if type(i) is str:
                                 filters.append(i)
                             else:
                                 for j in i:
