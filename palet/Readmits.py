@@ -1,7 +1,7 @@
 """
-PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary 
-readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital 
-then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below. 
+PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary
+readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital
+then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below.
 """
 
 # -------------------------------------------------------
@@ -452,7 +452,7 @@ class Readmits():
 
             >>> from palet.Enrollment import Enrollment
 
-            >>> from palet.Readmits import Readmits            
+            >>> from palet.Readmits import Readmits
 
         """
 
@@ -468,7 +468,7 @@ class Readmits():
     #
     #
     # -------------------------------------------------------
-    def apply_filters(self):        
+    def apply_filters(self):
         where = []
 
         if len(self.filter) > 0:
