@@ -160,7 +160,7 @@ class Diagnoses():
     # -------------------------------------------------------
     def _getRunIds(run_id_file: ServiceCategory, lookback: int = 6):
         from palet.DateDimension import DateDimension
-        return DateDimension().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), lookback)
+        return DateDimension.getInstance().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), lookback)
 
 
     # -------------------------------------------------------

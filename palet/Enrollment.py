@@ -983,7 +983,7 @@ class Enrollment(Paletable):
                     { self._groupTimeunit(self.alias) }
             """
 
-            self._addPostProcess(self._percentChange)
+            # self._addPostProcess(self._percentChange)
             self._sql = z
         else:
             return self._sql
