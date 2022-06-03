@@ -1,0 +1,577 @@
+"""
+PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary
+readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital
+then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below.
+"""
+
+# -------------------------------------------------------
+#
+#
+#
+# -------------------------------------------------------
+from pyspark.sql import SparkSession
+
+from palet.Palet import Palet
+from palet.DateDimension import DateDimension
+
+
+# -------------------------------------------------------
+#
+#
+#
+# -------------------------------------------------------
+class Readmits():
+    """
+    The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` from the Enrollment module
+    or :meth:`~Readmits.Readmits.calculate` from this module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned,
+    the :meth:`~Readmits.Readmits.allcause` method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension`
+    object associated with the Readmits class. Examples of how to use this module are visible below.
+
+    Note:
+        Enrollment().having(Readmits.allcause(30)) filters an enrollment query so counts only include readmits.
+        Enrollment().calculate(Readmits.allcause(30)) returns a standard enrollment query and appends columns with counts for readmits as well as a readmit rate.
+
+    Examples:
+
+        Import Enrollment and Readmits from PALET:
+
+        >>> from palet.Enrollment import Enrollment
+
+        >>> from palet.Readmits import Readmits
+
+        Create a Paletable object for Readmits using having()
+
+        >>> having = Enrollment().having(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+        Create a Paletable object for Readmits using calculate()
+
+        >>> having = Enrollment().calculate(Readmits.allcause(30))
+
+        Convert to a DataFrame and return
+
+        >>> df = having.fetch()
+
+        >>> display(df)
+
+    """
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def __init__(self):
+        self.days = 30
+        self.join_sql = ''
+        self.callback = None
+        self.alias = None
+        self.date_dimension = DateDimension.getInstance()
+        self.filter = {}
+
+        self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def sql(self):
+        return self.join_sql
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def __str__(self):
+        return self.sql()
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def init(self):
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_edge_ip = f"""
+            create or replace temporary view palet_readmits_edge_ip as
+            select distinct
+                'IP' as svc_cat
+                ,submtg_state_cd
+                ,msis_ident_num
+                ,admsn_dt
+                ,blg_prvdr_num
+                ,coalesce(dschrg_dt, srvc_endg_dt_drvd) as dschrg_dt
+                ,ptnt_stus_cd
+            from
+                taf.taf_iph
+            where
+                da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
+                and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
+            order by
+                 msis_ident_num
+                ,admsn_dt
+                ,blg_prvdr_num
+                ,dschrg_dt
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_edge_lt = f"""
+            create or replace temporary view palet_readmits_edge_lt as
+            select distinct
+                'LT' as svc_cat
+                ,submtg_state_cd
+                ,msis_ident_num
+                ,admsn_dt
+                ,blg_prvdr_num
+                ,dschrg_dt
+                ,srvc_bgnng_dt
+                ,srvc_endg_dt
+                ,ptnt_stus_cd
+            from
+                taf.taf_lth
+            where
+                da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
+                and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
+                and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
+            order by
+                 submtg_state_cd
+                ,msis_ident_num
+                ,blg_prvdr_num
+                ,dschrg_dt
+                ,srvc_bgnng_dt
+                ,srvc_endg_dt
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_edge = """
+            create or replace temporary view palet_readmits_edge as
+            select distinct
+                 svc_cat
+                ,submtg_state_cd
+                ,msis_ident_num
+                ,blg_prvdr_num
+                ,admsn_dt
+            from (
+                select distinct
+                     svc_cat
+                    ,submtg_state_cd
+                    ,msis_ident_num
+                    ,blg_prvdr_num
+                    ,admsn_dt
+                from
+                    palet_readmits_edge_ip
+            )
+            union all (
+                select distinct
+                     svc_cat
+                    ,submtg_state_cd
+                    ,msis_ident_num
+                    ,blg_prvdr_num
+                    ,admsn_dt
+                from
+                    palet_readmits_edge_lt
+            )
+            order by
+                 svc_cat
+                ,submtg_state_cd
+                ,msis_ident_num
+                ,admsn_dt
+                ,blg_prvdr_num
+            """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_edge_x_ip_lt = """
+            create or replace temporary view palet_readmits_edge_x_ip_lt as
+            select distinct
+                 e.submtg_state_cd
+                ,e.msis_ident_num
+                ,e.blg_prvdr_num
+                ,case
+                    when ((lt.srvc_bgnng_dt <= e.admsn_dt) and (ip.dschrg_dt <= lt.srvc_endg_dt)) then 1
+                    when ((e.admsn_dt <= lt.srvc_bgnng_dt) and (lt.srvc_bgnng_dt <= ip.dschrg_dt)) then 1
+                    when ((e.admsn_dt <= lt.srvc_endg_dt) and (lt.srvc_endg_dt <= ip.dschrg_dt)) then 1
+                    else 0 end as overlap
+                ,e.admsn_dt as admit
+                ,coalesce(ip.dschrg_dt, lt.dschrg_dt, lt.srvc_endg_dt) as discharge
+                ,coalesce(ip.ptnt_stus_cd, lt.ptnt_stus_cd) as ptnt_stus_cd
+            from
+                palet_readmits_edge as e
+            left join
+                palet_readmits_edge_ip as ip
+                on      e.msis_ident_num = ip.msis_ident_num
+                    and e.blg_prvdr_num = ip.blg_prvdr_num
+                    and e.admsn_dt = ip.admsn_dt
+            left join
+                palet_readmits_edge_lt as lt
+                on      e.msis_ident_num = lt.msis_ident_num
+                    and e.blg_prvdr_num = lt.blg_prvdr_num
+                    and e.admsn_dt = lt.admsn_dt
+            order by
+                 e.submtg_state_cd
+                ,e.msis_ident_num
+                ,admit
+                ,discharge
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_discharge = """
+            create or replace temporary view palet_readmits_discharge as
+            select
+                 submtg_state_cd
+                ,msis_ident_num
+                ,admit
+                ,max(discharge) as discharge
+                ,ptnt_stus_cd
+            from
+                palet_readmits_edge_x_ip_lt
+            group by
+                 submtg_state_cd
+                ,msis_ident_num
+                ,admit
+                ,ptnt_stus_cd
+            order by
+                 submtg_state_cd
+                ,msis_ident_num
+                ,admit
+                ,discharge
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_segments = """
+            create or replace temporary view palet_readmits_segments as
+            select
+                 submtg_state_cd
+                ,msis_ident_num
+                ,case
+                    when datediff(lead(admit) over (
+                        partition by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        order by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        ), discharge) = 1 and ptnt_stus_cd = 30 then 1
+                    when datediff(admit, lag(discharge) over (
+                        partition by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        order by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        )) = 1 and ptnt_stus_cd = 30 then 1
+                    when datediff(lead(admit) over (
+                        partition by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        order by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        ), discharge) = 0 then 1
+                    when datediff(admit, lag(discharge) over (
+                        partition by
+                             submtg_state_cd
+                            ,msis_ident_num
+                        order by
+                            submtg_state_cd
+                            ,msis_ident_num
+                        )) = 0 then 1
+                    else 0 end as carry
+                ,admit
+                ,discharge
+                ,datediff(lead(admit) over (
+                    partition by
+                         submtg_state_cd
+                        ,msis_ident_num
+                    order by
+                        submtg_state_cd
+                        ,msis_ident_num
+                ), discharge) as lead_diff_days
+                ,ptnt_stus_cd
+            from
+                palet_readmits_discharge
+            order by
+                 submtg_state_cd
+                ,msis_ident_num
+                ,admit
+                ,discharge
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_continuity = """
+            create or replace temporary view palet_readmits_continuity as
+            select distinct
+                 submtg_state_cd
+                ,msis_ident_num
+                ,case when carry = 1 then min(admit) over (
+                    partition by
+                         submtg_state_cd
+                        ,msis_ident_num
+                        ,carry
+                    order by
+                         submtg_state_cd
+                        ,msis_ident_num
+                        ,admit)
+                    else admit end as admit
+                ,case when carry = 1 then max(discharge) over (
+                    partition by
+                         submtg_state_cd
+                        ,msis_ident_num
+                        ,carry
+                    order by
+                         submtg_state_cd
+                        ,msis_ident_num
+                        ,discharge desc)
+                    else discharge end as discharge
+            from
+                palet_readmits_segments
+            order by
+                 submtg_state_cd
+                ,msis_ident_num
+                ,admit
+                ,discharge
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits = f"""
+            create or replace temporary view palet_readmits as
+            select distinct
+                 submtg_state_cd
+                ,msis_ident_num
+                ,year(admit) as year
+                ,month(admit) as month
+                ,1 as admit_ind
+                ,case when (datediff(lead(admit) over (
+                    partition by
+                        submtg_state_cd
+                        ,msis_ident_num
+                    order by
+                        submtg_state_cd
+                        ,msis_ident_num
+                ), discharge) <= {self.days}) then 1 else 0 end as readmit_ind
+            from
+                palet_readmits_continuity
+            order by
+                submtg_state_cd,
+                msis_ident_num,
+                year,
+                month
+        """
+
+        # -------------------------------------------------------
+        #
+        #
+        #
+        # -------------------------------------------------------
+        self.palet_readmits_summary = f"""
+            select
+                 submtg_state_cd
+                ,year
+                ,month
+                ,msis_ident_num
+                ,sum(readmit_ind) as has_readmit
+                ,sum(admit_ind) as has_admit
+                ,sum(readmit_ind) / sum(admit_ind) as readmit_rate
+            from
+                palet_readmits
+            group by
+                 submtg_state_cd
+                ,year
+                ,month
+                ,msis_ident_num
+            order by
+                 submtg_state_cd
+                ,year
+                ,month
+        """
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def calculate(self):
+        """
+        The calculate function can be used in place of :meth:`~Enrollment.Enrollment.having` from the enrollment class. Where having()
+        simply filters the the enrollee counts to reflect enrollees who experience readmits during the given period, calculate() appends
+        columns to the DataFrame that count the number of admits, the number of readmits, and the readmit rate for that time period.
+
+        Note:
+            When using either calculate() or :meth:`~Enrollment.Enrollment.having` for readmits, :meth:`~Readmits.Readmits.allcause` is required.
+
+        Args:
+            self: `Readmit object, required`: Included the Readmit object as well as :meth:`~Readmits.Readmits.allcause`.
+
+        Returns:
+            Joins the sql query from :class:`Enrollment` with the query from Readmits.
+
+        Example:
+            Import Enrollment and Readmits from PALET:
+
+            >>> from palet.Enrollment import Enrollment
+
+            >>> from palet.Readmits import Readmits
+
+        """
+
+        calculate_rate = f"""
+            sum({self.alias}.has_readmit) as readmits,
+            sum({self.alias}.has_admit) as admits,
+            round(sum({self.alias}.has_readmit) / sum({self.alias}.has_admit), 4) as readmit_rate,
+        """
+        return calculate_rate
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def apply_filters(self):
+        where = []
+
+        if len(self.filter) > 0:
+            for key in self.filter:
+                _in_stmt = []
+                _join = ""
+                if key not in ['SUBMTG_STATE_CD']:
+                    continue
+
+                # get the value(s) in case there are multiple
+                values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
+
+                _join = ",".join(_in_stmt)
+                where.append(key + ' in (' + _join + ')')
+
+            if len(where) > 0:
+                return f"and {' and '.join(where)}"
+
+        else:
+            return ''
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def prepare(self):
+
+        self.palet_readmits_edge_ip = self.palet_readmits_edge_ip.format(self.apply_filters())
+        self.palet_readmits_edge_lt = self.palet_readmits_edge_lt.format(self.apply_filters())
+
+        prep = [
+            self.palet_readmits_edge_ip,
+            self.palet_readmits_edge_lt,
+            self.palet_readmits_edge,
+            self.palet_readmits_edge_x_ip_lt,
+            self.palet_readmits_discharge,
+            self.palet_readmits_segments,
+            self.palet_readmits_continuity,
+            self.palet_readmits]
+
+        spark = SparkSession.getActiveSession()
+        if spark is not None:
+            for i in prep:
+                spark.sql(i)
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def join_inner(self) -> str:
+
+        self.prepare()
+
+        sql = f"""
+                ({self.palet_readmits_summary}) as {self.alias}
+                on
+                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt = {self.alias}.year"""
+
+        return sql
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def join_outer(self) -> str:
+
+        self.prepare()
+
+        sql = f"""
+                ({self.palet_readmits_summary}) as {self.alias}
+                on
+                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
+                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
+                    and {{parent}}.de_fil_dt = {self.alias}.year
+                    and {{parent}}.month = {self.alias}.month"""
+
+        return sql
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    @staticmethod
+    def allcause(days, date_dimension: DateDimension = None):
+
+        o = Readmits()
+        if date_dimension is not None:
+            o.date_dimension = date_dimension
+
+        palet = Palet.getInstance()
+        alias = palet.reserveSQLAlias()
+        o.alias = alias
+        o.init()
+        o.days = days
+
+        o.callback = o.calculate
+
+        return o
