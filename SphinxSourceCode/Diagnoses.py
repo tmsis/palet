@@ -1,6 +1,6 @@
 """
-The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions.
-This module only contains the :class:`Diagnoses` class and the :meth:`Diagnoses.Diagnoses.where` static method.
+The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions. This module only contains 
+the :class:`Diagnoses` class, the :meth:`~Diagnoses.Diagnoses.where` static method and the :meth:`~Diagnoses.Diagnoses.within`.
 """
 
 # -------------------------------------------------------
