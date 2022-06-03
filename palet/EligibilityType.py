@@ -55,6 +55,11 @@ class EligibilityType():
             'elgblty_grp_cd_11',
             'elgblty_grp_cd_12']
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     Pregnant = {"Pregnant": [f"""({{alias}}.age_num <= 59 or {{alias}}.age_num is null) and ({{alias}}.gndr_cd='F' or {{alias}}.gndr_cd is null) and {{alias}}.eligibility_type in ('67','68','05','53')"""]},
     MedicaidChildren = {"MedicaidChildren": [f"""{{alias}}.age_num < 21 and {{alias}}.eligibility_type in ('01','02','03','04','09','14','27','32','33','34','35','36','56','70','71') \
                               or {{alias}}.eligibility_type in ('06','07','08','28','29','30','31','54','55')""", f"""{{alias}}.age_num is null and {{alias}}.eligibility_type in ('54')"""]},
@@ -69,6 +74,11 @@ class EligibilityType():
     CHIPChildren = {"CHIPChildren": [f"""({{alias}}.age_num < 21 or {{alias}}.age_num is null) and {{alias}}.eligibility_type in ('61','62','63','64','65','66')"""]},
     COVIDNewlyEligible = {"COVIDNewlyEligible": [f"""({{alias}}.eligibility_type = '76' or {{alias}}.rstrctd_bnfts_cd = 'F') and {{alias}}.de_fil_dt >= '2020' and {{alias}}.month >= '3'"""]}
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def aggregate(alias):
         a = map(lambda x: alias + '.' + x, EligibilityType.cols)
         b = list(a)
@@ -76,6 +86,11 @@ class EligibilityType():
         f = ','.join(b)
         return f'coalesce({f})'
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def filter(self, filter_val):
         a = []
         filters = []
