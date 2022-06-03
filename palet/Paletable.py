@@ -876,12 +876,12 @@ class Paletable():
 
             if isinstance(constraint, list):
                 PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
-                self.palet.logger.info("Types were specified. The query will use types and constaints will be ignored.")
+                self.palet.logger.info("Special Types were specified. The query will use these types and user defined constaints will be ignored.")
                 self.filter_by_type.update({EligibilityType: constraint})
                 if type(constraint[0]) is tuple:
                     self._update_user_constraints(constraint)
             elif isinstance(constraint, dict):
-                self.palet.logger.info("Constraints were specified. The query will use constraints and types will be ignored.")
+                self.palet.logger.info("User Defined Constraints were specified. The query will use these constraints and special types will be ignored.")
                 self.user_constraint.update(constraint)
 
                 for _field, val in PaletMetadata.Enrollment.common_fields.items():
