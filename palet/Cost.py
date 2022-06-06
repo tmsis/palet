@@ -75,6 +75,7 @@ class Cost():
                 da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  msis_ident_num
                 ,admsn_dt
@@ -106,6 +107,7 @@ class Cost():
                 da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  submtg_state_cd
                 ,msis_ident_num
