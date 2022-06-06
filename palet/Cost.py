@@ -26,6 +26,7 @@ class Cost():
         self.callback = None
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
+        self.filter = {}
 
         self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
 
@@ -432,6 +433,60 @@ class Cost():
     #
     #
     # -------------------------------------------------------
+    def apply_filters(self):
+        where = []
+
+        if len(self.filter) > 0:
+            for key in self.filter:
+                _in_stmt = []
+                _join = ""
+                if key not in ['SUBMTG_STATE_CD']:
+                    continue
+
+                # get the value(s) in case there are multiple
+                values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
+
+                _join = ",".join(_in_stmt)
+                where.append(key + ' in (' + _join + ')')
+
+            if len(where) > 0:
+                return f"and {' and '.join(where)}"
+
+        else:
+            return ''
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    def prepare(self):
+
+        self.palet_admits_edge_ip = self.palet_admits_edge_ip.format(self.apply_filters())
+        self.palet_admits_edge_lt = self.palet_admits_edge_lt.format(self.apply_filters())
+
+        prep = [
+            self.palet_admits_edge_ip,
+            self.palet_admits_edge_lt,
+            self.palet_admits_edge,
+            self.palet_admits_edge_x_ip_lt,
+            self.palet_admits_discharge,
+            self.palet_admits_segments,
+            self.palet_admits_continuity,
+            self.palet_admits]
+
+        spark = SparkSession.getActiveSession()
+        if spark is not None:
+            for i in prep:
+                spark.sql(i)
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def join_inner(self) -> str:
 
         sql = f"""
@@ -476,18 +531,6 @@ class Cost():
         alias = palet.reserveSQLAlias()
         o.alias = alias
         o.init()
-
-        spark = SparkSession.getActiveSession()
-        if spark is not None:
-
-            spark.sql(o.palet_admits_edge_ip)
-            spark.sql(o.palet_admits_edge_lt)
-            spark.sql(o.palet_admits_edge)
-            spark.sql(o.palet_admits_edge_x_ip_lt)
-            spark.sql(o.palet_admits_discharge)
-            spark.sql(o.palet_admits_segments)
-            spark.sql(o.palet_admits_continuity)
-            spark.sql(o.palet_admits)
 
         o.callback = o.calculate
 
