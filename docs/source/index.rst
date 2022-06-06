@@ -53,6 +53,7 @@ PALET Current Release and Process information
    :maxdepth: 2
    :caption: Contents:
 
+   Cost
    Coverage
    CoverageType
    DateDimension
@@ -64,6 +65,7 @@ PALET Current Release and Process information
    Palet
    Paletable
    PaletMetadata
+   Readmits
    ServiceCategory
 
 Indices and tables

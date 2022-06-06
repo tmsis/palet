@@ -66,6 +66,7 @@ class DateDimension(object):
     #
     # -----------------------------------------------------------------------
     def __init__(self, asOf: date = None, runIds: list = None, years: list = None, months: list = None):
+        from pyspark.sql.functions import col, substring, length, when, upper, to_date, concat
 
         z = """
             select distinct
@@ -106,21 +107,22 @@ class DateDimension(object):
             spark_df = spark_df.withColumn('rptg_prd', spark_df['rptg_prd'].cast(StringType()))
             spark_df = spark_df.withColumn('fil_dt', spark_df['fil_dt'].cast(StringType()))
 
-            df = spark_df.toPandas()
+            spark_df = spark_df.withColumn('yyyy', substring('fil_dt', 1, 4))
+            spark_df = spark_df.withColumn('mmlen', length('fil_dt'))
+            spark_df = spark_df.withColumn('mm', when(col('mmlen') == 6, substring('fil_dt', 5, 2)).otherwise('01'))
+            spark_df = spark_df.withColumn('mmm', upper(when(col('mmlen') == 6, substring('rptg_prd', 1, 3)).otherwise('JAN')))
+            spark_df = spark_df.withColumn('year', col('yyyy').cast(IntegerType()))
+            spark_df = spark_df.withColumn('month', col('mm').cast(IntegerType()))
+            spark_df = spark_df.na.fill(value=1, subset=['month'])
+            spark_df = spark_df.withColumn('dt_yearmon', to_date(concat(col('yyyy'),col('mm')), 'yyyymm'))
 
-            df['yyyy'] = df['fil_dt'].str[0:4]
-            df['mmlen'] = df['fil_dt'].apply(len)
-            df['mm'] = df.apply(lambda x: x['fil_dt'][4:6] if x['mmlen'] == 6 else '01', axis=1)
-            df['mmm'] = df.apply(lambda x: x['rptg_prd'].str[0:3].upper() if x['mmlen'] == '6' else 'JAN', axis=1)
-            df['year'] = pd.to_numeric(df['yyyy'])
-            df['month'] = pd.to_numeric(df['mm'])
-            df['month'].fillna(1, inplace=True)
-            df['dt_yearmon'] = df.apply(lambda x: date(x['year'], int(x['month']), 1), axis=1)
-            self.df = df
+            self.spark_df = spark_df
             if years is not None:
-                self.df = self.df[self.df['year'].isin(years)]
+                self.spark_df = self.spark_df.filter(self.spark_df.year.isin(years))
             if months is not None:
-                self.df = self.df[self.df['month'].isin(months)]
+                self.spark_df = self.spark_df.filter(self.spark_df.month.isin(months))
+
+            self.df = spark_df.toPandas()
 
         else:
             self.df = None
@@ -177,6 +179,23 @@ class DateDimension(object):
 
             df = self.df
 
+            # ---------------------------------------------------------
+            # PySpark Version
+            # ---------------------------------------------------------
+            # if self.years is not None:
+            #     df = df.filter(df.year.isin(self.years))
+            # if self.months is not None:
+            #     df = df.filter(df.month.isin(self.months))
+
+            # df = df[(df['dt_yearmon'] >= dt) &
+            #         (df['dt_yearmon'] <= self.asOf) &
+            #         (df['fil_4th_node_txt'] == taf_file_type)]
+
+            # rids = df.select('da_run_id').rdd.flatMap(lambda x: x).collect()
+
+            # ---------------------------------------------------------
+            # Pandas Version
+            # ---------------------------------------------------------
             if self.years is not None:
                 df = df[df['year'].isin(self.years)]
             if self.months is not None:

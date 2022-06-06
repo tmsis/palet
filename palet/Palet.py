@@ -1,5 +1,5 @@
 """
-The flagship class the Palet lirbary is built around. This class provides the frame work for other classes in the library.
+The flagship class the Palet library is built around. This class provides the frame work for other classes in the library.
 The Palet module contains the Palet class, the Utils subclass (short for utilities), and attributes for initialization, loading
 metadata, and showing data. The Paletable module inherits from this module, and as such all high level objects that inherit from
 the Paletable module inherit from Palet as well.
@@ -139,59 +139,6 @@ class Palet:
 
         for rl in release:
             _logger.release(rl)
-
-    # --------------------------------------------------------------------
-    #
-    #
-    #
-    # --------------------------------------------------------------------
-    def cache_run_ids(self, field: str = "da_run_id"):
-        from pyspark.sql import SparkSession
-        """This method of the Palet class is responsible for pulling the most current valid run ids.
-
-        It uses the pyspark library to run a query on the efts_fil_meta TAF table. The most current valid run ids pulled from this method
-        are then used in any query run by a high level object like :class:`Enrollment` or :class:`Eligibility`.
-
-        Args:
-            self: None - no input required.
-
-        Returns:
-            Spark Datarame: Executes the query and returns a Spark Datarame with fil_4th_node_txt, otpt_name, da_run_id, rptg_prd, and fil_dt.
-
-        Note: Only returns the most current run ids available.
-
-        """
-
-        z = """
-                select distinct
-                    fil_4th_node_txt,
-                    otpt_name,
-                    da_run_id,
-                    rptg_prd,
-                    fil_dt
-                    from
-                    taf.efts_fil_meta
-                where
-                    ltst_run_ind = true
-                    --   and otpt_name = 'TAF_ANN_DE_BASE'
-                    and fil_4th_node_txt = 'BSE'
-                group by
-                    fil_4th_node_txt,
-                    otpt_name,
-                    da_run_id,
-                    rptg_prd,
-                    fil_dt
-                order by
-                    fil_4th_node_txt,
-                    otpt_name,
-                    da_run_id,
-                    rptg_prd,
-                    fil_dt
-            """
-
-        spark = SparkSession.getActiveSession()
-        pdf = spark.sql(z).toPandas()
-        return pdf[field].tolist()
 
     # --------------------------------------------------------------------
     #
@@ -398,9 +345,10 @@ class Palet:
             aliases: dict = pickle.load(filename, 'rb')
             return aliases
 
-        @staticmethod
-        def sql_formatter():
-            pass
+        # @staticmethod
+        # def sqlparse(z: str):
+        #     z = sqlparse.format(z, indent_tabs=False, indent_width=1, reindent_aligned=True, keyword_case="upper", comma_first=True)
+        #     return z
 
 
 # -------------------------------------------------------------------------------------

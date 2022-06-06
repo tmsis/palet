@@ -45,7 +45,8 @@ class CoverageType():
         f = ','.join(b)
         return f'coalesce({f})'
 
-    def filter(filter_val):
+    def filter(self, filter_val):
+        self.filter.update({CoverageType.alias: filter_val})
         a = []
         vals = "','".join(filter_val)
         a.append("('" + vals + "')")

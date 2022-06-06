@@ -535,7 +535,7 @@ class Enrollment(Paletable):
         breakdown = cull_type[self.timeunit]
         for key in self.filter_by_type:
             _type = self.filter_by_type[key]
-            return breakdown.format(key.alias, key.filter(_type))
+            return breakdown.format(key.alias, key.filter(self, _type))
 
         return breakdown.format('1', '(1)')
 
@@ -826,6 +826,7 @@ class Enrollment(Paletable):
         from collections import defaultdict
 
         if constraint not in self.having_constraints:
+            constraint.filter = self.filter
             self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
@@ -855,6 +856,7 @@ class Enrollment(Paletable):
         from collections import defaultdict
 
         if paletable not in self.calculations:
+            paletable.filter = self.filter
 
             self.calculations.append(paletable.callback)
 
@@ -940,7 +942,7 @@ class Enrollment(Paletable):
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
                         { self._getByTimeunitCull(Enrollment.timeunit.cull) } and
-                        { self._defineWhereClause(self.nested_alias) }
+                        { self._sqlFilterWhereClause(self.nested_alias, sqlloc="inner") }
                     group by
                         { self._getByGroupWithAlias() }
                         { self._getDerivedByTypeGroup() }
@@ -961,8 +963,9 @@ class Enrollment(Paletable):
 
                 where
                     { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
-                    { self._defineWhereClause(self.alias) } and
-                    { self._userDefinedClause() }
+                    { self._sqlFilterWhereClause(self.alias) } and
+                    { self._derivedTypesWhereClause() }
+
                 group by
                     counter,
                     { self._getByGroupWithAlias(self.alias) }
@@ -980,7 +983,7 @@ class Enrollment(Paletable):
                     { self._groupTimeunit(self.alias) }
             """
 
-            self._addPostProcess(self._percentChange)
+            # self._addPostProcess(self._percentChange)
             self._sql = z
         else:
             return self._sql
