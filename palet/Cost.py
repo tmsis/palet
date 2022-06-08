@@ -491,6 +491,8 @@ class Cost():
     # -------------------------------------------------------
     def join_inner(self) -> str:
 
+        self.prepare()
+        
         sql = f"""
                 ({self.palet_admits}) as {self.alias}
                 on
@@ -507,6 +509,8 @@ class Cost():
     # -------------------------------------------------------
     def join_outer(self) -> str:
 
+        self.prepare()
+        
         sql = f"""
                 ({self.palet_admits}) as {self.alias}
                 on
