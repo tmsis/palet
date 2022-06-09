@@ -1,7 +1,8 @@
 """
-PALET's Readmits module contains a Readmits class which can be leveraged with the :class:`Enrollment.Enrollment` module to look at amount of beneficiary
-readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance of a patient who is discharged from a hospital
-then admitted again within a specific time interval. This time interval can be specified using the :meth:`~Readmits.Readmits.allcause` method below.
+PALET's Readmits module contains a Readmits class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment.Enrollment` 
+module to look at amount of beneficiary readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance
+of a patient who is discharged from a hospital then admitted again within a specific time interval. This time interval can be specified using the
+:meth:`~Readmits.Readmits.allcause` method below.
 """
 
 # -------------------------------------------------------
@@ -11,26 +12,39 @@ then admitted again within a specific time interval. This time interval can be s
 # -------------------------------------------------------
 from pyspark.sql import SparkSession
 
-from palet.Palet import Palet
-from palet.DateDimension import DateDimension
-
+from Palet import Palet
+from DateDimension import DateDimension
+from ClaimsAnalysis import ClaimsAnalysis
 
 # -------------------------------------------------------
 #
 #
 #
 # -------------------------------------------------------
-class Readmits():
+class Readmits(ClaimsAnalysis):
     """
-    The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` from the Enrollment module
-    or :meth:`~Readmits.Readmits.calculate` from this module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned,
-    the :meth:`~Readmits.Readmits.allcause` method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension`
-    object associated with the Readmits class. Examples of how to use this module are visible below.
+    The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` or :meth:`~Enrollment.Enrollment.calculate`
+    from the Enrollment module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned, the :meth:`~Readmits.Readmits.allcause` 
+    method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension` object associated
+    with the Readmits class. Examples of how to use this module are visible below. The Readmits class contains 9 attributes that are SQL queries. These queries are
+    essential to the Readmits class as well as the process of joining said query to a Paletable object such as enrollment. Details on these attributes are detailed
+    below. 
 
     Note:
         Enrollment().having(Readmits.allcause(30)) filters an enrollment query so counts only include readmits.
         Enrollment().calculate(Readmits.allcause(30)) returns a standard enrollment query and appends columns with counts for readmits as well as a readmit rate.
 
+    Attributes:
+        palet_readmits_edge_ip: Pulls information relevant to inpatient claims from taf_iph.
+        palet_readmits_edge_lt: Pulls information relevant to long term claims from taf_lth.
+        palet_readmits_edge: Unions the data returned from the two initial attributes.
+        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables. 
+        palet_readmits_discharge: Adds in logic to account for discharges.
+        palet_readmits_segments: Accounts for segmentation.
+        palet_readmits_continuity: Accounts for overlapping admits and readmits.
+        palet_readmits: The final temporary table joining data from all of the tables above.
+        join_sql: The final SQL query which will be joined to the query of the Paletable object.
+    
     Examples:
 
         Import Enrollment and Readmits from PALET:
@@ -67,30 +81,10 @@ class Readmits():
     #
     # -------------------------------------------------------
     def __init__(self):
+        super().__init__()
         self.days = 30
-        self.join_sql = ''
-        self.callback = None
-        self.alias = None
-        self.date_dimension = DateDimension.getInstance()
-        self.filter = {}
 
         self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def sql(self):
-        return self.join_sql
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def __str__(self):
-        return self.sql()
 
     # -------------------------------------------------------
     #
@@ -405,7 +399,7 @@ class Readmits():
         #
         #
         # -------------------------------------------------------
-        self.palet_readmits_summary = f"""
+        self.join_sql = f"""
             select
                  submtg_state_cd
                 ,year
@@ -434,26 +428,8 @@ class Readmits():
     # -------------------------------------------------------
     def calculate(self):
         """
-        The calculate function can be used in place of :meth:`~Enrollment.Enrollment.having` from the enrollment class. Where having()
-        simply filters the the enrollee counts to reflect enrollees who experience readmits during the given period, calculate() appends
-        columns to the DataFrame that count the number of admits, the number of readmits, and the readmit rate for that time period.
-
-        Note:
-            When using either calculate() or :meth:`~Enrollment.Enrollment.having` for readmits, :meth:`~Readmits.Readmits.allcause` is required.
-
-        Args:
-            self: `Readmit object, required`: Included the Readmit object as well as :meth:`~Readmits.Readmits.allcause`.
-
-        Returns:
-            Joins the sql query from :class:`Enrollment` with the query from Readmits.
-
-        Example:
-            Import Enrollment and Readmits from PALET:
-
-            >>> from palet.Enrollment import Enrollment
-
-            >>> from palet.Readmits import Readmits
-
+        The calculate method is not directly interacted with by the analyst. This method is called by :meth:`~Readmits.Readmits.allcause` and responsible for
+        computing the columns for readmits, admits and readmit_rate when using :meth:`~Enrollment.Enrollment.calculate` from Enrollment. 
         """
 
         calculate_rate = f"""
@@ -468,36 +444,13 @@ class Readmits():
     #
     #
     # -------------------------------------------------------
-    def apply_filters(self):
-        where = []
-
-        if len(self.filter) > 0:
-            for key in self.filter:
-                _in_stmt = []
-                _join = ""
-                if key not in ['SUBMTG_STATE_CD']:
-                    continue
-
-                # get the value(s) in case there are multiple
-                values = self.filter[key]
-                for val in values:
-                    _in_stmt.append(f"'{val}'")
-
-                _join = ",".join(_in_stmt)
-                where.append(key + ' in (' + _join + ')')
-
-            if len(where) > 0:
-                return f"and {' and '.join(where)}"
-
-        else:
-            return ''
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
     def prepare(self):
+        """
+        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters` 
+        from :class:`ClaimsAnalysis` which constrains the initial IP and LT queries from the Attributes section by state if necessary. Additionally,
+        this method creates a Spark Session and runs through all of the queries from the attributes section. 
+
+        """
 
         self.palet_readmits_edge_ip = self.palet_readmits_edge_ip.format(self.apply_filters())
         self.palet_readmits_edge_lt = self.palet_readmits_edge_lt.format(self.apply_filters())
@@ -522,45 +475,42 @@ class Readmits():
     #
     #
     # -------------------------------------------------------
-    def join_inner(self) -> str:
-
-        self.prepare()
-
-        sql = f"""
-                ({self.palet_readmits_summary}) as {self.alias}
-                on
-                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
-                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
-                    and {{parent}}.de_fil_dt = {self.alias}.year"""
-
-        return sql
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def join_outer(self) -> str:
-
-        self.prepare()
-
-        sql = f"""
-                ({self.palet_readmits_summary}) as {self.alias}
-                on
-                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
-                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
-                    and {{parent}}.de_fil_dt = {self.alias}.year
-                    and {{parent}}.month = {self.alias}.month"""
-
-        return sql
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
     @staticmethod
     def allcause(days, date_dimension: DateDimension = None):
+        """
+        As previously stated, the allcause function is used define the time interval that determines what would be considered a readmit.
+        For example, if the number 15 is entered as an arguement of this function then enrollees admited within 15 days of the initial 
+        admission would be counted as a readmit. This function is appended onto the end of the Readmit object. More information and 
+        examples available below.
+
+        Note: 
+            The number of days defaults to 30, but any number of days may be entered.
+            This function also calls the :meth:`~Readmits.Readmits.calculate` method.
+
+        Examples:
+            Create a Readmit object with the default time interval:
+
+            >>> readmits = Readmits.allcause()
+
+            Create a Readmit object with a 10 day time interval:
+
+            >>> readmits = Readmits.allcause(10)
+
+            Create a :class:`Paletable` object with a :class:`ClaimsAnalysis` sub-object using :meth:`~Enrollment.Enrollment.having()`
+
+            >>> api = Enrollment().having(Readmits.allcause(30))
+
+            Create a :class:`Paletable` object with a :class:`ClaimsAnalysis` sub-object using :meth:`~Enrollment.Enrollment.calculate()`
+
+            >>> api = Enrollment().calculate(Readmits.allcause(30))
+
+            Convert the object to a DataFrame and return:
+
+            >>> df = api.fetch()
+
+            >>> display(df)
+
+        """
 
         o = Readmits()
         if date_dimension is not None:
