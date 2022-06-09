@@ -53,6 +53,7 @@ PALET Current Release and Process information
    :maxdepth: 2
    :caption: Contents:
 
+   ClaimsAnalysis
    Cost
    Coverage
    CoverageType
