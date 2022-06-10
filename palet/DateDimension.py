@@ -72,7 +72,7 @@ class DateDimension(object):
             select distinct
                 fil_4th_node_txt,
                 otpt_name,
-                da_run_id,
+                max(da_run_id) as da_run_id,
                 rptg_prd,
                 fil_dt
             from
@@ -80,23 +80,20 @@ class DateDimension(object):
             where
                 ltst_run_ind = true
                 and otpt_name in ('TAF_ANN_DE_BASE',
-                                    'TAF_IPH',
-                                    'TAF_LTH',
-                                    'TAF_OTH',
-                                    'TAF_RXH')
+                                  'TAF_IPH',
+                                  'TAF_LTH',
+                                  'TAF_OTH',
+                                  'TAF_RXH')
             group by
                 fil_4th_node_txt,
                 otpt_name,
                 fil_dt,
-                da_run_id,
                 rptg_prd
             order by
                 fil_4th_node_txt,
                 otpt_name,
                 fil_dt desc,
-                da_run_id,
                 rptg_prd
-            ;
         """
         spark = SparkSession.getActiveSession()
         if spark is not None:

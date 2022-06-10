@@ -1,5 +1,5 @@
 """
-PALET's Readmits module contains a Readmits class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment.Enrollment` 
+PALET's Readmits module contains a Readmits class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment.Enrollment`
 module to look at amount of beneficiary readmissions relative to the ammount of beneficiaries enrolled. A readmission should be viewed as an instance
 of a patient who is discharged from a hospital then admitted again within a specific time interval. This time interval can be specified using the
 :meth:`~Readmits.Readmits.allcause` method below.
@@ -16,6 +16,7 @@ from palet.Palet import Palet
 from palet.DateDimension import DateDimension
 from palet.ClaimsAnalysis import ClaimsAnalysis
 
+
 # -------------------------------------------------------
 #
 #
@@ -24,11 +25,11 @@ from palet.ClaimsAnalysis import ClaimsAnalysis
 class Readmits(ClaimsAnalysis):
     """
     The Readmits class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.having` or :meth:`~Enrollment.Enrollment.calculate`
-    from the Enrollment module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned, the :meth:`~Readmits.Readmits.allcause` 
+    from the Enrollment module. In this way, Readmits isn't a Paletable object but a sub-object of Enrollment. As previously mentioned, the :meth:`~Readmits.Readmits.allcause`
     method acts as arguement which allows the user to defined the time interval for readmits as well as the :class:`DateDimension.DateDimension` object associated
     with the Readmits class. Examples of how to use this module are visible below. The Readmits class contains 9 attributes that are SQL queries. These queries are
     essential to the Readmits class as well as the process of joining said query to a Paletable object such as enrollment. Details on these attributes are detailed
-    below. 
+    below.
 
     Note:
         Enrollment().having(Readmits.allcause(30)) filters an enrollment query so counts only include readmits.
@@ -38,13 +39,13 @@ class Readmits(ClaimsAnalysis):
         palet_readmits_edge_ip: Pulls information relevant to inpatient claims from taf_iph.
         palet_readmits_edge_lt: Pulls information relevant to long term claims from taf_lth.
         palet_readmits_edge: Unions the data returned from the two initial attributes.
-        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables. 
+        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables.
         palet_readmits_discharge: Adds in logic to account for discharges.
         palet_readmits_segments: Accounts for segmentation.
         palet_readmits_continuity: Accounts for overlapping admits and readmits.
         palet_readmits: The final temporary table joining data from all of the tables above.
         join_sql: The final SQL query which will be joined to the query of the Paletable object.
-    
+
     Examples:
 
         Import Enrollment and Readmits from PALET:
@@ -379,10 +380,10 @@ class Readmits(ClaimsAnalysis):
                 ,1 as admit_ind
                 ,case when (datediff(lead(admit) over (
                     partition by
-                        submtg_state_cd
+                         submtg_state_cd
                         ,msis_ident_num
                     order by
-                        submtg_state_cd
+                         submtg_state_cd
                         ,msis_ident_num
                 ), discharge) <= {self.days}) then 1 else 0 end as readmit_ind
             from
@@ -429,7 +430,7 @@ class Readmits(ClaimsAnalysis):
     def calculate(self):
         """
         The calculate method is not directly interacted with by the analyst. This method is called by :meth:`~Readmits.Readmits.allcause` and responsible for
-        computing the columns for readmits, admits and readmit_rate when using :meth:`~Enrollment.Enrollment.calculate` from Enrollment. 
+        computing the columns for readmits, admits and readmit_rate when using :meth:`~Enrollment.Enrollment.calculate` from Enrollment.
         """
 
         calculate_rate = f"""
@@ -446,10 +447,9 @@ class Readmits(ClaimsAnalysis):
     # -------------------------------------------------------
     def prepare(self):
         """
-        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters` 
+        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters`
         from :class:`ClaimsAnalysis` which constrains the initial IP and LT queries from the Attributes section by state if necessary. Additionally,
-        this method creates a Spark Session and runs through all of the queries from the attributes section. 
-
+        this method creates a Spark Session and runs through all of the queries from the attributes section.
         """
 
         self.palet_readmits_edge_ip = self.palet_readmits_edge_ip.format(self.apply_filters())
@@ -479,11 +479,11 @@ class Readmits(ClaimsAnalysis):
     def allcause(days, date_dimension: DateDimension = None):
         """
         As previously stated, the allcause function is used define the time interval that determines what would be considered a readmit.
-        For example, if the number 15 is entered as an arguement of this function then enrollees admited within 15 days of the initial 
-        admission would be counted as a readmit. This function is appended onto the end of the Readmit object. More information and 
+        For example, if the number 15 is entered as an arguement of this function then enrollees admited within 15 days of the initial
+        admission would be counted as a readmit. This function is appended onto the end of the Readmit object. More information and
         examples available below.
 
-        Note: 
+        Note:
             The number of days defaults to 30, but any number of days may be entered.
             This function also calls the :meth:`~Readmits.Readmits.calculate` method.
 

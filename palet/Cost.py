@@ -1,8 +1,8 @@
 """
-PALET's Cost module contains a Cost class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment` 
+PALET's Cost module contains a Cost class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment`
 module to look at cost of admissions for both inpatient care and long term care. Unlike :class:`Readmits`, which is a also a
 :class:`ClaimsAnalysis` object, Cost can only be appended to a :class:`Paletable` object like :class:`Enrollment` using the :meth:`~Enrollment.Enrollment.calculate`
-method from :class:`Enrollment`. This subject object will add columns to the DataFrame that contain various cost metrics for the type of care specified. 
+method from :class:`Enrollment`. This subject object will add columns to the DataFrame that contain various cost metrics for the type of care specified.
 """
 
 # -------------------------------------------------------
@@ -15,6 +15,7 @@ from pyspark.sql import SparkSession
 from palet.Palet import Palet
 from palet.DateDimension import DateDimension
 from palet.ClaimsAnalysis import ClaimsAnalysis
+
 
 # -------------------------------------------------------
 #
@@ -30,7 +31,7 @@ class Cost(ClaimsAnalysis):
         palet_readmits_edge_ip: Pulls information relevant to inpatient claims from taf_iph.
         palet_readmits_edge_lt: Pulls information relevant to long term claims from taf_lth.
         palet_readmits_edge: Unions the data returned from the two initial attributes.
-        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables. 
+        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables.
         palet_readmits_discharge: Adds in logic to account for discharges.
         palet_readmits_segments: Accounts for segmentation.
         palet_readmits_continuity: Accounts for overlapping admits and readmits.
@@ -360,16 +361,15 @@ class Cost(ClaimsAnalysis):
         #
         #
         # -------------------------------------------------------
-        self.palet_admits = """
-            create or replace temporary view palet_admits as
+        self.join_sql = """
             select distinct
-                submtg_state_cd,
-                year(admit) as year,
-                month(admit) as month,
-                msis_ident_num,
-                admit,
-                min(1) as units,
-                sum(total_amount) as total_amount
+                 submtg_state_cd
+                ,msis_ident_num
+                ,year(admit) as year
+                ,month(admit) as month
+                ,admit
+                ,min(1) as units
+                ,sum(total_amount) as total_amount
             from
                 palet_admits_continuity
             group by
@@ -380,30 +380,6 @@ class Cost(ClaimsAnalysis):
                 submtg_state_cd,
                 msis_ident_num,
                 admit
-        """
-
-        # -------------------------------------------------------
-        #
-        #
-        #
-        # -------------------------------------------------------
-        self.join_sql = f"""
-            select
-                 submtg_state_cd
-                ,year
-                ,month
-                ,sum(units) as units
-                ,sum(total_amount) as total_amount
-            from
-                palet_admits
-            group by
-                 submtg_state_cd
-                ,year
-                ,month
-            order by
-                 submtg_state_cd
-                ,year
-                ,month
         """
 
         self.mdcd_mm = f"sum({{parent}}.mdcd_enrollment)"
@@ -464,7 +440,7 @@ class Cost(ClaimsAnalysis):
     # -------------------------------------------------------
     def prepare(self):
         """
-        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters` 
+        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters`
         from :class:`ClaimsAnalysis` which constrains the initial IP and LT queries from the Attributes section by state if necessary. Additionally,
         this method creates a Spark Session and runs through all of the queries from the attributes section.
         """
@@ -479,8 +455,7 @@ class Cost(ClaimsAnalysis):
             self.palet_admits_edge_x_ip_lt,
             self.palet_admits_discharge,
             self.palet_admits_segments,
-            self.palet_admits_continuity,
-            self.palet_admits]
+            self.palet_admits_continuity]
 
         spark = SparkSession.getActiveSession()
         if spark is not None:
@@ -500,7 +475,7 @@ class Cost(ClaimsAnalysis):
 
         Examples:
             Create a cost object with the inpatient function:
-            
+
             >>> cost = Cost.inpatient()
 
             Append the Cost object to the end of an Enrollment object using :meth:`~Enrollment.Enrollment.Calculate`:

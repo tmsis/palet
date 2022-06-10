@@ -2,10 +2,12 @@
 The ClaimsAnalysis module contains the ClaimsAnalysis class, which is a parent class with attributes that are inherited by its child classes
 such as :class:`Redamits` and :class:`Cost`. As it's namesake implies, all child classes of ClaimsAnalysis pertain to claims. ClaimsAnalysis
 objects can be viewed as sub-objects of :class:`Paletable` objects. As such they do not return DataFrames on their own; they simply produce
-queries that can be joined with Paletable objects to append columns onto DataFrames or change the context of Paletable objects entirely. 
+queries that can be joined with Paletable objects to append columns onto DataFrames or change the context of Paletable objects entirely.
 """
 
 from palet.DateDimension import DateDimension
+
+
 # -------------------------------------------------------
 #
 #
@@ -15,7 +17,7 @@ class ClaimsAnalysis():
     """
     Being a parent class, like :class:`Paletable`, ClaimsAnalysis is not directly interacted with. Instead, its attributes and methods are inherited
     by its child classes. More information can found on these attributes and methods below:
-    
+
     Attributes:
         callback: Used by ClaimsAnalysis objects to initialize methods that create additional columns for the DataFrame. See :meth:`Readmits.Readmits.calculate` and :meth:`Cost.Cost.caclulate`
         alias: The alias that will be used for the ClaimsAnalysis objects SQL query.
@@ -188,7 +190,7 @@ class ClaimsAnalysis():
         The join_inner method is responsible for producing a join conidition that is appended to a :class:`Paletable` object's query ensuring
         that the query produced by a ClaimsAnalysis object is properly integrated. As this method's namesake implies this function produces
         an outer join condition.
-        
+
         """
 
         self.prepare()
@@ -202,4 +204,3 @@ class ClaimsAnalysis():
                     and {{parent}}.month = {self.alias}.month"""
 
         return sql
-
