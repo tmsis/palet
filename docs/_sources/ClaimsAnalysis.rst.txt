@@ -1,5 +1,5 @@
 ClaimsAnalysis
-=====================
+=================
 
 .. automodule:: ClaimsAnalysis
    :members:

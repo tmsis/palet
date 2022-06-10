@@ -57,7 +57,7 @@ uses the pandas library and elements of the pyspark library. Note the Paletable 
 the Enrollment module inherits from the Paletable module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="Enrollment.Enrollment">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Enrollment.</span></span><span class="sig-name descname"><span class="pre">Enrollment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paletable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="Paletable.html#Paletable.Paletable" title="Paletable.Paletable"><span class="pre">Paletable.Paletable</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'month'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Enrollment.</span></span><span class="sig-name descname"><span class="pre">Enrollment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asOf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.date</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paletable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="Paletable.html#Paletable.Paletable" title="Paletable.Paletable"><span class="pre">Paletable.Paletable</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'month'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="Paletable.html#Paletable.Paletable" title="Paletable.Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable.Paletable</span></code></a></p>
 <p>The class within the PALET library for viewing enrollment. This class is used to view enrollment for Medicaid and CHIP.
 Attributes inherited from the Paletable class can be used to apply and_filters for enrollee age, ehtnicity, gender, state, income, etc.</p>
@@ -89,6 +89,18 @@ Attributes inherited from the Paletable class can be used to apply and_filters f
 </div>
 <p>User defined run ids:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">([</span><span class="mi">6278</span><span class="p">,</span> <span class="mi">6280</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Specifying run ids and switching context</p>
+<p>or</p>
+<p>switching context by Parameter naming</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Eligibility</span><span class="p">([</span><span class="mi">6278</span><span class="p">,</span> <span class="mi">6280</span><span class="p">],</span> <span class="n">api</span><span class="p">)</span> <span class="ow">or</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Eligibility</span><span class="p">([],</span> <span class="n">api</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Eligibility</span><span class="p">(</span><span class="n">paletable</span><span class="o">=</span><span class="n">api</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You may also request FULL or PARTIAL month enrollments.</p>
@@ -182,7 +194,7 @@ Attributes inherited from the Paletable class can be used to apply and_filters f
 <dl class="py method">
 <dt class="sig sig-object py" id="Enrollment.Enrollment.byMedicaidOnly">
 <span class="sig-name descname"><span class="pre">byMedicaidOnly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment.byMedicaidOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter your query to only look at Medicaid enrollment <a class="reference internal" href="Paletable.html#Paletable.Paletable.byMedicaidOnly" title="Paletable.Paletable.byMedicaidOnly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">byMedicaidOnly()</span></code></a>.</p>
+<dd><p>Filter your query to only look at Medicaid enrollment <code class="xref py py-meth docutils literal notranslate"><span class="pre">byMedicaidOnly()</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -211,7 +223,8 @@ Attributes inherited from the Paletable class can be used to apply and_filters f
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The above attributes are inherited from the <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> class with the exception of <a class="reference internal" href="DateDimension.html#DateDimension.DateDimension.usingRunIds" title="DateDimension.DateDimension.usingRunIds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">usingRunIds()</span></code></a>. See <a class="reference internal" href="DateDimension.html#module-DateDimension" title="DateDimension"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateDimension</span></code></a> Attributes directly from the Enrollment class can be seen below.</p>
+<p>The above attributes are inherited from the <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> class with the exception of <a class="reference internal" href="DateDimension.html#DateDimension.DateDimension.usingRunIds" title="DateDimension.DateDimension.usingRunIds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">usingRunIds()</span></code></a>.
+See <a class="reference internal" href="DateDimension.html#module-DateDimension" title="DateDimension"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateDimension</span></code></a> Attributes directly from the Enrollment class can be seen below.</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="Enrollment.Enrollment.timeunit">
@@ -298,7 +311,7 @@ it is important to note that prior to including this function the analyst should
 </div>
 <p>Create an Enrollment object &amp; use the <a class="reference internal" href="#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> function with <a class="reference internal" href="Diagnoses.html#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">where()</span></code></a>
 as a parameter to filter by chronic condition:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ByMonth</span><span class="p">()</span><span class="o">.</span><span class="n">having</span><span class="p">(</span><span class="n">Diagnoses</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="n">AFib</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">byMonth</span><span class="p">()</span><span class="o">.</span><span class="n">having</span><span class="p">(</span><span class="n">Diagnoses</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ServiceCategory</span><span class="o">.</span><span class="n">inpatient</span><span class="p">,</span> <span class="n">AFib</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Return DataFrame:</p>
@@ -317,7 +330,7 @@ as a parameter to filter by chronic condition:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Enrollment.Enrollment.having">
-<span class="sig-name descname"><span class="pre">having</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Diagnoses.html#Diagnoses.Diagnoses" title="Diagnoses.Diagnoses"><span class="pre">Diagnoses.Diagnoses</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment.having" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">having</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment.having" title="Permalink to this definition">¶</a></dt>
 <dd><p>The having function, allows user to filter Enrollment objects by chronic conidition diagnoses.
 The <a class="reference internal" href="Diagnoses.html#Diagnoses.Diagnoses.where" title="Diagnoses.Diagnoses.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">where()</span></code></a> and <a class="reference internal" href="Diagnoses.html#Diagnoses.Diagnoses.within" title="Diagnoses.Diagnoses.within"><code class="xref py py-meth docutils literal notranslate"><span class="pre">within()</span></code></a> from <a class="reference internal" href="Diagnoses.html#module-Diagnoses" title="Diagnoses"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diagnoses</span></code></a>.
 Additionally, it is important to note that prior to including this function the analyst should create a list of the diagnoses codes
@@ -353,6 +366,48 @@ they wish to filter by.</p>
 </div>
 <p>Return the more readable version of the DataFrame:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Enrollment.Enrollment.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paletable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Enrollment.Enrollment.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculate function is utilized when combing <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> objects with sub-objects like <a class="reference internal" href="ClaimsAnalysis.html#module-ClaimsAnalysis" title="ClaimsAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClaimsAnalysis</span></code></a> objects. Where
+<a class="reference internal" href="#Enrollment.Enrollment.having" title="Enrollment.Enrollment.having"><code class="xref py py-meth docutils literal notranslate"><span class="pre">having()</span></code></a> is used to constrain a query, calculate does not constrain queries, but instead computes columns that
+provide additional context. When <a class="reference internal" href="Readmits.html#module-Readmits" title="Readmits"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readmits</span></code></a> is called using this function columns for admits, readmits, and readmit rate are included
+in addition to counts for enrollment. Similarly, when calculate is combined with <a class="reference internal" href="Cost.html#module-Cost" title="Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a> the dataframe with include additional columns
+that contain metrics on the cost of services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>paletable</strong> – ` <a class="reference internal" href="ClaimsAnalysis.html#module-ClaimsAnalysis" title="ClaimsAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClaimsAnalysis</span></code></a> object <cite>: Enter a claims analysis object like :class:`Readmits</cite> or <a class="reference internal" href="Cost.html#module-Cost" title="Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Create a <a class="reference internal" href="Cost.html#module-Cost" title="Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cost</span> <span class="o">=</span> <span class="n">Cost</span><span class="o">.</span><span class="n">inpatient</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Create an Enrollment object with a <code class="xref py py-class docutils literal notranslate"><span class="pre">cost</span></code> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Convert to a DataFrame and return:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, create an Enrollment object with a <a class="reference internal" href="Readmits.html#module-Readmits" title="Readmits"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readmits</span></code></a> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">api</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="p">()</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">Readmits</span><span class="o">.</span><span class="n">allcause</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Convert to a DataFrame and return:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

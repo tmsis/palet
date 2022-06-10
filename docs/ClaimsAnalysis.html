@@ -1,0 +1,238 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClaimsAnalysis &#8212; PALET Wiki Test 1.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cost" href="Cost.html" />
+    <link rel="prev" title="PALET Wiki [v. 1.11.20220610]" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Cost.html" title="Cost"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PALET Wiki [v. 1.11.20220610]"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ClaimsAnalysis</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-ClaimsAnalysis">
+<span id="claimsanalysis"></span><h1>ClaimsAnalysis<a class="headerlink" href="#module-ClaimsAnalysis" title="Permalink to this headline">¶</a></h1>
+<p>The ClaimsAnalysis module contains the ClaimsAnalysis class, which is a parent class with attributes that are inherited by its child classes
+such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Redamits</span></code> and <a class="reference internal" href="Cost.html#module-Cost" title="Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a>. As it’s namesake implies, all child classes of ClaimsAnalysis pertain to claims. ClaimsAnalysis
+objects can be viewed as sub-objects of <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> objects. As such they do not return DataFrames on their own; they simply produce
+queries that can be joined with Paletable objects to append columns onto DataFrames or change the context of Paletable objects entirely.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ClaimsAnalysis.</span></span><span class="sig-name descname"><span class="pre">ClaimsAnalysis</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Being a parent class, like <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a>, ClaimsAnalysis is not directly interacted with. Instead, its attributes and methods are inherited
+by its child classes. More information can found on these attributes and methods below:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.callback">
+<span class="sig-name descname"><span class="pre">callback</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used by ClaimsAnalysis objects to initialize methods that create additional columns for the DataFrame. See <a class="reference internal" href="Readmits.html#Readmits.Readmits.calculate" title="Readmits.Readmits.calculate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Readmits.Readmits.calculate()</span></code></a> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">Cost.Cost.caclulate()</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.alias">
+<span class="sig-name descname"><span class="pre">alias</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>The alias that will be used for the ClaimsAnalysis objects SQL query.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.date_dimension">
+<span class="sig-name descname"><span class="pre">date_dimension</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.date_dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="DateDimension.html#module-DateDimension" title="DateDimension"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateDimension</span></code></a> object relevant to the ClaimsAnalysis object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The attribute responsible for indicating whether a ClaimsAnalysis object needs to be constrained by state.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.join_sql">
+<span class="sig-name descname"><span class="pre">join_sql</span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.join_sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>The methods used produce the SQL query for a ClaimsAnalysis object.</p>
+</dd></dl>
+
+<p>Methods:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.sql">
+<span class="sig-name descname"><span class="pre">sql</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>The SQL query that the ClaimsAnalysis child class uses to pull dataframes.</p>
+<p>This can be called allowing an analyst to view the SQL query in question.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> – None - no input required.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a text string containing the SQL query run by the ClaimsAnalysis child class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Create a <a class="reference internal" href="Cost.html#module-Cost" title="Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cost</span> <span class="o">=</span> <span class="n">Cost</span><span class="o">.</span><span class="n">inpatient</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Return the query as text:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cost</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Create a <code class="xref py py-class docutils literal notranslate"><span class="pre">Readmit</span></code> object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">readmits</span> <span class="o">=</span> <span class="n">Readmits</span><span class="o">.</span><span class="n">allcause</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Return the query as text:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">readmits</span><span class="o">.</span><span class="n">sql</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>The prepare function is a simple “pass” function. Meaning that when this function is executed, it passed to the prepare function
+specific to the child class.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference internal" href="Cost.html#Cost.Cost.prepare" title="Cost.Cost.prepare"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare()</span></code></a> or <a class="reference internal" href="Readmits.html#Readmits.Readmits.prepare" title="Readmits.Readmits.prepare"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare()</span></code></a> to view the specific versions of this method.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculate function is a simple “pass” function. Meaning that when this function is executed, it passed to the prepare function
+specific to the child class.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference internal" href="Cost.html#Cost.Cost.calculate" title="Cost.Cost.calculate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate()</span></code></a> or <a class="reference internal" href="Readmits.html#Readmits.Readmits.calculate" title="Readmits.Readmits.calculate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate()</span></code></a> to view the specific versions of this method.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.apply_filters">
+<span class="sig-name descname"><span class="pre">apply_filters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.apply_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>The apply filters function is not directly interacted with by the user, but is called automatically when a query produced by a ClaimsAnalysis
+object will be joined to a <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> object’s query that is constrained by state. This ensures that query produced by the ClaimsAnalysis
+object is also constrained by state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.join_inner">
+<span class="sig-name descname"><span class="pre">join_inner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.join_inner" title="Permalink to this definition">¶</a></dt>
+<dd><p>The join_inner method is responsible for producing a join conidition that is appended to a <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> object’s query ensuring
+that the query produced by a ClaimsAnalysis object is properly integrated. As this method’s namesake implies this function produces
+an inner join condition.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ClaimsAnalysis.ClaimsAnalysis.join_outer">
+<span class="sig-name descname"><span class="pre">join_outer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ClaimsAnalysis.ClaimsAnalysis.join_outer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The join_inner method is responsible for producing a join conidition that is appended to a <a class="reference internal" href="Paletable.html#module-Paletable" title="Paletable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paletable</span></code></a> object’s query ensuring
+that the query produced by a ClaimsAnalysis object is properly integrated. As this method’s namesake implies this function produces
+an outer join condition.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">PALET Wiki [v. 1.11.20220610]</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Cost.html"
+                        title="next chapter">Cost</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ClaimsAnalysis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Cost.html" title="Cost"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PALET Wiki [v. 1.11.20220610]"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PALET Wiki Test 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ClaimsAnalysis</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, ch.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>
