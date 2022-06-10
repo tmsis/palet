@@ -612,7 +612,7 @@ class Paletable():
         using the gndr_cd column in the TAF data.
 
         Args:
-            gender: `str, optional`: Filter by a single gender using the corresponding code from gndr_cd
+            gender: `list, optional`: Filter by a single gender using the corresponding code from gndr_cd
             default: `none`: Defaults to filtering by all three options: -1 (null), F (female), M (male).
 
         Returns:
