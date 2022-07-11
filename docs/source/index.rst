@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PALET Wiki [v. 1.8.20220421]
+PALET Wiki [v. 1.12.20220623]
 ===========================================
 
 Introduction
@@ -53,6 +53,7 @@ PALET Current Release and Process information
    :maxdepth: 2
    :caption: Contents:
 
+   ClaimsAnalysis
    Cost
    Coverage
    CoverageType

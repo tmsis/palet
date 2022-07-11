@@ -1,5 +1,5 @@
 """
-The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions. This module only contains 
+The Diagnoses module is a critical component of filtering :class:`Enrollment` by chronic coniditions. This module only contains
 the :class:`Diagnoses` class, the :meth:`~Diagnoses.Diagnoses.where` static method and the :meth:`~Diagnoses.Diagnoses.within`.
 """
 
@@ -8,13 +8,12 @@ the :class:`Diagnoses` class, the :meth:`~Diagnoses.Diagnoses.where` static meth
 #
 #
 # -------------------------------------------------------
-from numpy import diag
-from pyspark.sql import SparkSession
-
 from palet.Palet import Palet
 from palet.DateDimension import DateDimension
 from palet.PaletMetadata import PaletMetadata
 from palet.ServiceCategory import ServiceCategory
+
+from datetime import date, datetime, timedelta
 
 
 # -------------------------------------------------------
@@ -73,6 +72,7 @@ class Diagnoses():
         self.service_categories = []
         self.diagnoses = []
         self.within = ''
+        self.asOf = self.date_dimension.asOf
 
     # -------------------------------------------------------
     #
@@ -162,58 +162,6 @@ class Diagnoses():
         from palet.DateDimension import DateDimension
         return DateDimension.getInstance().relevant_runids(PaletMetadata.Member.run_id_file.get(run_id_file), lookback)
 
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    @staticmethod
-    def where(service_category: ServiceCategory, diagnoses: list, lookback: int = 6, date_dimension: DateDimension = None):
-        """
-        The static method where() is used to assign parameters for the :meth:`~Enrollment.Enrollment.having` in :class:`Enrollment`. Unlike the :meth:`~Diagnoses.Diagnoses.within`
-        This method is specifically for filtering by a single chronic conditions.
-        This is where the user assigns a service category from the :class:`ServiceCategory` class and the list of diagnoses codes they have specified.
-
-        Args:
-            service_category: `attribute`: Specify an attribute from the :class:`ServiceCategory` such as ServiceCategory.inpaitent
-            diagnoses: `list`: User defined list of diagnoses codes
-            lookback: `int defaults to 6`: Enter an integer for the number of years you wish to be included. Defaults to 6.
-
-        Returns:
-            Spark DataFrame: returns the updated object
-
-        Note:
-            The where() function is nested within :meth:`~Enrollment.Enrollment.having`.
-
-        Example:
-            Create a list of diagnoses codes:
-
-            >>> AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 'I213', 'I214', 'I219', 'I220',
-                        'I221', 'I222', 'I228', 'I229', 'I21A1', 'I21A9', 'I2101', 'I2102', 'I2109', 'I2111', 'I2119', 'I2121', 'I2129']
-
-            Create an Enrollment object & use the :meth:`~Enrollment.Enrollment.having` function with :meth:`~Diagnoses.Diagnoses.where` as a parameter
-            to filter by chronic condition:
-
-            >>> api = Enrollment.ByMonth().having(Diagnoses.where(ServiceCategory.inpatient, AFib))
-
-            Return DataFrame:
-
-            >>> display(api.fetch())
-
-            Use the mark function to add a column specifying the chronic condition which the user is filtering by:
-
-            >>> api = Enrollment([6280]).byMonth().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib')
-
-            Return the more readable version of the DataFrame:
-
-            >>> display(api.fetch())
-
-        """
-
-        return Diagnoses.within([(service_category, 1)], diagnoses, lookback, date_dimension)
-
-
     # -------------------------------------------------------
     #
     #
@@ -282,9 +230,9 @@ class Diagnoses():
             >>>        Diagnoses.within([                        \
 
             >>>        (ServiceCategory.inpatient, 1),           \
-                
+
             >>>        (ServiceCategory.other_services, 2)],     \
-                
+
             >>>            AFib), 'AFib')
 
             Return the more readable version of the DataFrame:

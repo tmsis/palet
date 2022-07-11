@@ -612,7 +612,7 @@ class Paletable():
         using the gndr_cd column in the TAF data.
 
         Args:
-            gender: `str, optional`: Filter by a single gender using the corresponding code from gndr_cd
+            gender: `list, optional`: Filter by a single gender using the corresponding code from gndr_cd
             default: `none`: Defaults to filtering by all three options: -1 (null), F (female), M (male).
 
         Returns:
@@ -796,35 +796,9 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     @overload
     def byEligibilityType(self, constraint: dict = None) -> None:
-        """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
-        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
-        correspond to chip_cd in PaletMetadata.
-
-        Args:
-            type:`dict, (optional)`: Filter by one or more user specified constraints in dict format.
-
-            default: `none`: Filter by all available enrollment types
-
-        Returns:
-            Spark DataFrame: :class:`Paletable`: returns the updated object
-
-        Example:
-
-            Filter by special Eligibility Types:
-
-            >>> api = Enrollment().byEligibilityType([EligibilityType.BlindAndDisabled, EligibilityType.Aged])
-
-            or
-
-            Filter by user defined group(s)
-
-            >>> api = Enrollment().byEligibilityType(constraint={"Pregnant": ["(bb.age_num <= 59 or bb.age_num is null) and (bb.GNDR_CD='F'
-                                                                                or bb.GNDR_CD is null) and bb.eligibility_type
-                                                                                in ('67','68','05','53')"]})
-
-        Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
-        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
-        correspond to chip_cd in PaletMetadata.
+        """Filter your query by eligibility type. Most top level objects inherit this function such as Enrollment, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group. Eligibility type codes and values
+        correspond to eligibility_cd in PaletMetadata.
 
         Args:
             type:`list, (optional)`: Filter by one or more eligibilty types using eligibility type code or special groups within EligilibilityType.
@@ -855,7 +829,9 @@ class Paletable():
 
             Return Paletable object as a DataFrame:
 
-            >>> display(api.fetch())"""
+            >>> display(api.fetch())
+            
+        """
         ...
 
     @overload

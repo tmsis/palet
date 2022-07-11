@@ -1,3 +1,10 @@
+"""
+PALET's Cost module contains a Cost class which is a :class:`ClaimsAnalysis` object and can be leveraged with the :class:`Enrollment`
+module to look at cost of admissions for both inpatient care and long term care. Unlike :class:`Readmits`, which is a also a
+:class:`ClaimsAnalysis` object, Cost can only be appended to a :class:`Paletable` object like :class:`Enrollment` using the :meth:`~Enrollment.Enrollment.calculate`
+method from :class:`Enrollment`. This subject object will add columns to the DataFrame that contain various cost metrics for the type of care specified.
+"""
+
 # -------------------------------------------------------
 #
 #
@@ -7,6 +14,7 @@ from pyspark.sql import SparkSession
 
 from palet.Palet import Palet
 from palet.DateDimension import DateDimension
+from palet.ClaimsAnalysis import ClaimsAnalysis
 
 
 # -------------------------------------------------------
@@ -14,7 +22,42 @@ from palet.DateDimension import DateDimension
 #
 #
 # -------------------------------------------------------
-class Cost():
+class Cost(ClaimsAnalysis):
+    """
+    The Cost class can be appended to the end of an :class:`Enrollment.Enrollment` object using either :meth:`~Enrollment.Enrollment.calculate`
+    from the Enrollment module. In this way, Cost isn't a Paletable object but a sub-object of Enrollment.
+
+    Attributes:
+        palet_readmits_edge_ip: Pulls information relevant to inpatient claims from taf_iph.
+        palet_readmits_edge_lt: Pulls information relevant to long term claims from taf_lth.
+        palet_readmits_edge: Unions the data returned from the two initial attributes.
+        palet_readmits_edge_x_ip_lt: Pulls data from palet_readmits_edge and joins on values from the initial IP and LT tables.
+        palet_readmits_discharge: Adds in logic to account for discharges.
+        palet_readmits_segments: Accounts for segmentation.
+        palet_readmits_continuity: Accounts for overlapping admits and readmits.
+        palet_readmits: The final temporary table joining data from all of the tables above.
+        join_sql: The final SQL query which will be joined to the query of the Paletable object.
+
+    Examples:
+        Create a cost object:
+
+        >>> cost = Cost.inpatient()
+
+        Return the portion of the SQL query produced by the Cost object that will be appended to the :class:`Enrollment` query:
+
+        >>> print(cost.sql())
+
+        Create a :class:`Paletable` object with :meth:`~Enrollment.Enrollment.calculate` and cost entered as an argument:
+
+        >>> api = Enrollment().calculate(cost)
+
+        Convert the object to a DataFrame and return:
+
+        >>> df = api.fetch()
+
+        >>> display(df)
+
+    """
 
     # -------------------------------------------------------
     #
@@ -22,28 +65,9 @@ class Cost():
     #
     # -------------------------------------------------------
     def __init__(self):
-        self.join_sql = ''
-        self.callback = None
-        self.alias = None
-        self.date_dimension = DateDimension.getInstance()
+        super().__init__()
 
         self.clm_type_cds = ['1', '3', 'A', 'C', 'U', 'W']
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def sql(self):
-        return self.join_sql
-
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def __str__(self):
-        return self.sql()
 
     # -------------------------------------------------------
     #
@@ -74,6 +98,7 @@ class Cost():
                 da_run_id in ( {  self.date_dimension.relevant_runids('IPH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  msis_ident_num
                 ,admsn_dt
@@ -105,6 +130,7 @@ class Cost():
                 da_run_id in ( { self.date_dimension.relevant_runids('LTH') } )
                 and clm_type_cd in ('{ "','".join(self.clm_type_cds) }')
                 and substring(bill_type_cd,3,1) in ('1', '2')
+                {{0}}
             order by
                  submtg_state_cd
                 ,msis_ident_num
@@ -335,15 +361,15 @@ class Cost():
         #
         #
         # -------------------------------------------------------
-        self.palet_admits = """
+        self.join_sql = """
             select distinct
-                submtg_state_cd,
-                year(admit) as year,
-                month(admit) as month,
-                msis_ident_num,
-                admit,
-                min(1) as units,
-                sum(total_amount) as total_amount
+                 submtg_state_cd
+                ,msis_ident_num
+                ,year(admit) as year
+                ,month(admit) as month
+                ,admit
+                ,min(1) as units
+                ,sum(total_amount) as total_amount
             from
                 palet_admits_continuity
             group by
@@ -354,30 +380,6 @@ class Cost():
                 submtg_state_cd,
                 msis_ident_num,
                 admit
-        """
-
-        # -------------------------------------------------------
-        #
-        #
-        #
-        # -------------------------------------------------------
-        self.palet_admits_summary = f"""
-            select
-                 submtg_state_cd
-                ,year
-                ,month
-                ,sum(units) as units
-                ,sum(total_amount) as total_amount
-            from
-                ({ self.palet_admits })
-            group by
-                 submtg_state_cd
-                ,year
-                ,month
-            order by
-                 submtg_state_cd
-                ,year
-                ,month
         """
 
         self.mdcd_mm = f"sum({{parent}}.mdcd_enrollment)"
@@ -404,6 +406,10 @@ class Cost():
     #
     # -------------------------------------------------------
     def calculate(self):
+        """
+        The calculate method is not directly interacted with by the analyst. This method is called by :meth:`~Readmits.Readmits.allcause` and responsible for
+        computing the columns for mm, total_amount, pmpm, units, util and cost when using :meth:`~Enrollment.Enrollment.calculate` from Enrollment.
+        """
 
         # {self.mdcd_mm} as mdcd_mm,
         # {self.chip_mm} as chip_mm,
@@ -432,33 +438,29 @@ class Cost():
     #
     #
     # -------------------------------------------------------
-    def join_inner(self) -> str:
+    def prepare(self):
+        """
+        The prepare method is not directly interacted with by the analyst. This method calls :meth:`~ClaimsAnalysis.ClaimsAnalysis.apply_filters`
+        from :class:`ClaimsAnalysis` which constrains the initial IP and LT queries from the Attributes section by state if necessary. Additionally,
+        this method creates a Spark Session and runs through all of the queries from the attributes section.
+        """
 
-        sql = f"""
-                ({self.palet_admits}) as {self.alias}
-                on
-                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
-                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
-                    and {{parent}}.de_fil_dt = {self.alias}.year"""
+        self.palet_admits_edge_ip = self.palet_admits_edge_ip.format(self.apply_filters())
+        self.palet_admits_edge_lt = self.palet_admits_edge_lt.format(self.apply_filters())
 
-        return sql
+        prep = [
+            self.palet_admits_edge_ip,
+            self.palet_admits_edge_lt,
+            self.palet_admits_edge,
+            self.palet_admits_edge_x_ip_lt,
+            self.palet_admits_discharge,
+            self.palet_admits_segments,
+            self.palet_admits_continuity]
 
-    # -------------------------------------------------------
-    #
-    #
-    #
-    # -------------------------------------------------------
-    def join_outer(self) -> str:
-
-        sql = f"""
-                ({self.palet_admits}) as {self.alias}
-                on
-                        {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
-                    and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
-                    and {{parent}}.de_fil_dt = {self.alias}.year
-                    and {{parent}}.month = {self.alias}.month"""
-
-        return sql
+        spark = SparkSession.getActiveSession()
+        if spark is not None:
+            for i in prep:
+                spark.sql(i)
 
     # -------------------------------------------------------
     #
@@ -467,6 +469,20 @@ class Cost():
     # -------------------------------------------------------
     @staticmethod
     def inpatient(date_dimension: DateDimension = None):
+        """
+        The inpatient function is appended to the end of a cost object and is respoble for defining the :class:`DateDimension` object, aliasing and
+        calling the :meth:`~Cost.Cost.calculate object above.`
+
+        Examples:
+            Create a cost object with the inpatient function:
+
+            >>> cost = Cost.inpatient()
+
+            Append the Cost object to the end of an Enrollment object using :meth:`~Enrollment.Enrollment.Calculate`:
+
+            >>> api = Enrollment().calculate(cost)
+
+        """
 
         o = Cost()
         if date_dimension is not None:
@@ -476,18 +492,6 @@ class Cost():
         alias = palet.reserveSQLAlias()
         o.alias = alias
         o.init()
-
-        spark = SparkSession.getActiveSession()
-        if spark is not None:
-
-            spark.sql(o.palet_admits_edge_ip)
-            spark.sql(o.palet_admits_edge_lt)
-            spark.sql(o.palet_admits_edge)
-            spark.sql(o.palet_admits_edge_x_ip_lt)
-            spark.sql(o.palet_admits_discharge)
-            spark.sql(o.palet_admits_segments)
-            spark.sql(o.palet_admits_continuity)
-            spark.sql(o.palet_admits)
 
         o.callback = o.calculate
 

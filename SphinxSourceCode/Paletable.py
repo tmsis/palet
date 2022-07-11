@@ -5,10 +5,12 @@ ethnicity, file data, income bracket, gender and state. Paletable also contains 
 return datafranes created by high level objects.
 """
 
+from typing import overload
 import pandas as pd
 from DateDimension import DateDimension
 from Palet import Palet
 from PaletMetadata import PaletMetadata
+from datetime import date
 
 
 class Paletable():
@@ -33,6 +35,7 @@ class Paletable():
 
         >>> e.fetch()
 
+
     """
 
     # Initialize the comann variables here.
@@ -43,7 +46,7 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def __init__(self, runIds: list = None):
+    def __init__(self, asOf: date = None, runIds: list = None):
 
         self.timeunit = None
         self.by_group = []
@@ -53,14 +56,20 @@ class Paletable():
         self.derived_by_type_group = []
         self.aggregate_group = []
 
-        self.date_dimension = DateDimension(runIds=runIds)
+        self.date_dimension = DateDimension.getInstance()
 
         self.preprocesses = []
         self.postprocesses = []
 
+        self.outer_joins = []
+
+        self.calculations = []
+
         self.markers = {}
         self.having_constraints = []
+        self._outersql = {}
         self._sql = None
+        self.user_constraint = {}
 
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
@@ -70,18 +79,11 @@ class Paletable():
 
         self.palet = Palet.getInstance()
 
-        # if runIds is not None:
-        #     if not issubclass(type(runIds), Paletable):
-        #         self._user_runids = self.usingRunIds(runIds)
-        # else:
-        #     self._runids = self.palet.cache_run_ids()
-        #     self._years = self.palet.cache_run_ids("fil_dt")
-        # self.palet.logger.debug('Initializing Paletable super class')
-
-    # ----
+    # ---------------------------------------------------------------------------------
     #
     #
-    # ----
+    #
+    # ---------------------------------------------------------------------------------
     def setLoggingLevel(self, level: str):
         self.palet.logger.setLevel(level)
         return self
@@ -192,6 +194,9 @@ class Paletable():
                     for j in EligibilityType.cols:
                         z += j + new_line_comma
 
+                if str(column) == "age_band":
+                    z += "age_band" + new_line_comma
+
             return f"{z}"
         else:
             return ''
@@ -202,13 +207,13 @@ class Paletable():
     #       properly for the dynamic sql generation
     #
     # ---------------------------------------------------------------------------------
-    def _getByGroupWithAlias(self):
+    def _getByGroupWithAlias(self, alias: str = 'aa'):
         self.palet.logger.debug('Forming SQL by Groups')
         z = ""
         new_line_comma = '\n\t\t\t   ,'
         if (len(self.by_group)) > 0:
             for column in self.by_group:
-                z += "aa." + column + new_line_comma
+                z += f"{alias}." + column + new_line_comma
             return f"{z}"
         else:
             return ''
@@ -247,46 +252,108 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _defineWhereClause(self):
+    def _sqlFilterWhereClause(self, alias: str, sqlloc: str = "outer"):
         self.palet.logger.debug('defining our where clause based on api calls')
-        clause = ""
         where = []
 
         if len(self.filter) > 0:
             for key in self.filter:
+                if sqlloc == "inner" and key in PaletMetadata.Enrollment.derived_columns:
+                    continue
+                _in_stmt = []
+                _join = ""
 
                 # get the value(s) in case there are multiple
                 values = self.filter[key]
+                for val in values:
+                    _in_stmt.append(f"'{val}'")
 
-                # Check for multiple values here, space separator is default
-                if str(values).find(" ") > -1:
-                    splitRange = self._checkForMultiVarFilter(values)
-                    for value in splitRange:
-                        clause = ("aa." + key, value)
-                        where.append(' ((= '.join(clause))
+                _join = ",".join(_in_stmt)
+                where.append(alias + '.' + key + ' in (' + _join + ')')
 
-                # Check for multiples with , separator
-                elif str(values).find(",") > -1:
-                    splitVals = self._checkForMultiVarFilter(values, ",")
-                    for values in splitVals:
-                        # check for age ranges here with the - separator
-                        if str(values).find("-") > -1:
-                            splitRange = self._checkForMultiVarFilter(values, "-")
-                            range_stmt = "aa." + key + " between " + splitRange[0] + " and " + splitRange[1]
-                        # check for greater than; i.e. x+ equals >= x
-                        elif str(values).find("+") > -1:
-                            range_stmt = "aa." + key + " >= " + values.strip("+")
-                        # take the x+ and strip out the +
-                        where.append(range_stmt)
-
-                else:  # else parse the single value
-                    clause = ("aa." + key, self.filter[key])
-                    where.append(' = '.join(clause))
-
-            return f"{' and '.join(where)}"
+            if len(where) > 0:
+                return f"{' and '.join(where)}"
+            else:
+                return "1=1"
 
         else:
             return "1=1"
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _derivedTypesWhereClause(self):
+        self.palet.logger.debug('checking for user defined where clause based on api calls')
+        where = []
+
+        if len(self.user_constraint) > 0:
+            for key in self.user_constraint:
+                _constr = []
+                _join = ""
+
+                # get the value(s) in case there are multiple
+                metaval: str = self.user_constraint[key]
+                for constr in metaval:
+                    for field, val in PaletMetadata.Enrollment.stack_fields.items():
+                        constr = constr.replace(field, val)
+                        constr = constr.format(alias=self.alias)
+                    _constr.append(constr)
+
+                _join = " or ".join(_constr)
+            where.append(_join)
+
+            return f"{' or '.join(where)}"
+
+        else:
+            return "1=1"
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    def _userDefinedSelect(self, sql_type: str):
+        self.palet.logger.debug('checking for user defined select variabes based on api calls')
+
+        if len(self.user_constraint) > 0:
+            sel_fields = []
+            alias_fmt = None
+            returnval = ''
+
+            for key, case in self.user_constraint.items():
+                if sql_type == "inner":
+                    for constr in case:
+                        for field, val in PaletMetadata.Enrollment.common_fields.items():
+                            # get the value(s) in case there are multiple
+                            if constr.lower().find(field) >= 0:
+                                sel_fields.append(f"{self.nested_alias}.{val}")  # TODO:
+                        returnval = ',\n\t\t\t\t'.join(set(sel_fields)) + ","
+                elif sql_type == "outer":
+                    for constr in case:
+                        for field, val in PaletMetadata.Enrollment.common_fields.items():
+                            # get the value(s) in case there are multiple
+                            if constr.lower().find(field) >= 0:
+                                sel_fields.append(f"{self.alias}.{val}")  # TODO:
+                        returnval = ',\n\t\t\t\t'.join(set(sel_fields)) + ","
+                elif sql_type == "case":
+                    all_fields = PaletMetadata.Enrollment.all_common_fields()
+                    for cond in case:
+                        for field, metaval in all_fields.items():
+                            cond = cond.replace(field, metaval)
+                        alias_fmt = cond.format(alias=self.alias)
+                        sel_fields.append("when " + alias_fmt + " then '" + key + "'")
+                    returnval = 'case ' + '\n\t\t\t\t'.join(set(sel_fields)) + ' end as defined_category,'
+                else:
+                    return ""
+
+            return returnval
+
+        else:
+            return ''
 
     # ---------------------------------------------------------------------------------
     #
@@ -308,10 +375,17 @@ class Paletable():
     def _buildPctChangeColumn(self, df: pd.DataFrame, resultColumnName: str, columnNameToCalc: str, colIntPosition, isPct: bool):
         self.palet.logger.debug('master function to create pctChange columns based on column passed')
         df[resultColumnName] = [
-            round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x-colIntPosition]) - 1), 3)
-            if x != 0 and df[columnNameToCalc].iat[x-1] > 0 and df['isfirst'].iat[x] != 1
+            round(((df[columnNameToCalc].iat[x] / df[columnNameToCalc].iat[x - colIntPosition]) - 1), 3)
+            if x != 0 and df[columnNameToCalc].iat[x - 1] > 0 and df['isfirst'].iat[x] != 1
             else float('NaN')
             for x in range(len(df))]
+
+    def _update_user_constraints(self, constraints):
+        for list_constr in constraints:
+            for item in list_constr:
+                self.user_constraint.update(item)
+
+        return self
 
     # ---------------------------------------------------------------------------------
     #
@@ -429,7 +503,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.race: ethnicity})
 
         return self
 
@@ -476,7 +550,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.raceExpanded: ethnicity})
 
         return self
 
@@ -523,7 +597,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
-            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: "'" + ethnicity + "'"})
+            self.filter.update({PaletMetadata.Enrollment.raceEthnicity.ethnicity: ethnicity})
 
         return self
 
@@ -538,7 +612,7 @@ class Paletable():
         using the gndr_cd column in the TAF data.
 
         Args:
-            gender: `str, optional`: Filter by a single gender using the corresponding code from gndr_cd
+            gender: `list, optional`: Filter by a single gender using the corresponding code from gndr_cd
             default: `none`: Defaults to filtering by all three options: -1 (null), F (female), M (male).
 
         Returns:
@@ -572,7 +646,7 @@ class Paletable():
         self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
         if gender is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.gender: "'" + gender + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.gender: gender})
 
         return self
 
@@ -581,12 +655,12 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byState(self, state_cd=None):
+    def byState(self, state_cds: list = None):
         """Filter your query by State with total enrollment. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
         Args:
-            state_fips:`str, (optional)`: Filter by a single State using FIPS code.
+            state_fips:`list, (optional)`: Filter by a single State or multiple states using FIPS code. Note brackets around state or states is required.
             default: `none`: Filter the Paletable object by all states and territories.
 
         Returns:
@@ -603,13 +677,18 @@ class Paletable():
 
             Focus in one state, for this example Alabama:
 
-            api = Enrollment().byState('01')
+            >>> api = Enrollment().byState(['01'])
+
+            or
+
+            >>> api = Enrollment().byState(['NC'])
 
             Return the object as DataFrame:
 
             >>> display(api.fetch())
 
         """
+        _states_ = []
 
         self.palet.logger.info('adding byState to the by Group')
         if self.timeunit not in ('full', 'year', 'partial'):
@@ -617,14 +696,18 @@ class Paletable():
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
-        if state_cd is not None:
-            if type(state_cd) is not int:
+        if state_cds is not None and type(state_cds) is list:
+            if type(state_cds) is not int:
                 lkup = self.palet.st_fips
-                fips = lkup[lkup['STABBREV'] == state_cd]['FIPS']
-                state_fips = fips.iloc[0]
+                for state in state_cds:
+                    fips = lkup[lkup['STABBREV'] == state]['FIPS']
+                    state_fips = fips.iloc[0]
+                    _states_.append(state_fips)
             else:
-                state_fips = state_cd
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+                _states_.extend(state_cds)
+            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: _states_})
+        else:
+            PaletMetadata.Enrichment._checkForHelperMsg(state_cds, list, "['NC','NY','FL']")
 
         return self
 
@@ -633,13 +716,13 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byCoverageType(self, *ctype):
+    def byCoverageType(self, constraint: list = None):
         """Filter your query by coverage type. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group. Coverage type codes and values
             correspond to coverage_type in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual coverage type using coverage code.
+            type:`list, (optional)`: Filter by an individual coverage type or multiple coverage types using coverage code. Brackets are required.
             default: `none`: Filter by all available coverage types.
 
         Returns:
@@ -658,23 +741,15 @@ class Paletable():
             >>> display(api.fetch())
 
         """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
-            self.__byCoverageType__([])
-        else:
-            self.__byCoverageType__(ctype[0])
-
-    def __byCoverageType__(self, type: list = None):
         from CoverageType import CoverageType
 
         self.palet.logger.info('adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
-            self.filter_by_type.update({CoverageType: type})
+        if constraint is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
+            self.filter_by_type.update({CoverageType: constraint})
 
-        # return Enrollment(self._user_runids, self)
         return self
 
     # ---------------------------------------------------------------------------------
@@ -682,13 +757,13 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byEnrollmentType(self, *ctype):
+    def byEnrollmentType(self, constraint: list = None):
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            type:`list, (optional)`: Filter by an individual enrollment type or multiple enrollment types using enrollment type code. Brackets are required.
             default: `none`: Filter by all available enrollment types
 
         Returns:
@@ -704,84 +779,71 @@ class Paletable():
             >>> display(api.fetch())
 
         """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['1', '2', '3']")
-            self.__byEnrollmentType__([])
-        else:
-            self.__byEnrollmentType__(ctype[0])
-
-    def __byEnrollmentType__(self, type: list = None):
         from EnrollmentType import EnrollmentType
 
         self.palet.logger.info('adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EnrollmentType)
 
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['1', '2', '3']")
-            self.filter_by_type.update({EnrollmentType: type})
+        if constraint is not None:
+            PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['1', '2', '3']")
+            self.filter_by_type.update({EnrollmentType: constraint})
 
-        # return Enrollment(self.date_dimension.runIds, self)
         return self
 
     # ---------------------------------------------------------------------------------
     #
-    #
-    #
+    # Stub method for byEligibilityType user entries overloading
     # ---------------------------------------------------------------------------------
-    def byEligibilityType(self, *ctype):
+    @overload
+    def byEligibilityType(self, constraint: dict = None) -> None:
         """Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
         If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
         correspond to chip_cd in PaletMetadata.
 
         Args:
-            type:`str, (optional)`: Filter by an individual enrollment type using enrollment type code.
+            type:`dict, (optional)`: Filter by one or more user specified constraints in dict format.
+
             default: `none`: Filter by all available enrollment types
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
 
         Example:
-            Create Paletable object:
 
-            >>> api = Enrollment().byEnrollmentType()
+            Filter by special Eligibility Types:
 
-            Return Paletable object as a DataFrame:
+            >>> api = Enrollment().byEligibilityType([EligibilityType.BlindAndDisabled, EligibilityType.Aged])
 
-            >>> display(api.fetch())
+            or
 
-        """
-        if len(ctype) > 1:
-            PaletMetadata.Enrichment._checkForHelperMsg(str(ctype), list, "['01', '02', '03']")
-            self.__byEnrollmentType__([])
-        else:
-            self.__byEnrollmentType__(ctype[0])
+            Filter by user defined group(s)
 
-    def __byEligibilityType__(self, type: list = None):
-        from EligibilityType import EligibilityType
+            >>> api = Enrollment().byEligibilityType(constraint={"Pregnant": ["(bb.age_num <= 59 or bb.age_num is null) and (bb.GNDR_CD='F'
+                                                                                or bb.GNDR_CD is null) and bb.eligibility_type
+                                                                                in ('67','68','05','53')"]})
 
-        self.palet.logger.info('adding byEnrollmentType to the by Group')
-        self.derived_by_type_group.append(EligibilityType)
-
-        if type is not None:
-            PaletMetadata.Enrichment._checkForHelperMsg(type, list, "['01', '02', '03']")
-            self.filter_by_type.update({EligibilityType: type})
-
-        # return Enrollment(self.date_dimension.runIds, self)
-        return self
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def byMedicaidOnly(self, state_fips=None):
-        """Filter your query to only include counts and percentage changes for Medicaid. Most top level objects
-        inherit this function such as Enrollment, Trend, etc. If your object is already set by a by group this
-        will add it as the next by group.
+        Filter your query by enrollment type. Most top level objects inherit this function such as Eligibility, Trend, etc.
+        If your object is already set by a by group this will add it as the next by group. Enrollment type codes and values
+        correspond to chip_cd in PaletMetadata.
 
         Args:
-            state_fips:`str, (optional)`: Filter by State using FIPS code.
-            default: `none`: Change counts to focus only on Medicaid.
+            type:`list, (optional)`: Filter by one or more eligibilty types using eligibility type code or special groups within EligilibilityType.
+                                     Brackets are required.
+
+        Returns:
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Example:
+            Filter by user defined group(s)
+
+            >>> api = Enrollment().byEligibilityType([EligibilityType.BlindAndDisabled, EligibilityType.Aged])
+
+            or
+
+            >>> api = Enrollment().byEligibilityType(['01', '02', '03'])
+
+        Args:
+            default: `none`:No filter / show all available enrollment types
 
         Returns:
             Spark DataFrame: :class:`Paletable`: returns the updated object
@@ -789,31 +851,43 @@ class Paletable():
         Example:
             Create Paletable object:
 
-            >>> api = Enrollment().byMedicaidOnly()
+            >>> api = Enrollment().byEligibilityType()
 
             Return Paletable object as a DataFrame:
 
-            >>> display(api.fetch())
+            >>> display(api.fetch())"""
+        ...
 
-        """
+    @overload
+    def byEligibilityType(self, constraint: list = None) -> None:
+        ...
 
-        self.palet.logger.info('adding byMedicaidOnly to the by Group')
+    @overload
+    def byEligibilityType(self) -> None:
+        ...
 
-        self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
+    def byEligibilityType(self, constraint=None):
+        from EligibilityType import EligibilityType
 
-        if state_fips is not None:
-            self.filter.update({PaletMetadata.Enrollment.locale.submittingState: "'" + state_fips + "'"})
+        self.palet.logger.info('adding EligibilityType to the by Group')
+        self.derived_by_type_group.append(EligibilityType)
 
-        for month in PaletMetadata.Enrollment.CHIP.half1:
-            for field in month:
-                if field in self.filter:
-                    del self.filter[field]
-                    del self.by_group[field]
-            for month in PaletMetadata.Enrollment.CHIP.half2:
-                for field in month:
-                    if field in self.filter:
-                        del self.filter[field]
-                        del self.by_group[field]
+        if constraint is not None:
+
+            if isinstance(constraint, list):
+                PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
+                self.palet.logger.info("Special Types were specified. The query will use these types and user defined constaints will be ignored.")
+                self.filter_by_type.update({EligibilityType: constraint})
+                if type(constraint[0]) is tuple:
+                    self._update_user_constraints(constraint)
+            elif isinstance(constraint, dict):
+                self.palet.logger.info("User Defined Constraints were specified. The query will use these constraints and special types will be ignored.")
+                self.user_constraint.update(constraint)
+
+                for _field, val in PaletMetadata.Enrollment.common_fields.items():
+                    # get the value(s) in case there are multiple
+                    self.by_group.append(val)
+
         return self
 
     # ---------------------------------------------------------------------------------
@@ -822,7 +896,7 @@ class Paletable():
     #
     # ---------------------------------------------------------------------------------
     # This function is just returning the straight data from the table
-    def byIncomeBracket(self, bracket=None):
+    def byIncomeBracket(self, bracket: list = None):
         """Filter your query by income bracket. Most top level objects inherit this function such as Enrollment, Trend, etc.
             If your object is already set by a by group this will add it as the next by group.
 
@@ -845,10 +919,10 @@ class Paletable():
         """
 
         self.palet.logger.info('adding byIncomeBracket to the by Group')
-
+        PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
-            self.filter.update({PaletMetadata.Enrollment.identity.income: "'" + bracket + "'"})
+            self.filter.update({PaletMetadata.Enrollment.identity.income: bracket})
 
         return self
 
@@ -858,12 +932,11 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byYear(self, year: int = None, count: int = 1):
+    def byYear(self, year: list = None):
         """Filter your query by Year. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
-            year:`int, (optional)`: Filter by year using the year in numerical format. Defaults to None.
-            count:`int, (optional)`: Specify the number of years before or after the year specified. Defaults to 1.
+            year:`list, (optional)`: Filter by year using the year or years in numerical format. Input is list, brackets are required even when looking at one year.
             default: `none`: Filter object by all states and territories available.
 
         Returns:
@@ -880,11 +953,7 @@ class Paletable():
 
             Create Paletable object filtering by 2019 and 2020:
 
-            >>> api = Enrollment().byYear(2019, 1)
-
-            Or alternatively:
-
-            >>> api = api = Enrollment().byYear(2020, -1)
+            >>> api = Enrollment().byYear([2019, 2020])
 
             Return object as a DataFrame:
 
@@ -895,10 +964,9 @@ class Paletable():
         self.palet.logger.info('adding byYear to the by Group')
 
         self.timeunit = 'year'
-        self.timeunitvalue = year
 
         if year is not None:
-            self.filter.update({PaletMetadata.Enrollment.fileDate: "'" + year + "'"})
+            self.date_dimension.years = year
 
         return self
 
@@ -908,11 +976,11 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def byMonth(self, month: int = None):
+    def byMonth(self, month: list = None):
         """Filter your query by Month. Most top level objects inherit this function such as Enrollment, Trend, etc.
 
         Args:
-            month:`int, (optional)`: Filter by a specific month using the month in numerical format.
+            month:`list, (optional)`: Filter by a specific month or months using the month(s) in numerical format. Input is list, brackets are required even when looking at one month.
             default: `none`: Filter object by all available months.
 
         Returns:
@@ -932,10 +1000,14 @@ class Paletable():
             >>> api = Enrollment().byMonth(12)
 
         """
+        # TODO: Fix best way to allow for multiple month and year
 
         self.palet.logger.info('adding byMonth to the by Group')
         self.timeunit = 'month'
-        self.timeunitvalue = month
+
+        if month is not None:
+            self._outersql.update({"month": month})
+            self.date_dimension.months = month
 
         return self
 
@@ -945,13 +1017,17 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _selectTimeunit(self):
-        if self.timeunit == 'year':
-            return "de_fil_dt as year,"
+    def _selectTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
+        if self.timeunit in ('year', 'partial_year'):
+            return f"{a}de_fil_dt as year,"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                de_fil_dt as year,
-                month,
+            return f"""
+                {a}de_fil_dt as year,
+                {a}month,
                 """
 
     # ---------------------------------------------------------------------------------
@@ -960,13 +1036,17 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def _groupTimeunit(self):
-        if self.timeunit == 'year':
-            return "de_fil_dt"
+    def _groupTimeunit(self, alias: str = None):
+        a = ''
+        if alias is not None:
+            a = f"{alias}."
+
+        if self.timeunit in ('year', 'partial_year'):
+            return f"{a}de_fil_dt"
         elif self.timeunit in ('month', 'full', 'partial'):
-            return """
-                de_fil_dt,
-                month
+            return f"""
+                {a}de_fil_dt,
+                {a}month
                 """
 
     def _sumByTypeScenario(self, df: pd.DataFrame):
@@ -1017,12 +1097,12 @@ class Paletable():
     #
     #
     # ---------------------------------------------------------------------------------
-    def fetch(self):
-        """Call this method at the end of an object when you are ready for results. 
+    def fetch(self, asPandas: bool = True):
+        """Call this method at the end of an object when you are ready for results.
 
-        This converts the Spark DataFrame generated by a Paletable object into a Pandas DataFraem. This can be leveraged with display() 
+        This converts the Spark DataFrame generated by a Paletable object into a Pandas DataFraem. This can be leveraged with display()
         to quickly pivot results. fetch() also initiates enrichment and decoration such as adding more readable columns and including
-        percentage changes. 
+        percentage changes.
 
         Args:
             None: No input required
@@ -1043,48 +1123,83 @@ class Paletable():
 
             >>> display(api.byMonth().fetch())
         """
+        from pyspark.sql.types import StringType, DecimalType, IntegerType, LongType, DoubleType
+        from pyspark.sql.utils import AnalysisException, ParseException
         from pyspark.sql import SparkSession
+
         session = SparkSession.getActiveSession()
-        from pyspark.sql.types import StringType
 
         self._sql = self.sql(isFetch=True)
 
         self.palet.logger.debug('Fetching data - \n' + self._sql)
 
-        sparkDF = session.sql(self._sql)
+        try:
+            sparkDF = session.sql(self._sql)
+        except ParseException as pe:
+            self.palet.logger.fatal("There was a " + pe.cause + " in the sql query. Please review the syntax. \
+                                    To view the query being executed try 'print (api.sql())'")
+            return
+        except AnalysisException as ae:
+            self.palet.logger.fatal("There was a " + ae.cause + " in the sql query. Please review the syntax. \
+                                    To view the query being executed try 'print (api.sql())'")
+            return
 
         self._sql = None
 
-        if (sparkDF is not None):
+        if sparkDF is not None:
 
             for column in self.by_group:
                 sparkDF = sparkDF.withColumn(column, sparkDF[column].cast(StringType()))
 
-        df = sparkDF.toPandas()
+            if 'mdcd_total_amount' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('mdcd_total_amount', sparkDF['mdcd_total_amount'].cast(DoubleType()))
 
-        if df.empty is False:
+            if 'chip_total_amount' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('chip_total_amount', sparkDF['chip_total_amount'].cast(DoubleType()))
 
-            for column in self.by_group:
-                df[column] = df[column].astype(pd.StringDtype())
-                df[column].fillna('-1', inplace=True)
+            if 'mdcd_pmpm' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('mdcd_pmpm', sparkDF['mdcd_pmpm'].cast(DoubleType()))
 
-            # perform data post process
-            self.palet.logger.debug('Beginning call to run post-processes')
-            for pp in self.postprocesses:
-                df = pp(df)
+            if 'chip_pmpm' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('chip_pmpm', sparkDF['chip_pmpm'].cast(DoubleType()))
 
-            # perform data enrichments
-            if (sparkDF is not None):
-                self.palet.logger.debug('Beginning call to run post-processes')
-                for column in self.defined_columns:
-                    if column in df.columns:
-                        self.palet.logger.debug("Calling post-process " + column)
-                        col = self.defined_columns[column]
-                        df = col(df)
+            if 'mdcd_util' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('mdcd_util', sparkDF['mdcd_util'].cast(DoubleType()))
 
-            return df
-        else:
-            return print('No results')
+            if 'chip_util' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('chip_util', sparkDF['chip_util'].cast(DoubleType()))
+
+            if 'mdcd_cost' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('mdcd_cost', sparkDF['mdcd_cost'].cast(DoubleType()))
+
+            if 'chip_cost' in sparkDF.columns:
+                sparkDF = sparkDF.withColumn('chip_cost', sparkDF['chip_cost'].cast(DoubleType()))
+
+            if asPandas:
+                df = sparkDF.toPandas()
+
+                if df.empty is False:
+
+                    for column in self.by_group:
+                        df[column] = df[column].astype(pd.StringDtype())
+                        df[column].fillna('-1', inplace=True)
+
+                    # perform data post process
+                    #  self.palet.logger.debug('Beginning call to run post-processes')
+                    #  for pp in self.postprocesses:
+                    #      df = pp(df)
+
+                    # perform data enrichments
+                    self.palet.logger.debug('Beginning call to run post-processes')
+                    for column in self.defined_columns:
+                        if column in df.columns:
+                            self.palet.logger.debug("Calling post-process " + column)
+                            col = self.defined_columns[column]
+                            df = col(df)
+
+                    return df
+
+        return sparkDF
 
     # ---------------------------------------------------------------------------------
     #

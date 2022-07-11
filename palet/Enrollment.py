@@ -853,6 +853,42 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def calculate(self, paletable):
+        """
+        The calculate function is utilized when combing :class:`Paletable` objects with sub-objects like :class:`ClaimsAnalysis` objects. Where
+        :meth:`~Enrollment.Enrollment.having` is used to constrain a query, calculate does not constrain queries, but instead computes columns that
+        provide additional context. When :class:`Readmits` is called using this function columns for admits, readmits, and readmit rate are included
+        in addition to counts for enrollment. Similarly, when calculate is combined with :class:`Cost` the dataframe with include additional columns
+        that contain metrics on the cost of services.
+
+        Args:
+            paletable:` :class:`ClaimsAnalysis` object `: Enter a claims analysis object like :class:`Readmits` or :class:`Cost`.
+
+        Example:
+            Create a :class:`Cost` object:
+
+            >>> cost = Cost.inpatient()
+            
+            Create an Enrollment object with a :class:`cost` object:
+
+            >>> api = Enrollment().calculate(cost)
+
+            Convert to a DataFrame and return:
+
+            >>> df = api.fetch()
+
+            >>> display(df)
+
+            Alternatively, create an Enrollment object with a :class:`Readmits` object:
+
+            >>> api = Enrollment().calculate(Readmits.allcause(30))
+
+            Convert to a DataFrame and return:
+
+            >>> df = api.fetch()
+
+            >>> display(df)
+            
+        """
         from collections import defaultdict
 
         if paletable not in self.calculations:
