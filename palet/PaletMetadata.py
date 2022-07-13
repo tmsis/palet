@@ -106,7 +106,7 @@ class PaletMetadata:
                      stack(12,"""
                 for m in range(1, 13):
                     mm = str(m).zfill(2)
-                    z += f"""{m}, { {m} }
+                    z += f"""\n\t\t\t{m}, { {m} }
                         sum(case
                             when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1 or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 then 1
                             when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null
@@ -126,7 +126,7 @@ class PaletMetadata:
                             end)
                         """
                     if m < 12:
-                        z += ","
+                        z += " ,"
 
                 z += f""") as (month, mdcd_enrollment, chip_enrollment)"""
 
