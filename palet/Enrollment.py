@@ -210,45 +210,8 @@ class Enrollment(Paletable):
             #                         and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
             #     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
-                    'In Month' as counter,
-                    stack(12,
-                        1, { {0} }
-                        sum(case when aa.mdcd_enrlmt_days_01 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_01 > 0 then 1 else 0 end),
-                        2, { {1} }
-                        sum(case when aa.mdcd_enrlmt_days_02 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_02 > 0 then 1 else 0 end),
-                        3, { {2} }
-                        sum(case when aa.mdcd_enrlmt_days_03 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_03 > 0 then 1 else 0 end),
-                        4, { {3} }
-                        sum(case when aa.mdcd_enrlmt_days_04 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_04 > 0 then 1 else 0 end),
-                        5, { {4} }
-                        sum(case when aa.mdcd_enrlmt_days_05 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_05 > 0 then 1 else 0 end),
-                        6, { {5} }
-                        sum(case when aa.mdcd_enrlmt_days_06 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_06 > 0 then 1 else 0 end),
-                        7, { {6} }
-                        sum(case when aa.mdcd_enrlmt_days_07 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_07 > 0 then 1 else 0 end),
-                        8, { {7} }
-                        sum(case when aa.mdcd_enrlmt_days_08 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_08 > 0 then 1 else 0 end),
-                        9, { {8} }
-                        sum(case when aa.mdcd_enrlmt_days_09 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_09 > 0 then 1 else 0 end),
-                        10, { {9} }
-                        sum(case when aa.mdcd_enrlmt_days_10 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_10 > 0 then 1 else 0 end),
-                        11, { {10} }
-                        sum(case when aa.mdcd_enrlmt_days_11 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_11 > 0 then 1 else 0 end),
-                        12, { {11} }
-                        sum(case when aa.mdcd_enrlmt_days_12 > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_12 > 0 then 1 else 0 end)
-                    ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
+                {PaletMetadata.Enrollment.sqlstmts.enroll_count_stmt()}
+                """,
 
             'full': f"""
                     'Full Month' as counter,
@@ -379,16 +342,6 @@ class Enrollment(Paletable):
 
             'partial_year': '1=1'
 
-        }
-
-    class sqlstmts:
-
-        outer_filter = {
-            'year': """1=1""",
-            'month': f"""({ {0} } in ({ {1} }))""",
-            'full': "1=1",
-            'partial': '1=1',
-            'partial_year': '1=1'
         }
 
     # ---------------------------------------------------------------------------------
@@ -639,6 +592,39 @@ class Enrollment(Paletable):
     #
     #
     #
+    # ---------------------------------------------------------------------------------
+    def byServiceCategory(self, services: list = [], lookback=6):
+        """Filter your query by service category. Most top level objects inherit this function such as Enrollment, Trend, etc.
+            If your object is already set by a by group this will add it as the next by group.
+
+        Args
+        ----
+            bracket:`str, (optional)`: Filter by incm_cd, can be individual, range, or multiple. See examples below.
+            default: `none`: Filter data by all possible incm_cd's.
+
+        Returns
+        -------
+            Spark DataFrame: :class:`Paletable`: returns the updated object
+
+        Examples
+        --------
+        >>> Enrollment.byServiceCategory('iph')
+        """
+        from palet.ServiceCategory import ServiceCategory
+
+        if len(services) == 0:
+            services.append(ServiceCategory.inpatient)
+            services.append(ServiceCategory.long_term)
+            services.append(ServiceCategory.other_services)
+            services.append(ServiceCategory.prescription)
+
+        return self.having(ServiceCategory.within(service_categories=services, diagnoses=[], lookback=lookback))
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
     #
     # ---------------------------------------------------------------------------------
     def mark(self, condition: Diagnoses, marker: str):
@@ -867,7 +853,7 @@ class Enrollment(Paletable):
             Create a :class:`Cost` object:
 
             >>> cost = Cost.inpatient()
-            
+
             Create an Enrollment object with a :class:`cost` object:
 
             >>> api = Enrollment().calculate(cost)
@@ -887,7 +873,7 @@ class Enrollment(Paletable):
             >>> df = api.fetch()
 
             >>> display(df)
-            
+
         """
         from collections import defaultdict
 
@@ -949,8 +935,6 @@ class Enrollment(Paletable):
         if self._sql is None or isFetch:
             super().sql()
 
-            # create or replace temporary view enrollment_by_month as
-            # taf.data_anltcs_taf_ade_base_vw as a
             z = f"""
                 select
                     counter,
@@ -998,7 +982,7 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    { self._getOuterSQLFilter(Enrollment.sqlstmts.outer_filter) } and
+                    { self._getOuterSQLFilter(PaletMetadata.Enrollment.sqlstmts.outer_filter) } and
                     { self._sqlFilterWhereClause(self.alias) } and
                     { self._derivedTypesWhereClause() }
 

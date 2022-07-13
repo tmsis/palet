@@ -36,6 +36,8 @@ class PaletMetadata:
         type = 'chip_cd_01'
         derived_enrollment_field = 'enrollment_type'
         month = 'month'
+        elib_grp_cd_base_fld = "elgblty_grp_cd"
+        chip_cd_base_fld = "chip_cd"
 
         derived_columns = ['coverage_type',
                            'eligibility_type',
@@ -87,6 +89,59 @@ class PaletMetadata:
             year = df['de_fil_dt']
             if df['month'] != palet.Utils.numDaysInMonth(month, year):
                 return
+
+        class sqlstmts:
+
+            outer_filter = {
+                'year': """1=1""",
+                'month': f"""({ {0} } in ({ {1} }))""",
+                'full': "1=1",
+                'partial': '1=1',
+                'partial_year': '1=1'
+            }
+
+            @staticmethod
+            def enroll_count_stmt():
+                z = """'In Month' as counter,
+                     stack(12,"""
+                for m in range(1, 13):
+                    mm = str(m).zfill(2)
+                    z += f"""{m}, { {m} }
+                        sum(case
+                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1 or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 then 1
+                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null
+                                and {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 1 and 9
+                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
+                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
+                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 67 and 75 then 1
+                            else 0
+                        end),
+                    """
+                    z += f"""
+                        sum(case
+                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2 or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3 then 1
+                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null
+                            and {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68 then 1
+                            else 0
+                            end)
+                        """
+                    if m < 12:
+                        z += ","
+
+                z += f""") as (month, mdcd_enrollment, chip_enrollment)"""
+
+                return z
+
+            def prepare(self):
+                from pyspark.sql import SparkSession
+                prep = [
+                    self.enroll_counts,
+                ]
+
+                spark = SparkSession.getActiveSession()
+                if spark is not None:
+                    for i in prep:
+                        spark.sql(i)
 
         # ---------------------------------------------------------------------------------
         #
