@@ -108,27 +108,34 @@ class PaletMetadata:
                     mm = str(m).zfill(2)
                     z += f"""\n\t\t\t{m}, { {m} }
                         sum(case
-                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1 or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 then 1
-                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null
-                                and {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 1 and 9
-                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
-                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
-                                or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 67 and 75 then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1)
+                                then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm}) is null)
+                                and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 1 and 9
+                                  or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
+                                  or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
+                                  or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 69 and 75)
+                                then 1
                             else 0
                         end),
                     """
                     z += f"""
                         sum(case
-                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2 or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3 then 1
-                            when {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null
-                            and {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68 then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3)
+                                then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2
+                               or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4)
+                                then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
+                             and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68)
+                                then 1
                             else 0
-                            end)
+                        end)
                         """
                     if m < 12:
                         z += " ,"
 
-                z += f""") as (month, mdcd_enrollment, chip_enrollment)"""
+                z += """) as (month, mdcd_enrollment, chip_enrollment)"""
 
                 return z
 
