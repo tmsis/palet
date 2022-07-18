@@ -38,7 +38,7 @@ class Paletable():
 
     """
 
-    # Initialize the comann variables here.
+    # Initialize the common variables here.
     # All SQL objects should inherit from this class
     # ---------------------------------------------------------------------------------
     #
