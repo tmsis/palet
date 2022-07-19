@@ -830,7 +830,7 @@ class Paletable():
             Return Paletable object as a DataFrame:
 
             >>> display(api.fetch())
-            
+
         """
         ...
 
@@ -1099,7 +1099,7 @@ class Paletable():
 
             >>> display(api.byMonth().fetch())
         """
-        from pyspark.sql.types import StringType, DecimalType, IntegerType, LongType, DoubleType
+        from pyspark.sql.types import StringType, DoubleType
         from pyspark.sql.utils import AnalysisException, ParseException
         from pyspark.sql import SparkSession
 

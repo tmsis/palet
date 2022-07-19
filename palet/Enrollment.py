@@ -265,55 +265,8 @@ class Enrollment(Paletable):
                         ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
 
             'partial': f"""
-                    'Partial Month' as counter,
-                    stack(12,
-                        1, { {0} }
-                        sum(case when aa.mdcd_enrlmt_days_01 between 1 and 30 then 1 else 0 end) ,
-                        sum(case when aa.chip_enrlmt_days_01 between 1 and 30 then 1 else 0 end) ,
-                        2, { {1} }
-                        sum(case
-                                when aa.mdcd_enrlmt_days_02 between 1 and 27 then 1
-                                when (aa.mdcd_enrlmt_days_02 = 28
-                                    and ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0)
-                                    and (aa.de_fil_dt % 400 = 0)))) then 1
-                                else 0 end),
-                        sum(case
-                                when aa.chip_enrlmt_days_02 between 1 and 27 then 1
-                                when (aa.chip_enrlmt_days_02 = 28
-                                    and ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100== 0)
-                                    and (aa.de_fil_dt % 400 = 0)))) then 1
-                                else 0 end),
-                        3, { {2} }
-                        sum(case when aa.mdcd_enrlmt_days_03 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_03 between 1 and 30 then 1 else 0 end),
-                        4, { {3} }
-                        sum(case when aa.mdcd_enrlmt_days_04 between 1 and 29 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_04 between 1 and 29 then 1 else 0 end),
-                        5, { {4} }
-                        sum(case when aa.mdcd_enrlmt_days_05 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_05 between 1 and 30 then 1 else 0 end),
-                        6, { {5} }
-                        sum(case when aa.mdcd_enrlmt_days_06 between 1 and 29 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_06 between 1 and 29 then 1 else 0 end),
-                        7, { {6} }
-                        sum(case when aa.mdcd_enrlmt_days_07 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_07 between 1 and 30 then 1 else 0 end),
-                        8, { {7} }
-                        sum(case when aa.mdcd_enrlmt_days_08 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_08 between 1 and 30 then 1 else 0 end),
-                        9, { {8} }
-                        sum(case when aa.mdcd_enrlmt_days_09 between 1 and 29 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_09 between 1 and 29 then 1 else 0 end),
-                        10, { {9} }
-                        sum(case when aa.mdcd_enrlmt_days_10 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_10 between 1 and 30 then 1 else 0 end),
-                        11, { {10} }
-                        sum(case when aa.mdcd_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_11 between 1 and 29 then 1 else 0 end),
-                        12, { {11} }
-                        sum(case when aa.mdcd_enrlmt_days_12 between 1 and 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_12 between 1 and 30 then 1 else 0 end)
-                        ) as (month, { {12} } mdcd_enrollment, chip_enrollment)"""
+                        {PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt()}
+                        """
         }
 
         cull = {

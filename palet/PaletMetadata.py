@@ -38,6 +38,8 @@ class PaletMetadata:
         month = 'month'
         elib_grp_cd_base_fld = "elgblty_grp_cd"
         chip_cd_base_fld = "chip_cd"
+        mdcd_enrlmt_days_base_fld = "mdcd_enrlmt_days"
+        chip_enrlmt_days_base_fld = "chip_enrlmt_days"
 
         derived_columns = ['coverage_type',
                            'eligibility_type',
@@ -106,15 +108,17 @@ class PaletMetadata:
                      stack(12,"""
                 for m in range(1, 13):
                     mm = str(m).zfill(2)
-                    z += f"""\n\t\t\t{m}, { {m} }
+                    z += f"""\n\t\t\t{m}, { {m - 1} }
                         sum(case
                             when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1)
+                                and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0)
                                 then 1
-                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm}) is null)
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
                                 and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 1 and 9
                                   or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
                                   or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
                                   or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 69 and 75)
+                                 and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm}) > 0
                                 then 1
                             else 0
                         end),
@@ -122,12 +126,18 @@ class PaletMetadata:
                     z += f"""
                         sum(case
                             when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3)
+                                and ({PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0)
                                 then 1
                             when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2
-                               or {PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4)
+                                and {PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0
+                                and {PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0)
+                                then 1
+                            when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4)
+                                and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0)
                                 then 1
                             when ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
                              and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68)
+                             and ({PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0)
                                 then 1
                             else 0
                         end)
@@ -135,8 +145,115 @@ class PaletMetadata:
                     if m < 12:
                         z += " ,"
 
-                z += """) as (month, mdcd_enrollment, chip_enrollment)"""
+                z += f""") as (month, { {12} } mdcd_enrollment, chip_enrollment)"""
 
+                return z
+
+            def enroll_count_partial_stmt():
+                z = f"""'Partial Month' as counter,
+                     stack(12,
+                    1, { {0} }
+                    sum(case when aa.mdcd_enrlmt_days_01 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('01')}) then 1 else 0 end) ,
+                    sum(case when aa.chip_enrlmt_days_01 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('01')}) then 1 else 0 end) ,
+                    2, { {1} }
+                    sum(case
+                            when aa.mdcd_enrlmt_days_02 between 1 and 27 then 1
+                            when (aa.mdcd_enrlmt_days_02 = 28
+                                and ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0)
+                                and (aa.de_fil_dt % 400 = 0))))
+                                and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02')}) then 1
+                            else 0 end),
+                    sum(case
+                            when aa.chip_enrlmt_days_02 between 1 and 27 then 1
+                            when (aa.chip_enrlmt_days_02 = 28
+                                and ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100== 0)
+                                and (aa.de_fil_dt % 400 = 0))))
+                                and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02')}) then 1
+                            else 0 end),
+                    3, { {2} }
+                    sum(case when aa.mdcd_enrlmt_days_03 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('03')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_03 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('03')}) then 1 else 0 end),
+                    4, { {3} }
+                    sum(case when aa.mdcd_enrlmt_days_04 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('04')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_04 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('04')}) then 1 else 0 end),
+                    5, { {4} }
+                    sum(case when aa.mdcd_enrlmt_days_05 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('05')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_05 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('05')}) then 1 else 0 end),
+                    6, { {5} }
+                    sum(case when aa.mdcd_enrlmt_days_06 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('06')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_06 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('06')}) then 1 else 0 end),
+                    7, { {6} }
+                    sum(case when aa.mdcd_enrlmt_days_07 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('07')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_07 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('07')}) then 1 else 0 end),
+                    8, { {7} }
+                    sum(case when aa.mdcd_enrlmt_days_08 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('08')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_08 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('08')}) then 1 else 0 end),
+                    9, { {8} }
+                    sum(case when aa.mdcd_enrlmt_days_09 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('09')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_09 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('09')}) then 1 else 0 end),
+                    10, { {9} }
+                    sum(case when aa.mdcd_enrlmt_days_10 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('10')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_10 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('10')}) then 1 else 0 end),
+                    11, { {10} }
+                    sum(case when aa.mdcd_enrlmt_days_11 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('11')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_11 between 1 and 29
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('11')}) then 1 else 0 end),
+                    12, { {11} }
+                    sum(case when aa.mdcd_enrlmt_days_12 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('12')}) then 1 else 0 end),
+                    sum(case when aa.chip_enrlmt_days_12 between 1 and 30
+                        and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('12')}) then 1 else 0 end)
+                    """
+                z += f""") as (month, { {12} }mdcd_enrollment, chip_enrollment)"""
+
+                return z
+
+            def _base_mdcd_calc(mm: str):
+                z = f"""({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1)
+                        and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0)
+                        or
+                        ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
+                        and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 1 and 9
+                        or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
+                        or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
+                        or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 69 and 75)
+                        and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm}) > 0
+                    """
+                return z
+
+            def _base_chip_calc(mm: str):
+                z = f"""(({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3)
+                    and ({PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0))
+                        or (({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2
+                    and {PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0
+                    and {PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0))
+                    or
+                        (({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4)
+                    and ({PaletMetadata.Enrollment.mdcd_enrlmt_days_base_fld}_{mm} > 0))
+                    or 
+                        (({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
+                    and ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68)
+                    and ({PaletMetadata.Enrollment.chip_enrlmt_days_base_fld}_{mm} > 0))
+                    """
                 return z
 
             def prepare(self):
