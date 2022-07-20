@@ -214,87 +214,12 @@ class Enrollment(Paletable):
                 """,
 
             'full': f"""
-                    'Full Month' as counter,
-                    stack(12,
-                        1, { {0} }
-                        sum(case when aa.mdcd_enrlmt_days_01 = 31 then 1 else 0 end) ,
-                        sum(case when aa.chip_enrlmt_days_01 = 31 then 1 else 0 end) ,
-                        2, { {1} }
-                        sum(case
-                                when aa.mdcd_enrlmt_days_02 = 29 then 1
-                                when (aa.mdcd_enrlmt_days_02 = 28
-                                    and ((aa.de_fil_dt % 4 != 0) or ((aa.de_fil_dt % 100 != 0)
-                                    and (aa.de_fil_dt % 400 != 0)))) then 1
-                                else 0 end),
-                        sum(case
-                                when aa.chip_enrlmt_days_02 = 29 then 1
-                                when (aa.chip_enrlmt_days_02 = 28
-                                    and ((aa.de_fil_dt % 4 != 0) or ((aa.de_fil_dt % 100 != 0)
-                                    and (aa.de_fil_dt % 400 != 0)))) then 1
-                                else 0 end),
-                        3, { {2} }
-                        sum(case when aa.mdcd_enrlmt_days_03 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_03 = 31 then 1 else 0 end),
-                        4, { {3} }
-                        sum(case when aa.mdcd_enrlmt_days_04 = 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_04 = 30 then 1 else 0 end),
-                        5, { {4} }
-                        sum(case when aa.mdcd_enrlmt_days_05 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_05 = 31 then 1 else 0 end),
-                        6, { {5} }
-                        sum(case when aa.mdcd_enrlmt_days_06 = 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_06 = 30 then 1 else 0 end),
-                        7, { {6} }
-                        sum(case when aa.mdcd_enrlmt_days_07 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_07 = 31 then 1 else 0 end),
-                        8, { {7} }
-                        sum(case when aa.mdcd_enrlmt_days_08 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_08 = 31 then 1 else 0 end),
-                        9, { {8} }
-                        sum(case when aa.mdcd_enrlmt_days_09 = 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_09 = 30 then 1 else 0 end),
-                        10, { {9} }
-                        sum(case when aa.mdcd_enrlmt_days_10 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_10 = 31 then 1 else 0 end),
-                        11, { {10} }
-                        sum(case when aa.mdcd_enrlmt_days_11 = 30 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_11 = 30 then 1 else 0 end),
-                        12, { {11} }
-                        sum(case when aa.mdcd_enrlmt_days_12 = 31 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_12 = 31 then 1 else 0 end)
-                        ) as (month, { {12} } mdcd_enrollment, chip_enrollment)""",
+                {PaletMetadata.Enrollment.sqlstmts.enroll_count_full_stmt()}
+                """,
 
             'partial': f"""
-                        {PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt()}
-                        """
-        }
-
-        cull = {
-            'year': """(
-                (aa.mdcd_enrlmt_days_yr > 0) or (aa.chip_enrlmt_days_yr > 0)
-            )""",
-
-            'month': """(
-                ((aa.mdcd_enrlmt_days_01 > 0) or (aa.chip_enrlmt_days_01 > 0)) or
-                ((aa.mdcd_enrlmt_days_02 > 0) or (aa.chip_enrlmt_days_02 > 0)) or
-                ((aa.mdcd_enrlmt_days_03 > 0) or (aa.chip_enrlmt_days_03 > 0)) or
-                ((aa.mdcd_enrlmt_days_04 > 0) or (aa.chip_enrlmt_days_04 > 0)) or
-                ((aa.mdcd_enrlmt_days_05 > 0) or (aa.chip_enrlmt_days_05 > 0)) or
-                ((aa.mdcd_enrlmt_days_06 > 0) or (aa.chip_enrlmt_days_06 > 0)) or
-                ((aa.mdcd_enrlmt_days_07 > 0) or (aa.chip_enrlmt_days_07 > 0)) or
-                ((aa.mdcd_enrlmt_days_08 > 0) or (aa.chip_enrlmt_days_08 > 0)) or
-                ((aa.mdcd_enrlmt_days_09 > 0) or (aa.chip_enrlmt_days_09 > 0)) or
-                ((aa.mdcd_enrlmt_days_10 > 0) or (aa.chip_enrlmt_days_10 > 0)) or
-                ((aa.mdcd_enrlmt_days_11 > 0) or (aa.chip_enrlmt_days_11 > 0)) or
-                ((aa.mdcd_enrlmt_days_12 > 0) or (aa.chip_enrlmt_days_12 > 0))
-            )""",
-
-            'full': "1=1",
-
-            'partial': '1=1',
-
-            'partial_year': '1=1'
-
+                {PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt()}
+                """
         }
 
     # ---------------------------------------------------------------------------------
@@ -428,22 +353,6 @@ class Enrollment(Paletable):
             return z
 
         return breakdown.format('', '', '', '', '', '', '', '', '', '', '', '', '', '')
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
-    #  This function is used to dynamically generate the SQL where clause by returning the
-    #  selected timeunit. e.g. byMonth() or byYear()
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self, cull_type: dict):
-        breakdown = cull_type[self.timeunit]
-        for key in self.filter_by_type:
-            _type = self.filter_by_type[key]
-            return breakdown.format(key.alias, key.filter(self, _type))
-
-        return breakdown.format('1', '(1)')
 
     # ---------------------------------------------------------------------------------
     #
@@ -914,7 +823,6 @@ class Enrollment(Paletable):
                         { self._apply_constraints() }
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
-                        { self._getByTimeunitCull(Enrollment.timeunit.cull) } and
                         { self._sqlFilterWhereClause(self.nested_alias, sqlloc="inner") }
                     group by
                         { self._getByGroupWithAlias() }
