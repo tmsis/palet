@@ -430,7 +430,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byAgeRange to aggregate by Group')
+        self.palet.logger.info('Adding byAgeRange to aggregate by Group')
 
         if age_range is not None:
             self._removeByGroup(PaletMetadata.Enrollment.identity.ageGroup)
@@ -450,7 +450,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     # def byAgeGroup(self, age_group=None):
 
-    #     self.palet.logger.info('adding byAgeGroup to by Group')
+    #     self.palet.logger.info('Adding byAgeGroup to by Group')
 
     #     self._addByGroup(PaletMetadata.Enrollment.identity.ageGroup)
 
@@ -499,7 +499,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byRaceEthnicity to by Group')
+        self.palet.logger.info('Adding byRaceEthnicity to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.race)
 
         if ethnicity is not None:
@@ -546,7 +546,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byRaceEthnicityExpanded to by Group')
+        self.palet.logger.info('Adding byRaceEthnicityExpanded to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.raceExpanded)
 
         if ethnicity is not None:
@@ -593,7 +593,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byEthnicity to by Group')
+        self.palet.logger.info('Adding byEthnicity to by Group')
         self._addByGroup(PaletMetadata.Enrollment.raceEthnicity.ethnicity)
 
         if ethnicity is not None:
@@ -641,7 +641,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byGender to by Group')
+        self.palet.logger.info('Adding byGender to by Group')
 
         self._addByGroup(PaletMetadata.Enrollment.identity.gender)
 
@@ -690,7 +690,7 @@ class Paletable():
         """
         _states_ = []
 
-        self.palet.logger.info('adding byState to the by Group')
+        self.palet.logger.info('Adding byState to the by Group')
         if self.timeunit not in ('full', 'year', 'partial'):
             self.timeunit = 'month'
 
@@ -743,7 +743,7 @@ class Paletable():
         """
         from palet.CoverageType import CoverageType
 
-        self.palet.logger.info('adding CoverageType to the by Group')
+        self.palet.logger.info('Adding CoverageType to the by Group')
         self.derived_by_type_group.append(CoverageType)
 
         if constraint is not None:
@@ -781,7 +781,7 @@ class Paletable():
         """
         from palet.EnrollmentType import EnrollmentType
 
-        self.palet.logger.info('adding byEnrollmentType to the by Group')
+        self.palet.logger.info('Adding byEnrollmentType to the by Group')
         self.derived_by_type_group.append(EnrollmentType)
 
         if constraint is not None:
@@ -845,7 +845,7 @@ class Paletable():
     def byEligibilityType(self, constraint=None):
         from palet.EligibilityType import EligibilityType
 
-        self.palet.logger.info('adding EligibilityType to the by Group')
+        self.palet.logger.info('Adding EligibilityType to the by Group')
         self.derived_by_type_group.append(EligibilityType)
 
         if constraint is not None:
@@ -894,7 +894,7 @@ class Paletable():
         >>> Trend.byIncomeBracket('02,03,05')
         """
 
-        self.palet.logger.info('adding byIncomeBracket to the by Group')
+        self.palet.logger.info('Adding byIncomeBracket to the by Group')
         PaletMetadata.Enrichment._checkForHelperMsg(bracket, list, "byIncomeBracket(['03', '05']) or byIncomeBracket(['01'])")
         self._addByGroup(PaletMetadata.Enrollment.identity.income)
         if bracket is not None:
@@ -937,7 +937,7 @@ class Paletable():
 
         """
 
-        self.palet.logger.info('adding byYear to the by Group')
+        self.palet.logger.info('Adding byYear to the by Group')
 
         self.timeunit = 'year'
 
@@ -978,7 +978,7 @@ class Paletable():
         """
         # TODO: Fix best way to allow for multiple month and year
 
-        self.palet.logger.info('adding byMonth to the by Group')
+        self.palet.logger.info('Adding byMonth to the by Group')
         self.timeunit = 'month'
 
         if month is not None:
