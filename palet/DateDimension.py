@@ -18,7 +18,31 @@ class DateDimension(object):
     The date dimension class consists of an SQL query that generates every possible run id pertaining to enrollment, chronic conditions, claims and more.
     This class also contains :meth:`DateDimension.DateDimension.relvant_runids` which automatically returns run ids for a given file type and lookback period.
     Additionally, this class contains :meth:`DateDimension.DateDimension.usingRunIds` which an analyst can utilize to manually specify the run ids to include
-    in the query.
+    in the query. Run ids can also be manually set by year using using the DateDimension object. Examples of both methods are present below.
+
+    Examples:
+        Import DateDimension
+
+        >>> from palet.DateDimension import DateDimension
+
+        Specify the year you would like to focus on
+
+        >>> DateDimension(years=[2019])
+
+        Or specify multiple years
+
+        >>> DateDimension(years=[2019,2020])
+
+        Now run a Paletable object
+
+        >>> api = Enrollment()
+
+        Convert the query to a DataFrame and return
+
+        >>> df = api.fetch()
+
+        >>> display(df)
+
     """
 
     # -----------------------------------------------------------------------
@@ -154,9 +178,24 @@ class DateDimension(object):
             Users will likely not interact with this function directly, as it is automatically run when Paletable objects are
 
         Example:
+            Import DateDimension
+
+            >>> from palet.DateDimension import DateDimension
+
             Create a DateDimension object with this function and the relevant arguements
 
             >>> DateDimension().relevant_runids('BSE', 6)
+
+            Now run a Paletable object with the run ids entered as an arguement of the object
+
+            >>> api = Enrollment([7072])
+
+            Convert the query to a DataFrame and return
+
+            >>> df = api.fetch()
+
+            >>> display(df)
+
         """
 
         if lookback is None:
