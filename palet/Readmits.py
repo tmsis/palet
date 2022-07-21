@@ -404,7 +404,7 @@ class Readmits(ClaimsAnalysis):
             select
                  submtg_state_cd
                 ,year
-                ,month
+                {{0}}
                 ,msis_ident_num
                 ,sum(readmit_ind) as has_readmit
                 ,sum(admit_ind) as has_admit
@@ -414,12 +414,12 @@ class Readmits(ClaimsAnalysis):
             group by
                  submtg_state_cd
                 ,year
-                ,month
+                {{0}}
                 ,msis_ident_num
             order by
                  submtg_state_cd
                 ,year
-                ,month
+                {{0}}
         """
 
     # -------------------------------------------------------
@@ -432,7 +432,7 @@ class Readmits(ClaimsAnalysis):
         The calculate method is not directly interacted with by the analyst. This method is called by :meth:`~Readmits.Readmits.allcause` and responsible for
         computing the columns for readmits, admits and readmit_rate when using :meth:`~Enrollment.Enrollment.calculate` from Enrollment.
         """
-
+        
         calculate_rate = f"""
             sum({self.alias}.has_readmit) as readmits,
             sum({self.alias}.has_admit) as admits,
@@ -452,8 +452,11 @@ class Readmits(ClaimsAnalysis):
         this method creates a Spark Session and runs through all of the queries from the attributes section.
         """
 
+        self.init()
+        
         self.palet_readmits_edge_ip = self.palet_readmits_edge_ip.format(self.apply_filters())
         self.palet_readmits_edge_lt = self.palet_readmits_edge_lt.format(self.apply_filters())
+        self.join_sql = self.join_sql.format(self.apply_timeunit())
 
         prep = [
             self.palet_readmits_edge_ip,
@@ -519,7 +522,7 @@ class Readmits(ClaimsAnalysis):
         palet = Palet.getInstance()
         alias = palet.reserveSQLAlias()
         o.alias = alias
-        o.init()
+        
         o.days = days
 
         o.callback = o.calculate

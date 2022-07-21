@@ -39,6 +39,8 @@ class ClaimsAnalysis():
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
         self.filter = {}
+        # self.timeunit = None
+        self.paletable = None
         self.join_sql = ''
 
     # -------------------------------------------------------
@@ -161,6 +163,20 @@ class ClaimsAnalysis():
     #
     #
     # -------------------------------------------------------
+    def apply_timeunit(self):
+
+        if self.paletable.timeunit != 'year':
+            return f"{' and '.join([',month'])}"
+
+        else:
+            return ''
+
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def join_inner(self) -> str:
         """
         The join_inner method is responsible for producing a join conidition that is appended to a :class:`Paletable` object's query ensuring
@@ -195,12 +211,17 @@ class ClaimsAnalysis():
 
         self.prepare()
 
+        if self.paletable.timeunit != 'year':
+            month = f"and {{parent}}.month = {self.alias}.month"
+        else:
+            month = ''
+
         sql = f"""
                 ({self.join_sql}) as {self.alias}
                 on
                         {{parent}}.{{augment}}submtg_state_cd = {self.alias}.submtg_state_cd
                     and {{parent}}.msis_ident_num = {self.alias}.msis_ident_num
                     and {{parent}}.de_fil_dt = {self.alias}.year
-                    and {{parent}}.month = {self.alias}.month"""
+                    {month} """
 
         return sql

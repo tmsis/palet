@@ -742,6 +742,8 @@ class Enrollment(Paletable):
         if paletable not in self.calculations:
             paletable.filter = self.filter
 
+            paletable.paletable = self
+
             self.calculations.append(paletable.callback)
 
             self.outer_joins.append(paletable.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
