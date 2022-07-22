@@ -39,7 +39,6 @@ class ClaimsAnalysis():
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
         self.filter = {}
-        # self.timeunit = None
         self.paletable = None
         self.join_sql = ''
 

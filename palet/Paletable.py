@@ -48,7 +48,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def __init__(self, asOf: date = None, runIds: list = None):
 
-        self.timeunit = None
+        self._timeunit = None
         self.by_group = []
         self.filter = {}
         self.filter_by_type = {}
@@ -73,11 +73,36 @@ class Paletable():
 
         self.defined_columns = PaletMetadata.Enrichment.getDefinedColumns(self)
 
-        # self.report_month = datetime.strptime(report_month, '%Y%m')
-        # self.start_month = datetime.strptime(start_month, '%Y%m')
-        # self.end_month = datetime.strptime(end_month, '%Y%m')
-
         self.palet = Palet.getInstance()
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    @property
+    def timeunit(self):
+        return self._timeunit
+
+    @timeunit.setter
+    def timeunit(self, timeunit):
+        if timeunit == 'year':
+            self.byYear()
+        elif timeunit == 'month':
+            self.byMonth()
+
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
+    @property
+    def counter(self):
+        return self._counter
+
+    @counter.setter
+    def counter(self, counter):
+        self._counter = counter
 
     # ---------------------------------------------------------------------------------
     #
@@ -691,8 +716,8 @@ class Paletable():
         _states_ = []
 
         self.palet.logger.info('Adding byState to the by Group')
-        if self.timeunit not in ('full', 'year', 'partial'):
-            self.timeunit = 'month'
+        if self._timeunit not in ('year'):
+            self._timeunit = 'month'
 
         self._addByGroup(PaletMetadata.Enrollment.locale.submittingState)
 
@@ -939,7 +964,7 @@ class Paletable():
 
         self.palet.logger.info('Adding byYear to the by Group')
 
-        self.timeunit = 'year'
+        self._timeunit = 'year'
 
         if year is not None:
             self.date_dimension.years = year
@@ -979,7 +1004,7 @@ class Paletable():
         # TODO: Fix best way to allow for multiple month and year
 
         self.palet.logger.info('Adding byMonth to the by Group')
-        self.timeunit = 'month'
+        self._timeunit = 'month'
 
         if month is not None:
             self._outersql.update({"month": month})
@@ -998,13 +1023,13 @@ class Paletable():
         if alias is not None:
             a = f"{alias}."
 
-        if self.timeunit in ('year', 'partial_year'):
+        if self._timeunit in ('year'):
             return f"{a}de_fil_dt as year,"
-        elif self.timeunit in ('month', 'full', 'partial'):
+        elif self._timeunit in ('month'):
             return f"""
                 {a}de_fil_dt as year,
                 {a}month,
-                """
+            """
 
     # ---------------------------------------------------------------------------------
     #
@@ -1017,21 +1042,22 @@ class Paletable():
         if alias is not None:
             a = f"{alias}."
 
-        if self.timeunit in ('year', 'partial_year'):
+        if self._timeunit in ('year'):
             return f"{a}de_fil_dt"
-        elif self.timeunit in ('month', 'full', 'partial'):
+        elif self._timeunit in ('month'):
             return f"""
                 {a}de_fil_dt,
                 {a}month
                 """
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _sumByTypeScenario(self, df: pd.DataFrame):
         df['num_types_per_year'] = df['SUBMTG_STATE_CD'].apply(lambda x: str(x).zfill(2))
-        # if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
-
-        # df.groupby(by=['STABBREV', timeunit]).sum().reset_index()
-
-        pass
 
     # ---------------------------------------------------------------------------------
     #

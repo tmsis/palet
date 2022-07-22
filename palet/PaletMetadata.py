@@ -106,10 +106,82 @@ class PaletMetadata:
             }
 
             # -----------------------------------------------------------------------------------
+            #   Enrollment Count - General - Year
+            # -----------------------------------------------------------------------------------
+            @staticmethod
+            def year_enroll_count_stmt():
+                z = f"""
+                    'In Year' as counter,
+                    stack(1,
+                        1, { {13} }
+                        sum(case when
+                            {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('yr')} then 1
+                            else 0
+                        end),
+                        sum(case when
+                            {PaletMetadata.Enrollment.sqlstmts._base_chip_calc('yr')} then 1
+                            else 0
+                        end)
+                    ) as (year, { {12} } mdcd_enrollment, chip_enrollment)"""
+
+                return z
+
+            # -----------------------------------------------------------------------------------
+            #   Enrollment Count - Partial Year
+            # -----------------------------------------------------------------------------------
+            @staticmethod
+            def year_enroll_count_partial_stmt():
+                z = f"""
+                    'Partial Year' as counter,
+                    stack(1,
+                        1, { {13} }
+                        sum(case
+                            when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
+                                and {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('yr', 366, '<')} then 1
+                            when {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('yr', 365, '<')} then 1
+                            else 0
+                        end),
+                        sum(case
+                            when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
+                                and {PaletMetadata.Enrollment.sqlstmts._base_chip_calc('yr', 366, '<')} then 1
+                            when {PaletMetadata.Enrollment.sqlstmts._base_chip_calc('yr', 365, '<')} then 1
+                            else 0
+                        end)
+                    ) as (year, { {12} } mdcd_enrollment, chip_enrollment)"""
+
+                return z
+
+            # -----------------------------------------------------------------------------------
+            #   Enrollment Count - Full Year
+            # -----------------------------------------------------------------------------------
+            @staticmethod
+            def year_enroll_count_full_stmt():
+                z = f"""
+                    'Full Year' as counter,
+                    stack(1,
+                        1, { {13} }
+                        sum(case
+                            when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
+                                and {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('yr', 366)} then 1
+                            when {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('yr', 365)} then 1
+                            else 0
+                        end),
+                        sum(case
+                            when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
+                                and {PaletMetadata.Enrollment.sqlstmts._base_chip_calc('yr', 366)} then 1
+                            when {PaletMetadata.Enrollment.sqlstmts._base_chip_calc('yr', 365)} then 1
+                            else 0
+                        end)
+                    ) as (year, { {12} } mdcd_enrollment, chip_enrollment)"""
+
+                return z
+
+            # -----------------------------------------------------------------------------------
             #   Enrollment Count - General
             # -----------------------------------------------------------------------------------
             @staticmethod
             def enroll_count_stmt():
+
                 z = """
                     'In Month' as counter,
                      stack(12,"""
@@ -146,15 +218,15 @@ class PaletMetadata:
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('01', 31, '<')}) then 1 else 0 end),
                     2, { {1} }
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28, '<')}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
                                 and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 29, '<')}) then 1
                             else 0 end),
+                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28, '<')}) then 1
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28, '<')}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
                                 and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 29, '<')}) then 1
                             else 0 end),
+                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28, '<')}) then 1
                     3, { {2} }
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('03', 31, '<')}) then 1 else 0 end),
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('03', 31, '<')}) then 1 else 0 end),
@@ -202,15 +274,15 @@ class PaletMetadata:
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('01', 31)}) then 1 else 0 end),
                     2, { {1} }
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28)}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
                                 and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 29)}) then 1
                             else 0 end),
+                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28)}) then 1
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28)}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
                                 and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 29)}) then 1
                             else 0 end),
+                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28)}) then 1
                     3, { {2} }
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('03', 31)}) then 1 else 0 end),
                     sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('03', 31)}) then 1 else 0 end),
@@ -247,16 +319,16 @@ class PaletMetadata:
                 return z
 
             # -----------------------------------------------------------------------------------
-            #
+            #   Total days in month/year comparator
             # -----------------------------------------------------------------------------------
             @staticmethod
-            def month_days(mm: str, days: int, mc: str, op: str = '='):
+            def _sum_limit_days(mm_yr: str, days: int, mc: str, op: str = '='):
 
                 if days > 0:
                     if mc == 'M':  # Medicaid
-                        return f"and (aa.mdcd_enrlmt_days_{mm} {op} {days})"
+                        return f"and (aa.mdcd_enrlmt_days_{mm_yr} {op} {days})"
                     elif mc == 'C':  # CHIP
-                        return f"and (aa.chip_enrlmt_days_{mm} {op} {days})"
+                        return f"and (aa.chip_enrlmt_days_{mm_yr} {op} {days})"
 
                 return ''
 
@@ -266,17 +338,22 @@ class PaletMetadata:
             @staticmethod
             def _base_mdcd_calc(mm: str, days: int = 0, op: str = '='):
 
+                if (mm == 'yr'):
+                    i = 'ltst'
+                else:
+                    i = mm
+
                 z = f"""(
-                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 1)
+                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} = 1)
                         ) or (
-                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null)
+                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} is null)
                             and
-                            ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between  1 and  9
-                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 11 and 56
-                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
-                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 69 and 75)
+                            ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{i} between  1 and  9
+                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{i} between 11 and 56
+                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{i} between 59 and 60
+                          or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{i} between 69 and 75)
                        )
-                       {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)}
+                       {PaletMetadata.Enrollment.sqlstmts._sum_limit_days(mm, days, 'M', op)}
                     """
                 return z
 
@@ -286,14 +363,19 @@ class PaletMetadata:
             @staticmethod
             def _base_chip_calc(mm: str, days: int = 0, op: str = '='):
 
+                if (mm == 'yr'):
+                    i = 'ltst'
+                else:
+                    i = mm
+
                 z = f"""(
-                           ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'C', op)})
-                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)})
-                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)})
+                           ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} = 3 {PaletMetadata.Enrollment.sqlstmts._sum_limit_days(mm, days, 'C', op)})
+                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} = 2 {PaletMetadata.Enrollment.sqlstmts._sum_limit_days(mm, days, 'M', op)})
+                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} = 4 {PaletMetadata.Enrollment.sqlstmts._sum_limit_days(mm, days, 'M', op)})
                         or (
-                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null) and
-                            ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68)
-                            {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'C', op)}
+                            ({PaletMetadata.Enrollment.chip_cd_base_fld}_{i} is null) and
+                            ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{i} between 61 and 68)
+                            {PaletMetadata.Enrollment.sqlstmts._sum_limit_days(mm, days, 'C', op)}
                         )
                     )
                     """

@@ -92,7 +92,7 @@ class DateDimension(object):
     def __init__(self, asOf: date = None, runIds: list = None, years: list = None, months: list = None, period: str = 'month'):
         from pyspark.sql.functions import col, substring, length, when, upper, to_date, concat
 
-        self.timeunit = period
+        self._timeunit = period
 
         z = """
             select distinct
