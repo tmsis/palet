@@ -95,7 +95,9 @@ class PaletMetadata:
         # -----------------------------------------------------------------------------------
         #   SQL Snippets
         # -----------------------------------------------------------------------------------
-        class sqlstmts:
+        class SQLStmts:
+
+            _ifRif = False
 
             outer_filter = {
                 'year': """1=1""",
@@ -103,6 +105,11 @@ class PaletMetadata:
                 'full': "1=1",
                 'partial': '1=1',
                 'partial_year': '1=1'
+            }
+
+            query_schema = {
+                'rif_ade': """data_anltcs_taf_ade_base_vw""",
+                'non_rif_ade': """taf_ann_de_base"""
             }
 
             # -----------------------------------------------------------------------------------
@@ -117,13 +124,13 @@ class PaletMetadata:
                     mm = str(m).zfill(2)
                     z += f"""\n\t\t\t{m}, { {m - 1} }
                         sum(case when
-                            {PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc(mm)} then 1
+                            {PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc(mm)} then 1
                             else 0
                         end),
                     """
                     z += f"""
                         sum(case when
-                            {PaletMetadata.Enrollment.sqlstmts._base_chip_calc(mm)} then 1
+                            {PaletMetadata.Enrollment.SQLStmts._base_chip_calc(mm)} then 1
                             else 0
                         end)
                         """
@@ -142,49 +149,49 @@ class PaletMetadata:
                     'Partial Month' as counter,
                      stack(12,
                     1, { {0} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('01', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('01', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('01', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('01', 31, '<')}) then 1 else 0 end),
                     2, { {1} }
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28, '<')}) then 1
+                            when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('02', 28, '<')}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
-                                and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 29, '<')}) then 1
+                                and ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('02', 29, '<')}) then 1
                             else 0 end),
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28, '<')}) then 1
+                            when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('02', 28, '<')}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
-                                and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 29, '<')}) then 1
+                                and ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('02', 29, '<')}) then 1
                             else 0 end),
                     3, { {2} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('03', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('03', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('03', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('03', 31, '<')}) then 1 else 0 end),
                     4, { {3} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('04', 30, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('04', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('04', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('04', 30, '<')}) then 1 else 0 end),
                     5, { {4} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('05', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('05', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('05', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('05', 31, '<')}) then 1 else 0 end),
                     6, { {5} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('06', 30, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('06', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('06', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('06', 30, '<')}) then 1 else 0 end),
                     7, { {6} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('07', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('07', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('07', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('07', 31, '<')}) then 1 else 0 end),
                     8, { {7} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('08', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('08', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('08', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('08', 31, '<')}) then 1 else 0 end),
                     9, { {8} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('09', 30, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('09', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('09', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('09', 30, '<')}) then 1 else 0 end),
                     10, { {9} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('10', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('10', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('10', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('10', 31, '<')}) then 1 else 0 end),
                     11, { {10} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('11', 30, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('11', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('11', 30, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('11', 30, '<')}) then 1 else 0 end),
                     12, { {11} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('12', 31, '<')}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('12', 31, '<')}) then 1 else 0 end)
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('12', 31, '<')}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('12', 31, '<')}) then 1 else 0 end)
                     """
                 z += f""") as (month, { {12} }mdcd_enrollment, chip_enrollment)"""
 
@@ -198,49 +205,49 @@ class PaletMetadata:
                     'Full Month' as counter,
                      stack(12,
                     1, { {0} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('01', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('01', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('01', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('01', 31)}) then 1 else 0 end),
                     2, { {1} }
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 28)}) then 1
+                            when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('02', 28)}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
-                                and ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('02', 29)}) then 1
+                                and ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('02', 29)}) then 1
                             else 0 end),
                     sum(case
-                            when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 28)}) then 1
+                            when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('02', 28)}) then 1
                             when ((aa.de_fil_dt % 4 = 0) or ((aa.de_fil_dt % 100 = 0) and (aa.de_fil_dt % 400 = 0)))
-                                and ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('02', 29)}) then 1
+                                and ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('02', 29)}) then 1
                             else 0 end),
                     3, { {2} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('03', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('03', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('03', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('03', 31)}) then 1 else 0 end),
                     4, { {3} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('04', 30)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('04', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('04', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('04', 30)}) then 1 else 0 end),
                     5, { {4} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('05', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('05', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('05', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('05', 31)}) then 1 else 0 end),
                     6, { {5} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('06', 30)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('06', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('06', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('06', 30)}) then 1 else 0 end),
                     7, { {6} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('07', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('07', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('07', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('07', 31)}) then 1 else 0 end),
                     8, { {7} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('08', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('08', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('08', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('08', 31)}) then 1 else 0 end),
                     9, { {8} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('09', 30)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('09', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('09', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('09', 30)}) then 1 else 0 end),
                     10, { {9} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('10', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('10', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('10', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('10', 31)}) then 1 else 0 end),
                     11, { {10} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('11', 30)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('11', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('11', 30)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('11', 30)}) then 1 else 0 end),
                     12, { {11} }
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_mdcd_calc('12', 31)}) then 1 else 0 end),
-                    sum(case when ({PaletMetadata.Enrollment.sqlstmts._base_chip_calc('12', 31)}) then 1 else 0 end)
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_mdcd_calc('12', 31)}) then 1 else 0 end),
+                    sum(case when ({PaletMetadata.Enrollment.SQLStmts._base_chip_calc('12', 31)}) then 1 else 0 end)
                     """
                 z += f""") as (month, { {12} }mdcd_enrollment, chip_enrollment)"""
 
@@ -276,7 +283,7 @@ class PaletMetadata:
                           or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 59 and 60
                           or {PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 69 and 75)
                        )
-                       {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)}
+                       {PaletMetadata.Enrollment.SQLStmts.month_days(mm, days, 'M', op)}
                     """
                 return z
 
@@ -287,17 +294,30 @@ class PaletMetadata:
             def _base_chip_calc(mm: str, days: int = 0, op: str = '='):
 
                 z = f"""(
-                           ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'C', op)})
-                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)})
-                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'M', op)})
+                           ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 3 {PaletMetadata.Enrollment.SQLStmts.month_days(mm, days, 'C', op)})
+                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 2 {PaletMetadata.Enrollment.SQLStmts.month_days(mm, days, 'M', op)})
+                        or ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} = 4 {PaletMetadata.Enrollment.SQLStmts.month_days(mm, days, 'M', op)})
                         or (
                             ({PaletMetadata.Enrollment.chip_cd_base_fld}_{mm} is null) and
                             ({PaletMetadata.Enrollment.elib_grp_cd_base_fld}_{mm} between 61 and 68)
-                            {PaletMetadata.Enrollment.sqlstmts.month_days(mm, days, 'C', op)}
+                            {PaletMetadata.Enrollment.SQLStmts.month_days(mm, days, 'C', op)}
                         )
                     )
                     """
                 return z
+
+            # ------------------------------------------------------------------------------------
+            #
+            #  Determine which table to query from
+            #  True: data_anltcs_taf_ade_base_vw
+            #  False: taf_ann_de_base
+            # ------------------------------------------------------------------------------------
+            @staticmethod
+            def isRIFQuery(isRIF: bool = False):
+                if isRIF is False:
+                    return PaletMetadata.Enrollment.SQLStmts.query_schema.get("non_rif_ade")
+                else:
+                    return PaletMetadata.Enrollment.SQLStmts.query_schema.get("rif_ade")
 
             # -----------------------------------------------------------------------------------
             #

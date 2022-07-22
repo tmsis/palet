@@ -210,15 +210,15 @@ class Enrollment(Paletable):
             #                         and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
             #     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
             'month': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_stmt()}
+                {PaletMetadata.Enrollment.SQLStmts.enroll_count_stmt()}
                 """,
 
             'full': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_full_stmt()}
+                {PaletMetadata.Enrollment.SQLStmts.enroll_count_full_stmt()}
                 """,
 
             'partial': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt()}
+                {PaletMetadata.Enrollment.SQLStmts.enroll_count_partial_stmt()}
                 """
         }
 
@@ -821,7 +821,7 @@ class Enrollment(Paletable):
                         { self._getTimeUnitBreakdown() }
                         { PaletMetadata.Enrichment._renderAgeRange(self) }
                     from
-                        taf.taf_ann_de_base as aa
+                        taf.{ PaletMetadata.Enrollment.SQLStmts.isRIFQuery(True) } as aa
                         { self._apply_constraints() }
                     where
                         aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
@@ -845,9 +845,10 @@ class Enrollment(Paletable):
                 { self._joinsOnYearMon() }
 
                 where
-                    { self._getOuterSQLFilter(PaletMetadata.Enrollment.sqlstmts.outer_filter) } and
+                    { self._getOuterSQLFilter(PaletMetadata.Enrollment.SQLStmts.outer_filter) } and
                     { self._sqlFilterWhereClause(self.alias) } and
-                    { self._derivedTypesWhereClause() }
+                    { self._derivedTypesWhereClause() } and
+                    { self._getValueFromFilterByGroup() }
 
                 group by
                     counter,

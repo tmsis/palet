@@ -246,6 +246,19 @@ class Paletable():
         value = self.filter.get(column)
         return column + " = " + value
 
+    def _getValueFromFilterByGroup(self):
+        ret_val = ""
+        type_vals = ""
+        self.palet.logger.debug('creating filter values for SQL')
+        for key, vals in self.filter_by_type.items():
+            str_list = "', '".join(vals)
+            type_vals = f""" ('{str_list}') """
+            ret_val += key.alias + " in " + type_vals + " and "
+
+        z = ret_val + " 1=1 "
+
+        return z
+
     # ---------------------------------------------------------------------------------p
     #
     # slice and dice here to create the proper sytax for a where clause
