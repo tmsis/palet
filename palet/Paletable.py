@@ -48,7 +48,7 @@ class Paletable():
     # ---------------------------------------------------------------------------------
     def __init__(self, asOf: date = None, runIds: list = None):
 
-        self.timeunit = None
+        self._timeunit = None
         self.by_group = []
         self.filter = {}
         self.filter_by_type = {}
