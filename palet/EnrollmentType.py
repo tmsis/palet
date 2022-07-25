@@ -38,6 +38,11 @@ class EnrollmentType():
             'chip_cd_11',
             'chip_cd_12']
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def aggregate(alias):
         a = map(lambda x: alias + '.' + x, EnrollmentType.cols)
         b = list(a)
@@ -45,6 +50,11 @@ class EnrollmentType():
         f = ','.join(b)
         return f'coalesce({f})'
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def filter(self, filter_val):
         self.filter.update({EnrollmentType.alias: filter_val})
         a = []
@@ -56,5 +66,10 @@ class EnrollmentType():
         f = ' or '.join(b)
         return f'{f}'
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def __hash__(self):
         return(hash(str(self)))

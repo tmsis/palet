@@ -405,6 +405,11 @@ class Paletable():
             else float('NaN')
             for x in range(len(df))]
 
+    # ---------------------------------------------------------------------------------
+    #
+    #
+    #
+    # ---------------------------------------------------------------------------------
     def _update_user_constraints(self, constraints):
         for list_constr in constraints:
             for item in list_constr:
@@ -773,7 +778,7 @@ class Paletable():
 
         if constraint is not None:
             PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
-            self.filter_by_type.update({CoverageType: constraint})
+            self.filter.update({CoverageType.alias: constraint})
 
         return self
 
@@ -878,9 +883,14 @@ class Paletable():
             if isinstance(constraint, list):
                 PaletMetadata.Enrichment._checkForHelperMsg(constraint, list, "['01', '02', '03']")
                 self.palet.logger.info("Special Types were specified. The query will use these types and user defined constaints will be ignored.")
+
                 self.filter_by_type.update({EligibilityType: constraint})
+
                 if type(constraint[0]) is tuple:
                     self._update_user_constraints(constraint)
+                else:
+                    self.filter.update({EligibilityType.alias: constraint})
+
             elif isinstance(constraint, dict):
                 self.palet.logger.info("User Defined Constraints were specified. The query will use these constraints and special types will be ignored.")
                 self.user_constraint.update(constraint)

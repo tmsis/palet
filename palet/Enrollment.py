@@ -102,7 +102,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, asOf: date = None, paletable: Paletable = None, period: str = "month"):
+    def __init__(self, runIds: list = None, asOf: date = None, paletable: Paletable = None, period: str = "month", counter: str = "any"):
         # print('Initializing Enrollment API')
         super().__init__(asOf=asOf, runIds=runIds)
 
@@ -117,7 +117,7 @@ class Enrollment(Paletable):
         self.palet.clearAliasStack()
 
         self._timeunit = period
-        self._counter = 'any'
+        self._counter = counter
 
         self._marker_cache = []
         self._groupby_cache = []
@@ -187,14 +187,14 @@ class Enrollment(Paletable):
 
         breakdown = {
             'year': {
-                'any':     PaletMetadata.Enrollment.sqlstmts.year_enroll_count_stmt(),
-                'partial': PaletMetadata.Enrollment.sqlstmts.year_enroll_count_partial_stmt(),
-                'full':    PaletMetadata.Enrollment.sqlstmts.year_enroll_count_full_stmt(),
+                'any':     PaletMetadata.Enrollment.SQLStmts.year_enroll_count_stmt(),
+                'partial': PaletMetadata.Enrollment.SQLStmts.year_enroll_count_partial_stmt(),
+                'full':    PaletMetadata.Enrollment.SQLStmts.year_enroll_count_full_stmt(),
             },
             'month': {
-                'any':     PaletMetadata.Enrollment.sqlstmts.enroll_count_stmt(),
-                'partial': PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt(),
-                'full':    PaletMetadata.Enrollment.sqlstmts.enroll_count_full_stmt(),
+                'any':     PaletMetadata.Enrollment.SQLStmts.enroll_count_stmt(),
+                'partial': PaletMetadata.Enrollment.SQLStmts.enroll_count_partial_stmt(),
+                'full':    PaletMetadata.Enrollment.SQLStmts.enroll_count_full_stmt(),
             },
 
         }
@@ -503,6 +503,8 @@ class Enrollment(Paletable):
 
         self.markers[marker] = condition
 
+        condition.paletable = self
+
         self.outer_joins.append(condition.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
 
         return self
@@ -646,6 +648,9 @@ class Enrollment(Paletable):
 
         if constraint not in self.having_constraints:
             constraint.filter = self.filter
+
+            constraint.paletable = self
+
             self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
@@ -815,7 +820,7 @@ class Enrollment(Paletable):
             { self._joinsOnYearMon() }
 
             where
-                { self._getOuterSQLFilter(PaletMetadata.Enrollment.sqlstmts.outer_filter) } and
+                { self._getOuterSQLFilter(PaletMetadata.Enrollment.SQLStmts.outer_filter) } and
                 { self._sqlFilterWhereClause(self.alias) } and
                 { self._derivedTypesWhereClause() }
 
