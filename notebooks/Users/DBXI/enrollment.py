@@ -15,16 +15,16 @@
 
 # COMMAND ----------
 
-import sys
-sys.path.append('/dbfs/FileStore/shared_uploads/akira/lib')
-
 from palet.DateDimension import DateDimension
 from palet.Enrollment import Enrollment
-from palet.Diagnoses import Diagnoses
-from palet.ServiceCategory import ServiceCategory
-from palet.Readmits import Readmits
-from palet.EligibilityType import EligibilityType
-from palet.CoverageType import CoverageType
+
+
+
+
+
+
+
+
 
 # COMMAND ----------
 
@@ -167,17 +167,10 @@ display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allc
 
 # COMMAND ----------
 
-# ERROR
-display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allcause(30)).fetch())
-
-# COMMAND ----------
-
-# ERROR
 display(Enrollment().byState(['MD']).byGender('F').byYear().calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
 
-# ERROR
 display(Enrollment().byState(['MD']).byGender('F').calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
@@ -190,8 +183,7 @@ enrl.fetch()
 
 # COMMAND ----------
 
-# dis_MD = Enrollment().byYear().mark(Readmits.allcause(30), 'readmits').fetch()
-dis_MD = Enrollment().byState(['MD']).byGender('F').byYear().mark(Readmits.allcause(30), 'readmits')
+dis_MD = Enrollment().byState(['MD']).byGender('F').byYear().mark(Readmits.allcause(30),'readmits')
 
 # COMMAND ----------
 
@@ -231,7 +223,7 @@ display(api.byMonth().fetch())
 # COMMAND ----------
 
 # A bug: the same numbers for full and partial show up. 
-# api = Enrollment(period='partial')
+api = Enrollment(period='partial')
 # fix:
 api = Enrollment(counter='partial')
 
@@ -285,14 +277,26 @@ AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 
 
 # COMMAND ----------
 
+api = Enrollment()
+
+# COMMAND ----------
+
+# test = api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib))
+# print(test.byYear().sql())
+
+diag = Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib)
+
+print(diag)
+
+# COMMAND ----------
+
 from palet.Diagnoses import Diagnoses
 from palet.ServiceCategory import ServiceCategory
 display(api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib)).fetch())
 
 # COMMAND ----------
 
-# display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib').fetch())
-display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.within([ServiceCategory.inpatient], AFib), 'AFib').fetch())
+display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib').fetch())
 
 # COMMAND ----------
 
