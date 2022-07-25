@@ -55,15 +55,15 @@ class CoverageType():
     #
     #
     # -------------------------------------------------------
-    def filter(self, filter_val):
-        self.filter.update({CoverageType.alias: filter_val})
-        a = []
-        vals = "','".join(filter_val)
-        a.append("('" + vals + "')")
+    # def filter(self, filter_val):
+    #     self.filter.update({CoverageType.alias: filter_val})
+    #     a = []
+    #     vals = "','".join(filter_val)
+    #     a.append("('" + vals + "')")
 
-        b = list(a)
-        f = ' or '.join(b)
-        return f'{f}'
+    #     b = list(a)
+    #     f = ' or '.join(b)
+    #     return f'{f}'
 
     # -------------------------------------------------------
     #

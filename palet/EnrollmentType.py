@@ -55,16 +55,16 @@ class EnrollmentType():
     #
     #
     # -------------------------------------------------------
-    def filter(self, filter_val):
-        self.filter.update({EnrollmentType.alias: filter_val})
-        a = []
-        vals = "','".join(filter_val)
-        a.append("('" + vals + "')")
+    # def filter(self, filter_val):
+    #     self.filter.update({EnrollmentType.alias: filter_val})
+    #     a = []
+    #     vals = "','".join(filter_val)
+    #     a.append("('" + vals + "')")
 
-        b = list(a)
+    #     b = list(a)
 
-        f = ' or '.join(b)
-        return f'{f}'
+    #     f = ' or '.join(b)
+    #     return f'{f}'
 
     # -------------------------------------------------------
     #

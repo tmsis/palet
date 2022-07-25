@@ -465,7 +465,6 @@ class Paletable():
         if age_range is not None:
             self._removeByGroup(PaletMetadata.Enrollment.identity.ageGroup)
             self.age_band = age_range
-            self._addDerivedByTypeGroup(PaletMetadata.Enrollment.identity.age_band)
             self._addAggregateGroup(PaletMetadata.Enrollment.identity.age_band)
 
         else:

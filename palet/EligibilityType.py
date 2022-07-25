@@ -123,38 +123,38 @@ class EligibilityType():
     #
     #
     # -------------------------------------------------------
-    def filter(self, filter_val):
-        """
-        The filter function constrains the query by a specific eligibility type or multiple eligibilty types.
+    # def filter(self, filter_val):
+    #     """
+    #     The filter function constrains the query by a specific eligibility type or multiple eligibilty types.
 
-        Note:
-            This function is not directly interacted with by the user.
+    #     Note:
+    #         This function is not directly interacted with by the user.
 
-        """
-        a = []
-        filters = []
-        if isinstance(filter_val, list) and type(filter_val[0]) is tuple:
-            for constraint in filter_val:
-                for constr in constraint:
-                    for val in constr:
-                        strlist = constr[val]
-                        for i in strlist:
-                            if type(i) is str:
-                                filters.append(i)
-                            else:
-                                for j in i:
-                                    filters.append(j)
-            self.user_constraint.update({EligibilityType.alias: filters})
-        else:
-            filters.extend(filter_val)
-            self.filter.update({EligibilityType.alias: filters})
+    #     """
+    #     a = []
+    #     filters = []
+    #     if isinstance(filter_val, list) and type(filter_val[0]) is tuple:
+    #         for constraint in filter_val:
+    #             for constr in constraint:
+    #                 for val in constr:
+    #                     strlist = constr[val]
+    #                     for i in strlist:
+    #                         if type(i) is str:
+    #                             filters.append(i)
+    #                         else:
+    #                             for j in i:
+    #                                 filters.append(j)
+    #         self.user_constraint.update({EligibilityType.alias: filters})
+    #     else:
+    #         filters.extend(filter_val)
+    #         self.filter.update({EligibilityType.alias: filters})
 
-        vals = "','".join(filters)
-        a.append("('" + vals + "')")
+    #     vals = "','".join(filters)
+    #     a.append("('" + vals + "')")
 
-        b = list(a)
-        f = ' or '.join(b)
-        return f'{f}'
+    #     b = list(a)
+    #     f = ' or '.join(b)
+    #     return f'{f}'
 
     # -------------------------------------------------------
     #
