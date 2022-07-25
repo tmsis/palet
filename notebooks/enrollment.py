@@ -15,12 +15,24 @@
 
 # COMMAND ----------
 
-from palet.Enrollment import Enrollment 
+import sys
+sys.path.append('/dbfs/FileStore/shared_uploads/akira/lib')
+
+from palet.DateDimension import DateDimension
+from palet.Enrollment import Enrollment
+from palet.Diagnoses import Diagnoses
+from palet.ServiceCategory import ServiceCategory
+from palet.Readmits import Readmits
+from palet.EligibilityType import EligibilityType
+from palet.CoverageType import CoverageType
+
+# COMMAND ----------
+
+DateDimension(years=[2019,2020,2021])
 
 # COMMAND ----------
 
 api = Enrollment()
-
 
 # COMMAND ----------
 
@@ -44,11 +56,11 @@ display(api.fetch())
 
 # COMMAND ----------
 
-api.timeunit = 'full'
+api.counter = 'full'
 
 # COMMAND ----------
 
-display(api.byYear().fetch())
+display(api.fetch())
 
 # COMMAND ----------
 
@@ -61,8 +73,7 @@ pe = Enrollment()
 
 # COMMAND ----------
 
-# pe.timeout = 'partial'
-pe.timeunit = 'partial'
+pe.counter = 'partial'
 
 # COMMAND ----------
 
@@ -115,7 +126,6 @@ display(api.byState('AL').byGender('F').fetch())
 
 # COMMAND ----------
 
-
 display(Enrollment().byCoverageType().byState(['MD']).byYear().fetch())
 
 # COMMAND ----------
@@ -124,7 +134,7 @@ display(Enrollment().byCoverageType().byEligibilityType().byState(['MD']).byYear
 
 # COMMAND ----------
 
-display(Enrollment().byCoverageType(['1']).byEligibilityType(['1']).byState(['MD']).byYear().fetch())
+display(Enrollment().byCoverageType(['01']).byEligibilityType(['01']).byState(['MD']).byYear().fetch())
 
 # COMMAND ----------
 
@@ -157,23 +167,31 @@ display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allc
 
 # COMMAND ----------
 
+# ERROR
+display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allcause(30)).fetch())
+
+# COMMAND ----------
+
+# ERROR
 display(Enrollment().byState(['MD']).byGender('F').byYear().calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
 
+# ERROR
 display(Enrollment().byState(['MD']).byGender('F').calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
 
-enrl = (Enrollment().byState(['MD']).byGender('F').calculate(Readmits.allcause(30)).fetch())
+enrl = Enrollment().byState(['MD']).byGender('F').calculate(Readmits.allcause(30))
 
 # COMMAND ----------
 
-enr=having.fetch()
+enrl.fetch()
 
 # COMMAND ----------
 
-dis_MD = Enrollment().byState(['MD']).byGender('F').byYear().mark(Readmits.allcause(30),'readmits').fetch()
+# dis_MD = Enrollment().byYear().mark(Readmits.allcause(30), 'readmits').fetch()
+dis_MD = Enrollment().byState(['MD']).byGender('F').byYear().mark(Readmits.allcause(30), 'readmits')
 
 # COMMAND ----------
 
@@ -185,7 +203,7 @@ from palet.Enrollment import Enrollment
 
 # COMMAND ----------
 
-dsn_MD = Enrollment.byState('MD').byGender('F').having(Readmits.allcause(30))
+dsn_MD = Enrollment().byState('MD').byGender('F').having(Readmits.allcause(30))
 
 # COMMAND ----------
 
@@ -202,7 +220,6 @@ display(readm_60.fetch())
 
 # COMMAND ----------
 
-
 api = Enrollment()
 display(api.byMonth().fetch())
 
@@ -214,16 +231,13 @@ display(api.byMonth().fetch())
 # COMMAND ----------
 
 # A bug: the same numbers for full and partial show up. 
-api = Enrollment(period='partial')
-  
+# api = Enrollment(period='partial')
+# fix:
+api = Enrollment(counter='partial')
 
 # COMMAND ----------
 
 display(api.byYear().fetch())
-
-# COMMAND ----------
-
-
 
 # COMMAND ----------
 
@@ -241,15 +255,15 @@ print(api.sql())
 
 # COMMAND ----------
 
+from palet.CoverageType import CoverageType
+
+# COMMAND ----------
+
 CoverageType.alias
 
 # COMMAND ----------
 
 CoverageType.cols
-
-# COMMAND ----------
-
-api.derived_by_group
 
 # COMMAND ----------
 
@@ -273,11 +287,12 @@ AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 
 
 from palet.Diagnoses import Diagnoses
 from palet.ServiceCategory import ServiceCategory
-display(api.having(Diagnoses.where(ServiceCategory.inpatient, AFib)).fetch())
+display(api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib)).fetch())
 
 # COMMAND ----------
 
-display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib').fetch())
+# display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib').fetch())
+display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.within([ServiceCategory.inpatient], AFib), 'AFib').fetch())
 
 # COMMAND ----------
 
@@ -308,7 +323,7 @@ type(api)
 
 # COMMAND ----------
 
-df = Enrollment(period='partial').fetch()
+df = Enrollment(counter='partial').fetch()
 display(df)
 
 # COMMAND ----------
@@ -317,7 +332,7 @@ df.shape
 
 # COMMAND ----------
 
- api = Enrollment(period='full')
+ api = Enrollment(counter='full')
 
 # COMMAND ----------
 
