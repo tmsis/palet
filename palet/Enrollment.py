@@ -102,7 +102,7 @@ class Enrollment(Paletable):
     # -----------------------------------------------------------------------
     # Initialize the Enrollment API
     # -----------------------------------------------------------------------
-    def __init__(self, runIds: list = None, asOf: date = None, paletable: Paletable = None, period: str = "month"):
+    def __init__(self, runIds: list = None, asOf: date = None, paletable: Paletable = None, period: str = "month", counter: str = "any"):
         # print('Initializing Enrollment API')
         super().__init__(asOf=asOf, runIds=runIds)
 
@@ -116,7 +116,8 @@ class Enrollment(Paletable):
         self.palet = Palet.getInstance()
         self.palet.clearAliasStack()
 
-        self.timeunit = period
+        self._timeunit = period
+        self._counter = counter
 
         self._marker_cache = []
         self._groupby_cache = []
@@ -131,21 +132,21 @@ class Enrollment(Paletable):
         self.palet.logger.debug('Initializing Enrollment API')
 
     # ---------------------------------------------------------------------------------
-    # timeunit class
-    # Create the proper summary columns based on the by timeunit selected.
-    # Use the stack SQL function to create columns
+    #
+    #  Summary class
+    #
+    #  Create the proper summary columns based on the by timeunit selected.
+    #  Use the stack SQL function to create columns
     #
     # ---------------------------------------------------------------------------------
-    class timeunit():
+    class Summary():
         """
-        The timeunit class is a subclass within the Enrollment. It is composed of two dictionaries: breakdown & cull.
+        The Summary class is a subclass within the Enrollment. It is composed of two dictionaries: breakdown.
         This class specifies how counts for enrollment are calculated. When looking at enrollment by year, enrollment
         refers to beneficiaries who are enrolled at least one day in a given year. When looking at enrollment by
         month, enrollment refers to beneficiaries who are enrolled at least one day in a given month.
 
         Breakdown - Provides the sum of all beneficiaries enrolled within the time period or periods specified.
-
-        Cull - Provides the individual beneficiaries enrolled within the time period or periods specified.
 
         Available Time Units:
             In Year (year) - Beneficiaries enrolled at least one day in a given year
@@ -185,41 +186,17 @@ class Enrollment(Paletable):
         """
 
         breakdown = {
-            'year': f"""
-                'In Year' as counter,
-                stack(1,
-                    1, { {13} }
-                        sum(case when aa.mdcd_enrlmt_days_yr > 0 then 1 else 0 end),
-                        sum(case when aa.chip_enrlmt_days_yr > 0 then 1 else 0 end)
-                    ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
-            # 'partial_year': f"""
-            #     'Partial Year' as counter,
-            #     stack(1,
-            #         1, { {13} }
-            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-            #                     and aa.de_fil_dt % 400 = 0
-            #                         and aa.mdcd_enrlmt_days_yr between 1 and 366
-            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-            #                     and aa.de_fil_dt % 400 != 0
-            #                         and aa.mdcd_enrlmt_days_yr between 1 and 365 then 1 else 0 end),
-            #             sum(case when aa.de_fil_dt % 4 = 0 or aa.de_fil_dt % 100 = 0
-            #                     and aa.de_fil_dt % 400 = 0
-            #                         and aa.chip_enrlmt_days_yr between 1 and 366
-            #                 or aa.de_fil_dt % 4 != 0 or aa.de_fil_dt % 100 != 0
-            #                     and aa.de_fil_dt % 400 != 0
-            #                         and aa.chip_enrlmt_days_yr between 1 and 365 then 1 else 0 end)
-            #     ) as (year, { {12} } mdcd_enrollment, chip_enrollment)""",
-            'month': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_stmt()}
-                """,
+            'year': {
+                'any':     PaletMetadata.Enrollment.SQLStmts.year_enroll_count_stmt(),
+                'partial': PaletMetadata.Enrollment.SQLStmts.year_enroll_count_partial_stmt(),
+                'full':    PaletMetadata.Enrollment.SQLStmts.year_enroll_count_full_stmt(),
+            },
+            'month': {
+                'any':     PaletMetadata.Enrollment.SQLStmts.enroll_count_stmt(),
+                'partial': PaletMetadata.Enrollment.SQLStmts.enroll_count_partial_stmt(),
+                'full':    PaletMetadata.Enrollment.SQLStmts.enroll_count_full_stmt(),
+            },
 
-            'full': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_full_stmt()}
-                """,
-
-            'partial': f"""
-                {PaletMetadata.Enrollment.sqlstmts.enroll_count_partial_stmt()}
-                """
         }
 
     # ---------------------------------------------------------------------------------
@@ -230,7 +207,6 @@ class Enrollment(Paletable):
     def _getDerivedTypeSelections(self):
         derived_types = []
 
-        # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
             for bytype in self.derived_by_type_group:
                 derived_types.append(f"{self.alias}.{bytype.alias}")
@@ -250,7 +226,6 @@ class Enrollment(Paletable):
 
         _type_groups = []
 
-        # if (len(self.derived_by_group)) > 0 and self.timeunit != 'year':
         if (len(self.derived_by_type_group)) > 0:
             for column in self.derived_by_type_group:
                 if str(column) == "<class 'palet.EnrollmentType.EnrollmentType'>":
@@ -295,7 +270,7 @@ class Enrollment(Paletable):
         # from palet.CoverageType import CoverageType
         # from palet.EligibilityType import EligibilityType
 
-        breakdown = Enrollment.timeunit.breakdown[self.timeunit]
+        breakdown = Enrollment.Summary.breakdown[self._timeunit][self._counter]
 
         series_00 = []
         series_01 = []
@@ -360,7 +335,7 @@ class Enrollment(Paletable):
     #
     # ---------------------------------------------------------------------------------
     def _getOuterSQLFilter(self, filters: dict):
-        filter = filters[self.timeunit]
+        filter = filters[self._timeunit]
         _stmt_list = []
 
         if len(self._outersql) > 0:
@@ -383,11 +358,7 @@ class Enrollment(Paletable):
     def _percentChange(self, df: pd.DataFrame):
         self.palet.logger.debug('Percent Change')
 
-        # df['year'] = df['de_fil_dt']
-
-        # if self.timeunit != 'full' and self.timeunit != 'year' and self.timeunit != 'partial':
-
-        if self.timeunit != 'year':
+        if self._timeunit != 'year':
             # Month-over-Month
             if (len(self.by_group)) > 0 and (len(self.derived_by_type_group)) > 0:
                 df = df.sort_values(by=self.by_group + self._getDerivedTypePctSort() + ['year', 'month'], ascending=True)
@@ -428,7 +399,7 @@ class Enrollment(Paletable):
             else:
                 df = df.sort_values(by=self.by_group + ['year', 'month'], ascending=True)
 
-        elif self.timeunit == 'year':
+        elif self._timeunit == 'year':
 
             # Year-over-Year
             if (len(self.derived_by_type_group)) > 0 and (len(self.by_group)) > 0:
@@ -531,6 +502,8 @@ class Enrollment(Paletable):
         from collections import defaultdict
 
         self.markers[marker] = condition
+
+        condition.paletable = self
 
         self.outer_joins.append(condition.join_outer().format_map(defaultdict(str, parent=self.alias, augment=Palet.augment)))
 
@@ -675,6 +648,9 @@ class Enrollment(Paletable):
 
         if constraint not in self.having_constraints:
             constraint.filter = self.filter
+
+            constraint.paletable = self
+
             self.having_constraints.append(constraint.join_inner().format_map(defaultdict(str, parent=self.nested_alias)))
 
         return self
@@ -796,80 +772,78 @@ class Enrollment(Paletable):
 
             >>> print(Enrollment.sql())
         """
-        if self._sql is None or isFetch:
-            super().sql()
+        super().sql()
 
-            z = f"""
+        z = f"""
+            select
+                counter,
+                { self._getByGroupWithAlias(self.alias) }
+                { self._getDerivedTypeSelections() }
+                { self._getAggregateGroup() }
+                { self._selectTimeunit(self.alias) }
+                { self._select_indicators() }
+                { self._do_calculations() }
+                { self._userDefinedSelect('case') }
+                sum(mdcd_enrollment) as mdcd_enrollment,
+                sum(chip_enrollment) as chip_enrollment
+            from (
                 select
-                    counter,
-                    { self._getByGroupWithAlias(self.alias) }
-                    { self._getDerivedTypeSelections() }
-                    { self._getAggregateGroup() }
-                    { self._selectTimeunit(self.alias) }
-                    { self._select_indicators() }
-                    { self._do_calculations() }
-                    { self._userDefinedSelect('case') }
-                    sum(mdcd_enrollment) as mdcd_enrollment,
-                    sum(chip_enrollment) as chip_enrollment
-                from (
-                    select
-                        { self._getByGroupWithAlias() }
-                        aa.de_fil_dt,
-                        { Palet.joinable('aa.submtg_state_cd') },
-                        aa.msis_ident_num,
-                        { self._userDefinedSelect('inner') }
-                        { self._getTimeUnitBreakdown() }
-                        { PaletMetadata.Enrichment._renderAgeRange(self) }
-                    from
-                        taf.taf_ann_de_base as aa
-                        { self._apply_constraints() }
-                    where
-                        aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
-                        { self._sqlFilterWhereClause(self.nested_alias, sqlloc="inner") }
-                    group by
-                        { self._getByGroupWithAlias() }
-                        { self._getDerivedByTypeGroup() }
-                        { self._userDefinedSelect('inner') }
-                        aa.de_fil_dt,
-                        { Palet.joinable('aa.submtg_state_cd', True) },
-                        aa.msis_ident_num
-                    order by
-                        { self._getByGroupWithAlias() }
-                        { self._getDerivedByTypeGroup() }
-                        { self._userDefinedSelect('inner') }
-                        aa.de_fil_dt,
-                        { Palet.joinable('aa.submtg_state_cd', True) },
-                        aa.msis_ident_num
-                ) as {self.alias}
-
-                { self._joinsOnYearMon() }
-
+                    { self._getByGroupWithAlias() }
+                    aa.de_fil_dt,
+                    { Palet.joinable('aa.submtg_state_cd') },
+                    aa.msis_ident_num,
+                    { self._userDefinedSelect('inner') }
+                    { self._getTimeUnitBreakdown() }
+                    { PaletMetadata.Enrichment._renderAgeRange(self) }
+                from
+                    taf.taf_ann_de_base as aa
+                    { self._apply_constraints() }
                 where
-                    { self._getOuterSQLFilter(PaletMetadata.Enrollment.sqlstmts.outer_filter) } and
-                    { self._sqlFilterWhereClause(self.alias) } and
-                    { self._derivedTypesWhereClause() }
-
+                    aa.da_run_id in ( {self.date_dimension.relevant_runids('BSE') } ) and
+                    { self._sqlFilterWhereClause(self.nested_alias, sqlloc="inner") }
                 group by
-                    counter,
-                    { self._getByGroupWithAlias(self.alias) }
-                    { self._groupby_indicators() }
-                    { self._getDerivedTypeSelections() }
-                    { self._userDefinedSelect('outer') }
-                    { self._getAggregateGroup() }
-                    { self._groupTimeunit(self.alias) }
+                    { self._getByGroupWithAlias() }
+                    { self._getDerivedByTypeGroup() }
+                    { self._userDefinedSelect('inner') }
+                    aa.de_fil_dt,
+                    { Palet.joinable('aa.submtg_state_cd', True) },
+                    aa.msis_ident_num
                 order by
-                    { self._getByGroupWithAlias(self.alias) }
-                    { self._groupby_indicators() }
-                    { self._getDerivedTypeSelections() }
-                    { self._userDefinedSelect('outer') }
-                    { self._getAggregateGroup() }
-                    { self._groupTimeunit(self.alias) }
-            """
+                    { self._getByGroupWithAlias() }
+                    { self._getDerivedByTypeGroup() }
+                    { self._userDefinedSelect('inner') }
+                    aa.de_fil_dt,
+                    { Palet.joinable('aa.submtg_state_cd', True) },
+                    aa.msis_ident_num
+            ) as {self.alias}
 
-            # self._addPostProcess(self._percentChange)
-            self._sql = z
-        else:
-            return self._sql
+            { self._joinsOnYearMon() }
+
+            where
+                { self._getOuterSQLFilter(PaletMetadata.Enrollment.SQLStmts.outer_filter) } and
+                { self._sqlFilterWhereClause(self.alias) } and
+                { self._derivedTypesWhereClause() }
+
+            group by
+                counter,
+                { self._getByGroupWithAlias(self.alias) }
+                { self._groupby_indicators() }
+                { self._getDerivedTypeSelections() }
+                { self._userDefinedSelect('outer') }
+                { self._getAggregateGroup() }
+                { self._groupTimeunit(self.alias) }
+            order by
+                { self._getByGroupWithAlias(self.alias) }
+                { self._groupby_indicators() }
+                { self._getDerivedTypeSelections() }
+                { self._userDefinedSelect('outer') }
+                { self._getAggregateGroup() }
+                { self._groupTimeunit(self.alias) }
+        """
+
+        # self._addPostProcess(self._percentChange)
+        self._sql = z
+
         return z
 
 

@@ -38,6 +38,11 @@ class CoverageType():
             'mc_plan_type_cd_11',
             'mc_plan_type_cd_12']
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def aggregate(alias):
         a = map(lambda x: alias + '.' + x, CoverageType.cols)
         b = list(a)
@@ -45,15 +50,25 @@ class CoverageType():
         f = ','.join(b)
         return f'coalesce({f})'
 
-    def filter(self, filter_val):
-        self.filter.update({CoverageType.alias: filter_val})
-        a = []
-        vals = "','".join(filter_val)
-        a.append("('" + vals + "')")
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
+    # def filter(self, filter_val):
+    #     self.filter.update({CoverageType.alias: filter_val})
+    #     a = []
+    #     vals = "','".join(filter_val)
+    #     a.append("('" + vals + "')")
 
-        b = list(a)
-        f = ' or '.join(b)
-        return f'{f}'
+    #     b = list(a)
+    #     f = ' or '.join(b)
+    #     return f'{f}'
 
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def __hash__(self):
         return(hash(str(self)))

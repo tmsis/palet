@@ -526,22 +526,6 @@ class Enrollment(Paletable):
     # ---------------------------------------------------------------------------------
     #
     #
-    #  This function is used to dynamically generate the SQL where clause by returning the
-    #  selected timeunit. e.g. byMonth() or byYear()
-    #
-    #
-    # ---------------------------------------------------------------------------------
-    def _getByTimeunitCull(self, cull_type: dict):
-        breakdown = cull_type[self.timeunit]
-        for key in self.filter_by_type:
-            _type = self.filter_by_type[key]
-            return breakdown.format(key.alias, key.filter(self, _type))
-
-        return breakdown.format('1', '(1)')
-
-    # ---------------------------------------------------------------------------------
-    #
-    #
     #
     # ---------------------------------------------------------------------------------
     def _getOuterSQLFilter(self, filters: dict):
@@ -867,7 +851,7 @@ class Enrollment(Paletable):
             Create a :class:`Cost` object:
 
             >>> cost = Cost.inpatient()
-            
+
             Create an Enrollment object with a :class:`cost` object:
 
             >>> api = Enrollment().calculate(cost)
@@ -887,7 +871,7 @@ class Enrollment(Paletable):
             >>> df = api.fetch()
 
             >>> display(df)
-            
+
         """
         from collections import defaultdict
 

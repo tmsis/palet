@@ -13,10 +13,10 @@ class EligibilityType():
     """
     The EligibilityType class creates an alias called eligibility_type that transposes the 12 elgblty_grp_cd
     columns allowing :meth:`~Paletable.Paletable.byEligibilityType` to filter by various eligibility types.
-    It also plays a role in the backend method for decorating the eligibility_category column that is included when 
+    It also plays a role in the backend method for decorating the eligibility_category column that is included when
     one runs :meth:`~Paletable.Paletable.byEligibilityype` on a Paletable object like :class:`Enrollment`.
 
-    Analysts can filter by an eligibility code such as '01' or one of the predefined attributes below. 
+    Analysts can filter by an eligibility code such as '01' or one of the predefined attributes below.
 
     Note:
         PALET users do not need to import this module, it is automatically imported when :meth:`~Paletable.Paletable.byEligibilityType` is called.
@@ -61,7 +61,7 @@ class EligibilityType():
         >>> display(df)
 
     Attributes:
-        
+
     """
 
     alias = 'eligibility_type'
@@ -106,11 +106,11 @@ class EligibilityType():
     def aggregate(alias):
         """
         The aggregate function is responsible for transposing the 12 elgblty_grp_cd's into one column called eligibility_type.
-        This column is then used to filter by eligibility type. 
+        This column is then used to filter by eligibility type.
 
         Note:
             This function is not directly interacted with by the user.
-        
+
         """
         a = map(lambda x: alias + '.' + x, EligibilityType.cols)
         b = list(a)
@@ -123,39 +123,43 @@ class EligibilityType():
     #
     #
     # -------------------------------------------------------
-    def filter(self, filter_val):
-        """
-        The filter function is responsible for constrained the query by a specific eligibility type or multiple eligibilty
-        types. 
+    # def filter(self, filter_val):
+    #     """
+    #     The filter function constrains the query by a specific eligibility type or multiple eligibilty types.
 
-        Note:
-            This function is not directly interacted with by the user.
-        
-        """
-        a = []
-        filters = []
-        if isinstance(filter_val, list) and type(filter_val[0]) is tuple:
-            for constraint in filter_val:
-                for constr in constraint:
-                    for val in constr:
-                        strlist = constr[val]
-                        for i in strlist:
-                            if type(i) is str:
-                                filters.append(i)
-                            else:
-                                for j in i:
-                                    filters.append(j)
-            self.user_constraint.update({EligibilityType.alias: filters})
-        else:
-            filters.extend(filter_val)
-            self.filter.update({EligibilityType.alias: filters})
+    #     Note:
+    #         This function is not directly interacted with by the user.
 
-        vals = "','".join(filters)
-        a.append("('" + vals + "')")
+    #     """
+    #     a = []
+    #     filters = []
+    #     if isinstance(filter_val, list) and type(filter_val[0]) is tuple:
+    #         for constraint in filter_val:
+    #             for constr in constraint:
+    #                 for val in constr:
+    #                     strlist = constr[val]
+    #                     for i in strlist:
+    #                         if type(i) is str:
+    #                             filters.append(i)
+    #                         else:
+    #                             for j in i:
+    #                                 filters.append(j)
+    #         self.user_constraint.update({EligibilityType.alias: filters})
+    #     else:
+    #         filters.extend(filter_val)
+    #         self.filter.update({EligibilityType.alias: filters})
 
-        b = list(a)
-        f = ' or '.join(b)
-        return f'{f}'
+    #     vals = "','".join(filters)
+    #     a.append("('" + vals + "')")
 
+    #     b = list(a)
+    #     f = ' or '.join(b)
+    #     return f'{f}'
+
+    # -------------------------------------------------------
+    #
+    #
+    #
+    # -------------------------------------------------------
     def __hash__(self):
         return(hash(str(self)))

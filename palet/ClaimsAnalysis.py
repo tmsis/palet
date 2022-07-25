@@ -39,7 +39,6 @@ class ClaimsAnalysis():
         self.alias = None
         self.date_dimension = DateDimension.getInstance()
         self.filter = {}
-        # self.timeunit = None
         self.paletable = None
         self.join_sql = ''
 
@@ -141,8 +140,9 @@ class ClaimsAnalysis():
             for key in self.filter:
                 _in_stmt = []
                 _join = ""
-                if key not in ['SUBMTG_STATE_CD']:
-                    continue
+
+                # if key in ['SUBMTG_STATE_CD']:
+                #     continue
 
                 # get the value(s) in case there are multiple
                 values = self.filter[key]
@@ -154,6 +154,8 @@ class ClaimsAnalysis():
 
             if len(where) > 0:
                 return f"and {' and '.join(where)}"
+            else:
+                return "and 1=1"
 
         else:
             return ''
@@ -170,7 +172,6 @@ class ClaimsAnalysis():
 
         else:
             return ''
-
 
     # -------------------------------------------------------
     #

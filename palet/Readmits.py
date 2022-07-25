@@ -406,6 +406,7 @@ class Readmits(ClaimsAnalysis):
                 ,year
                 {{0}}
                 ,msis_ident_num
+                ,case when sum(readmit_ind) > 0 then 1 else 0 end as indicator
                 ,sum(readmit_ind) as has_readmit
                 ,sum(admit_ind) as has_admit
                 ,sum(readmit_ind) / sum(admit_ind) as readmit_rate
