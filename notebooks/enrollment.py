@@ -20,11 +20,11 @@ sys.path.append('/dbfs/FileStore/shared_uploads/akira/lib')
 
 from palet.DateDimension import DateDimension
 from palet.Enrollment import Enrollment
-from palet.Diagnoses import Diagnoses
-from palet.ServiceCategory import ServiceCategory
-from palet.Readmits import Readmits
-from palet.EligibilityType import EligibilityType
-from palet.CoverageType import CoverageType
+# from palet.Diagnoses import Diagnoses
+# from palet.ServiceCategory import ServiceCategory
+# from palet.Readmits import Readmits
+# from palet.EligibilityType import EligibilityType
+# from palet.CoverageType import CoverageType
 
 # COMMAND ----------
 
@@ -90,12 +90,20 @@ display(api.byState().fetch())
 
 # COMMAND ----------
 
+display(pe.byState().fetch())
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Enrollment by Year, by State, by Gender
 
 # COMMAND ----------
 
 display(api.byGender().fetch())
+
+# COMMAND ----------
+
+display(pe.byGender().fetch())
 
 # COMMAND ----------
 
@@ -167,17 +175,10 @@ display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allc
 
 # COMMAND ----------
 
-# ERROR
-display(Enrollment().byState(['MD']).byGender('F').byYear().having(Readmits.allcause(30)).fetch())
-
-# COMMAND ----------
-
-# ERROR
 display(Enrollment().byState(['MD']).byGender('F').byYear().calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
 
-# ERROR
 display(Enrollment().byState(['MD']).byGender('F').calculate(Readmits.allcause(30)).fetch())
 
 # COMMAND ----------
@@ -190,7 +191,6 @@ enrl.fetch()
 
 # COMMAND ----------
 
-# dis_MD = Enrollment().byYear().mark(Readmits.allcause(30), 'readmits').fetch()
 dis_MD = Enrollment().byState(['MD']).byGender('F').byYear().mark(Readmits.allcause(30), 'readmits')
 
 # COMMAND ----------
@@ -285,22 +285,12 @@ AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 
 
 # COMMAND ----------
 
-diag = Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib, 2)
+api = Enrollment()
 
 # COMMAND ----------
 
-print(diag.sql())
-
-# COMMAND ----------
-
-date_dim = DateDimension.getInstance()
-
-# COMMAND ----------
-
-display(date_dim.df)
-
-# COMMAND ----------
-
+from palet.Diagnoses import Diagnoses
+from palet.ServiceCategory import ServiceCategory
 display(api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib, 2)).fetch())
 
 # COMMAND ----------
