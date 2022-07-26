@@ -285,14 +285,27 @@ AFib = ['I230', 'I231', 'I232', 'I233', 'I234', 'I235', 'I236', 'I237', 'I238', 
 
 # COMMAND ----------
 
-from palet.Diagnoses import Diagnoses
-from palet.ServiceCategory import ServiceCategory
-display(api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib)).fetch())
+diag = Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib, 2)
 
 # COMMAND ----------
 
-# display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.where(ServiceCategory.inpatient, AFib), 'AFib').fetch())
-display(Enrollment(period='partial').byCoverageType().mark(Diagnoses.within([ServiceCategory.inpatient], AFib), 'AFib').fetch())
+print(diag.sql())
+
+# COMMAND ----------
+
+date_dim = DateDimension.getInstance()
+
+# COMMAND ----------
+
+display(date_dim.df)
+
+# COMMAND ----------
+
+display(api.having(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib, 2)).fetch())
+
+# COMMAND ----------
+
+display(Enrollment(counter='partial').byCoverageType().mark(Diagnoses.within([(ServiceCategory.inpatient, 1)], AFib, 2), 'AFib').fetch())
 
 # COMMAND ----------
 
@@ -341,86 +354,6 @@ display(api.byState().fetch())
 # COMMAND ----------
 
 display(api.byMonth().byState().fetch())
-
-# COMMAND ----------
-
-api = Eligibility([6278, 6280], api)
-
-# COMMAND ----------
-
-display(api.byMonth().byState().fetch())
-
-# COMMAND ----------
-
-display(api.byMonth().byState().byAgeRange().byEnrollmentType().fetch())
-
-# COMMAND ----------
-
-type(api)
-
-# COMMAND ----------
-
-type(api)
-
-# COMMAND ----------
-
-api = Eligibility(paletable=api)
-
-# COMMAND ----------
-
-api._runids
-
-# COMMAND ----------
-
-display(api.fetch())
-
-# COMMAND ----------
-
-q = Enrollment().byState().sql()
-
-# COMMAND ----------
-
-print(q)
-
-# COMMAND ----------
-
-from palet.Eligibility import Eligibility
-
-# COMMAND ----------
-
-api = Eligibility()
-
-# COMMAND ----------
-
-api.fetch()
-
-# COMMAND ----------
-
-display(api.byState().fetch()) 
-
-# COMMAND ----------
-
-from palet.Eligibility import Eligibility
-
-# COMMAND ----------
-
-eli = Eligibility([6278])
-
-# COMMAND ----------
-
-eli.fetch()
-
-# COMMAND ----------
-
-display(eli.byState().fetch())
-
-# COMMAND ----------
-
-display(eli.byYear().fetch())
-
-# COMMAND ----------
-
- api = Enrollment(paletable=api)
 
 # COMMAND ----------
 
